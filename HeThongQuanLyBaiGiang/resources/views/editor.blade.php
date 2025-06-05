@@ -41,21 +41,35 @@
         tinymce.init({
             selector: '#editor'
             , license_key: 'gpl'
-            , height: 500
-            , menubar: 'file edit view insert format tools table help'
-            , plugins: [
+            , height: 500,
+
+            // THÊM menu 'elfinder' vào menubar
+            menubar: 'file edit view insert format tools table help elfinder',
+
+            // Cấu hình plugin
+            plugins: [
                 'importcss', 'searchreplace', 'autolink'
                 , 'autosave', 'save', 'directionality', 'code', 'visualblocks', 'visualchars'
                 , 'fullscreen', 'image', 'link', 'media', 'codesample', 'table'
                 , 'charmap', 'pagebreak', 'nonbreaking', 'anchor'
                 , 'insertdatetime', 'advlist', 'lists', 'wordcount'
                 , 'help', 'quickbars', 'emoticons'
-            ]
-            , toolbar: 'undo redo | formatselect | bold italic underline strikethrough | ' +
+            ],
+
+            // Toolbar vẫn giữ nút elfinder
+            toolbar: 'undo redo | formatselect | bold italic underline strikethrough | ' +
                 'alignleft aligncenter alignright alignjustify | outdent indent | ' +
                 'numlist bullist | forecolor backcolor removeformat | ' +
                 'pagebreak | charmap emoticons | fullscreen preview save print | ' +
                 'insertfile image media link codesample | elfinder',
+
+            // THÊM cấu hình menu mới
+            menu: {
+                elfinder: {
+                    title: 'Quản lý file'
+                    , items: 'elfinder_menu'
+                }
+            },
 
             toolbar_sticky: true
             , relative_urls: false
@@ -81,8 +95,32 @@
             },
 
             setup: function(editor) {
+                // NÚT toolbar
                 editor.ui.registry.addButton('elfinder', {
                     text: 'elFinder'
+                    , onAction: function() {
+                        $('#elfinderModal').modal('show');
+                        if (!window.elfinderInstance) {
+                            window.elfinderInstance = $('#elfinder').elfinder({
+                                customData: {
+                                    _token: '{{ csrf_token() }}'
+                                }
+                                , lang: 'en'
+                                , url: '{{ route("elfinder.connector") }}'
+                                , soundPath: '{{ asset("assets/sounds") }}'
+                                , getFileCallback: function(file) {
+                                    editor.insertContent('<img src="' + file.url + '" />');
+                                    $('#elfinderModal').modal('hide');
+                                }
+                                , resizable: false
+                            }).elfinder('instance');
+                        }
+                    }
+                });
+
+                // MENU item cho menubar
+                editor.ui.registry.addMenuItem('elfinder_menu', {
+                    text: 'Mở elFinder'
                     , onAction: function() {
                         $('#elfinderModal').modal('show');
                         if (!window.elfinderInstance) {
@@ -106,6 +144,7 @@
         });
 
     </script>
+
     <script>
         function getUrl(fileUrl) {
             window.parent.postMessage({
