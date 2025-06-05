@@ -42,8 +42,22 @@
             selector: '#editor'
             , license_key: 'gpl'
             , height: 500
-            , plugins: 'image link media code'
-            , toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link image media | code | elfinder'
+            , menubar: 'file edit view insert format tools table help'
+            , plugins: [
+                'importcss', 'searchreplace', 'autolink'
+                , 'autosave', 'save', 'directionality', 'code', 'visualblocks', 'visualchars'
+                , 'fullscreen', 'image', 'link', 'media', 'codesample', 'table'
+                , 'charmap', 'pagebreak', 'nonbreaking', 'anchor'
+                , 'insertdatetime', 'advlist', 'lists', 'wordcount'
+                , 'help', 'quickbars', 'emoticons'
+            ]
+            , toolbar: 'undo redo | formatselect | bold italic underline strikethrough | ' +
+                'alignleft aligncenter alignright alignjustify | outdent indent | ' +
+                'numlist bullist | forecolor backcolor removeformat | ' +
+                'pagebreak | charmap emoticons | fullscreen preview save print | ' +
+                'insertfile image media link codesample | elfinder',
+
+            toolbar_sticky: true
             , relative_urls: false
             , remove_script_host: false
             , document_base_url: "{{ url('/') }}/",
@@ -71,15 +85,13 @@
                     text: 'elFinder'
                     , onAction: function() {
                         $('#elfinderModal').modal('show');
-
-                        // Khởi tạo elFinder nếu chưa có
-                        if (!elfinderInstance) {
-                            elfinderInstance = $('#elfinder').elfinder({
-                                url: '{{ route("elfinder.connector") }}'
-                                , lang: 'en'
-                                , customData: {
+                        if (!window.elfinderInstance) {
+                            window.elfinderInstance = $('#elfinder').elfinder({
+                                customData: {
                                     _token: '{{ csrf_token() }}'
                                 }
+                                , lang: 'en'
+                                , url: '{{ route("elfinder.connector") }}'
                                 , soundPath: '{{ asset("assets/sounds") }}'
                                 , getFileCallback: function(file) {
                                     editor.insertContent('<img src="' + file.url + '" />');
