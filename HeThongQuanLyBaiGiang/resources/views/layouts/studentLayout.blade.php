@@ -1,0 +1,121 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>
+        Trang chủ
+    </title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/student/main.css') }}">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-white border-bottom px-3 fixed-top">
+        <div class="container-fluid">
+            <!-- Nút toggle sidebar -->
+            <button class="navbar-toggler me-2" type="button" id="anHienSidebarBtn" title="Thu gọn / Mở rộng thanh sidebar" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <img alt="Website logo placeholder image" height="24" src="https://placehold.co/50" width="30" />
+                <span>Tên website</span>
+            </a>
+
+            <!-- Nút toggle menu navbar -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#anHienNavbar" aria-controls="anHienNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+
+            <!-- Nội dung navbar -->
+            <div class="collapse navbar-collapse justify-content-between" id="anHienNavbar">
+                <!-- Trái: Dropdown Khoa -->
+                <div class="d-flex align-items-center">
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle text-dark fw-bold text-nowrap" type="button" id="khoaDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                            Khoa
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="khoaDropdownBtn">
+                            <li class="dropdown-submenu dropend">
+                                <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown">Khoa 1</a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-submenu dropend">
+                                        <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown">Môn
+                                            học
+                                            1</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#">Giảng viên 1</a></li>
+                                            <li><a class="dropdown-item" href="#">Giảng viên 2</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="dropdown-item" href="#">Môn học 2</a></li>
+                                </ul>
+                            </li>
+                            <li><a class="dropdown-item" href="#">Khoa 2</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Giữa: Search -->
+                <form class="d-flex me-auto mx-lg-auto my-2 my-lg-0 flex-grow-1 justify-content-end justify-content-lg-center px-3" role="search" style="max-width: 600px;">
+                    <div class="position-relative w-100">
+                        <input class="form-control rounded-pill" type="search" placeholder="Tìm kiếm lớp học phần, học phần, ..." aria-label="Search" />
+                        <i class="fas fa-search search-icon-inside"></i>
+                    </div>
+                </form>
+
+                <!-- Phải: Thông báo + Tên sinh viên -->
+                <div class="d-flex align-items-center">
+                    <!-- Chuông thông báo -->
+                    <div class="dropdown me-3">
+                        <button class="btn btn-link text-dark position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Thông báo">
+                            <i class="fas fa-bell fa-lg"></i>
+                        </button>
+                        <div class="dropdown-menu shadow border-0 p-3 mt-2" aria-labelledby="notificationDropdown" style="width: 300px; border-radius: 12px;">
+                            <h6 class="fw-bold mb-2">Thông báo</h6>
+                            <div class="dropdown-item-text mb-0">Bạn có bài tập mới</div>
+                            <div class="dropdown-item-text mb-0">Lớp học bắt đầu lúc 14h</div>
+                            <!-- Nếu không có thông báo -->
+                            <!-- <p class="text-muted mb-0">Chưa có thông báo nào</p> -->
+                        </div>
+                    </div>
+
+                    <!-- Tên người dùng -->
+                    <div class="dropdown d-flex align-items-center text-nowrap">
+                        <button class="btn btn-link dropdown-toggle d-flex align-items-center text-dark fw-bold text-decoration-none" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="me-2">Xin chào Tên sinh viên</span>
+                            <i class="fas fa-user-circle fa-lg"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#">Thay đổi thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" href="#">Đổi mật khẩu</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="/login/index.html">Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <nav class="sidebar" id="sidebar" aria-label="Sidebar navigation">
+        {{-- @include('layouts.sidebarTrangChu') --}}
+        {{-- @include('layouts.sidebarLopHocPhan') --}}
+        {{-- Render sidebar --}}
+        @yield('sidebar')
+    </nav>
+
+    <main class="content-area" id="mainContent" tabindex="-1">
+        {{-- Render nội dung --}}
+        @yield('content')
+    </main>
+
+    <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('/js/student/main.js') }}"></script>
+</body>
+
+</html>

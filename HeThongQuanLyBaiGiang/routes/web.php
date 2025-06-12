@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Login;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Elfinder\ElfinderController;
 
@@ -12,3 +13,27 @@ Route::any('elfinder/connector', [ElfinderController::class, 'showConnector'])->
 Route::get('/editor', function () {
     return view('editor');
 });
+
+Route::get('/teacher', function () {
+    return view('layouts.teacherLayout');
+});
+
+Route::get('/', function () {
+    return view('layouts.studentLayout');
+});
+
+Route::get('/dang-nhap', function () {
+    return view('login.dangNhap');
+})->name('login');
+
+Route::get('/khoi-phuc-mat-khau', function () {
+    return view('login.khoiPhucMatKhau');
+})->name('forgot');
+
+Route::get('/xac-nhan-otp', function () {
+    return view('login.xacNhanOTP');
+})->name('OTP');
+
+Route::get('/dat-lai-mat-khau', function () {
+    return view('login.datLaiMatKhau');
+})->name('reset');
