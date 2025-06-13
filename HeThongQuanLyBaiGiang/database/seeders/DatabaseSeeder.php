@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\LopHocPhan;
 use App\Models\SinhVien;
 use App\Models\User;
 use App\Models\VaiTro;
@@ -18,7 +19,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             VaiTroSeeder::class,
             NguoiDungSeeder::class,
-            SinhVienSeeder::class
+            SinhVienSeeder::class,
+            KhoaSeeder::class,
+            MonHocSeeder::class,
+            HocPhanSeeder::class,
+            LopHocPhanSeeder::class,
+            DanhSachLopSeeder::class
         ]);
     }
 }

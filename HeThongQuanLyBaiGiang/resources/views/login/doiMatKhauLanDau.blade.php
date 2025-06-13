@@ -2,16 +2,16 @@
 @section('content')
 
 <div class="login100-pic js-tilt" data-tilt>
-    <img src="{{ asset('/img/login/dat-lai-mat-khau.png') }}" alt="ĐẶT LẠI MẬT KHẨU">
+    <img src="{{ asset('/img/login/dat-lai-mat-khau.png') }}" alt="ĐỔI MẬT KHẨU LẦN ĐẦU">
 </div>
 <!--=====TIÊU ĐỀ======-->
 <div class="login100-form validate-form">
     <span class="login100-form-title">
-        <b>ĐẶT LẠI MẬT KHẨU</b>
+        <b>ĐỔI MẬT KHẨU LẦN ĐẦU</b>
     </span>
-    <form method="POST" action="{{ route('resetPass.submit') }}">
+    <form method="POST" action="{{ route('changePassFirst.submit') }}">
         @csrf
-        <input type="hidden" name="email" value="{{ request('email') }}">
+        <input type="hidden" name="username" value="{{ request('username') }}">
         <div class="wrap-input100 validate-input">
             <input autocomplete="off" class="input100" type="password" placeholder="Nhập mật khẩu mới" name="password" id="password">
             <span toggle="#password" class="bx fa-fw bx-hide field-icon click-eye"></span>
@@ -27,12 +27,7 @@
             </span>
         </div>
         <div class="container-login100-form-btn">
-            <button type="submit" class="btn btn-primary">Đặt lại mật khẩu</button>
-        </div>
-        <div class="text-center p-t-12">
-            <a class="txt2" href="{{ route('login') }}">
-                Trở về trang chủ
-            </a>
+            <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
         </div>
     </form>
 </div>

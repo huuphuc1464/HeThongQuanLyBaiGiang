@@ -9,8 +9,10 @@
     <span class="login100-form-title">
         <b>XÁC NHẬN OTP</b>
     </span>
-    <form action="">
-        <div class="wrap-input100 validate-input" data-validate="Bạn cần nhập đúng thông tin như: ex@abc.xyz">
+    <form method="POST" action="{{ route('otp.xacNhan') }}">
+        @csrf
+        <input type="hidden" name="email" value="{{ request('email') }}">
+        <div class="wrap-input100 validate-input">
             <input class="input100" type="text" placeholder="Nhập OTP khôi phục mật khẩu" name="otp" id="otp" value="" />
             <span class="symbol-input100">
                 <i class='bx bx-check-shield'></i>

@@ -7,15 +7,17 @@
     <span class="login100-form-title">
         <b>KHÔI PHỤC MẬT KHẨU</b>
     </span>
-    <form action="">
+    <form action="{{ route('forgot.sendOtp') }}" method="POST">
+        @csrf
         <div class="wrap-input100 validate-input" data-validate="Bạn cần nhập đúng thông tin như: ex@abc.xyz">
-            <input class="input100" type="text" placeholder="Nhập email" name="emailInput" id="emailInput" value="" />
+            <input class="input100" type="text" placeholder="Nhập email" name="email" id="emailInput" value="" />
+
             <span class="symbol-input100">
                 <i class='bx bx-mail-send'></i>
             </span>
         </div>
         <div class="container-login100-form-btn">
-            <button type="submit" class="btn btn-primary">Lấy mật khẩu</button>
+            <button type="submit" class="btn btn-primary">Lấy mã OTP</button>
         </div>
 
         <div class="text-center p-t-12">
