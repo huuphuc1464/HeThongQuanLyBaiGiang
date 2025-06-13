@@ -37,3 +37,12 @@ Route::get('/xac-nhan-otp', function () {
 Route::get('/dat-lai-mat-khau', function () {
     return view('login.datLaiMatKhau');
 })->name('reset');
+
+
+
+
+Route::prefix('admin')->group(function () {
+   Route::get('/quan-ly-khoa', function () {
+    return view('admin.quanLyKhoa');
+   })->name('quanLyKhoa');
+});
