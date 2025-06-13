@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class NguoiDung extends Model
+class NguoiDung extends Authenticatable
 {
     protected $primaryKey = 'MaNguoiDung';
     protected $table = 'nguoi_dung';
@@ -68,5 +69,9 @@ class NguoiDung extends Model
     public function thongBao()
     {
         return $this->hasMany(ThongBao::class, 'MaNguoiTao', 'MaNguoiDung');
+    }
+    public function getAuthPassword()
+    {
+        return $this->MatKhau;
     }
 }
