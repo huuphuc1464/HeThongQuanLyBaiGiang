@@ -39,7 +39,19 @@ Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKh
 
 
 Route::prefix('admin')->group(function () {
-    Route::get('/quan-ly-khoa', function () {
-        return view('admin.quanLyKhoa');
-    })->name('quanLyKhoa');
+    Route::get('/', function () {
+        return view('admin.dashboard');
+    })->name('admin');
+   Route::get('/quan-ly-khoa', function () {
+    return view('admin.quanLyKhoa');
+   })->name('quanLyKhoa');
+   Route::get('/quan-ly-mon-hoc', function () {
+    return view('admin.quanLyMonHoc');
+   })->name('quanLyMonHoc');
+   Route::get('/quan-ly-giang-vien', function () {
+    return view('admin.quanLyGiangVien');
+   })->name('quanLyGiangVien');
+   Route::get('/quan-ly-sinh-vien', function () {
+    return view('admin.quanLySinhVien');
+   })->name('quanLySinhVien');
 });

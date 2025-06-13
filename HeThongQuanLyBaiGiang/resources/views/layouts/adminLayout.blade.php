@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title','Admin - Hệ thống quản lý bài giảng<')< /title>
+    <title>@yield('title','Admin - Hệ thống quản lý bài giảng')</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
             <style>
@@ -41,18 +41,18 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar position-fixed">
-        <div class="p-3 text-center border-bottom border-secondary">
-            <h5 class="text-white">Quản trị hệ thống</h5>
-        </div>
-        <a href="/admin/dashboard"><i class="fas fa-home me-2"></i> Dashboard</a>
-        <a href="/admin/quanlykhoa"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
-        <a href="/admin/quanlymonhoc"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-        <a href="/admin/quanlygiangvien"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
-        <a href="/admin/quanlysinhvien"><i class="fas fa-user-graduate me-2"></i> Quản lý Sinh viên</a>
-        <a href="/admin/caidat"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
+<!-- Sidebar -->
+<div class="sidebar position-fixed">
+    <div class="p-3 text-center border-bottom border-secondary">
+        <h5 class="text-white">Quản trị hệ thống</h5>
     </div>
+    <a href="{{ route('admin') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+    <a href="{{ route('quanLyKhoa') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
+    <a href="{{ route('quanLyMonHoc') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
+    <a href="{{ route('quanLyGiangVien') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
+    <a href="{{ route('quanLySinhVien') }}"><i class="fas fa-user-graduate me-2"></i> Quản lý Sinh viên</a>
+    <a href="/admin/caidat"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
+</div>
 
     <!-- Content -->
     <div class="content">

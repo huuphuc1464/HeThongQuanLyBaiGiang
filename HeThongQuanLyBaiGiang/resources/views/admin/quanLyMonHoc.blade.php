@@ -1,19 +1,27 @@
 @extends('layouts.adminLayout')
-@section('title','Admin - Quản lý Khoa')
+
 @section('content')
 <div class="container">
-    <h2 class="mb-4">Quản lý Khoa</h2>
+    <h2 class="mb-4">Quản lý Môn học</h2>
 
-    <!-- Tìm kiếm khoa -->
+    <!-- Tìm kiếm và lọc môn học -->
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Tìm kiếm Khoa</span>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThemKhoa">Thêm Khoa</button>
+            <span>Tìm kiếm & Lọc Môn học</span>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThemMonHoc">Thêm Môn học</button>
         </div>
         <div class="card-body">
             <form class="row g-3">
-                <div class="col-md-10">
-                    <input type="text" class="form-control" placeholder="Nhập tên khoa cần tìm">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" placeholder="Nhập tên môn học cần tìm">
+                </div>
+                <div class="col-md-5">
+                    <select class="form-select" id="filterKhoa" name="filterKhoa">
+                        <option value="">-- Lọc theo Khoa --</option>
+                        <option value="1">Công nghệ thông tin</option>
+                        <option value="2">Kinh tế</option>
+                        <option value="3">Ngoại ngữ</option>
+                    </select>
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
@@ -22,15 +30,16 @@
         </div>
     </div>
 
-    <!-- Danh sách các khoa (mẫu cứng) -->
+    <!-- Danh sách môn học -->
     <div class="card">
-        <div class="card-header">Danh sách Khoa</div>
+        <div class="card-header">Danh sách Môn học</div>
         <div class="card-body">
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Tên Khoa</th>
+                        <th>Tên Môn học</th>
+                        <th>Khoa</th>
                         <th>Mô tả</th>
                         <th>Thao tác</th>
                     </tr>
@@ -39,10 +48,11 @@
                     @for ($i = 1; $i <= 10; $i++)
                     <tr>
                         <td>{{ $i }}</td>
-                        <td>Khoa {{ $i }}</td>
-                        <td>Mô tả khoa {{ $i }}</td>
+                        <td>Môn học {{ $i }}</td>
+                        <td>Khoa {{ ($i % 3) + 1 }}</td>
+                        <td>Mô tả môn học {{ $i }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalSuaKhoa">Sửa</button>
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalSuaMonHoc">Sửa</button>
                             <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa">Xóa</button>
                         </td>
                     </tr>
@@ -68,19 +78,28 @@
     </div>
 </div>
 
-<!-- Modal Thêm Khoa -->
-<div class="modal fade" id="modalThemKhoa" tabindex="-1" aria-labelledby="themKhoaLabel" aria-hidden="true">
+<!-- Modal Thêm Môn học -->
+<div class="modal fade" id="modalThemMonHoc" tabindex="-1" aria-labelledby="themMonHocLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="themKhoaLabel">Thêm Khoa Mới</h5>
+                <h5 class="modal-title" id="themMonHocLabel">Thêm Môn học Mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form>
                     <div class="mb-3">
-                        <label for="tenKhoa" class="form-label">Tên Khoa</label>
-                        <input type="text" class="form-control" id="tenKhoa" name="tenKhoa" required>
+                        <label for="tenMonHoc" class="form-label">Tên Môn học</label>
+                        <input type="text" class="form-control" id="tenMonHoc" name="tenMonHoc" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="khoa" class="form-label">Khoa</label>
+                        <select class="form-select" id="khoa" name="khoa" required>
+                            <option value="">-- Chọn Khoa --</option>
+                            <option value="1">Công nghệ thông tin</option>
+                            <option value="2">Kinh tế</option>
+                            <option value="3">Ngoại ngữ</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="moTa" class="form-label">Mô tả</label>
@@ -93,23 +112,31 @@
     </div>
 </div>
 
-<!-- Modal Sửa Khoa (mẫu cứng, sau này load động dữ liệu vào) -->
-<div class="modal fade" id="modalSuaKhoa" tabindex="-1" aria-labelledby="suaKhoaLabel" aria-hidden="true">
+<!-- Modal Sửa Môn học (mẫu cứng) -->
+<div class="modal fade" id="modalSuaMonHoc" tabindex="-1" aria-labelledby="suaMonHocLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="suaKhoaLabel">Sửa Khoa</h5>
+                <h5 class="modal-title" id="suaMonHocLabel">Sửa Môn học</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form>
                     <div class="mb-3">
-                        <label for="tenKhoaSua" class="form-label">Tên Khoa</label>
-                        <input type="text" class="form-control" id="tenKhoaSua" name="tenKhoaSua" value="Công nghệ thông tin">
+                        <label for="tenMonHocSua" class="form-label">Tên Môn học</label>
+                        <input type="text" class="form-control" id="tenMonHocSua" name="tenMonHocSua" value="Môn học mẫu">
+                    </div>
+                    <div class="mb-3">
+                        <label for="khoaSua" class="form-label">Khoa</label>
+                        <select class="form-select" id="khoaSua" name="khoaSua">
+                            <option value="1">Công nghệ thông tin</option>
+                            <option value="2">Kinh tế</option>
+                            <option value="3">Ngoại ngữ</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="moTaSua" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="moTaSua" name="moTaSua" rows="3">Khoa CNTT</textarea>
+                        <textarea class="form-control" id="moTaSua" name="moTaSua" rows="3">Mô tả mẫu</textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
@@ -127,7 +154,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Bạn có chắc chắn muốn xóa khoa này?
+                Bạn có chắc chắn muốn xóa môn học này?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
