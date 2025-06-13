@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\NguoiDung;
+use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -44,7 +47,7 @@ class AuthController extends Controller
             return back()->with('swal_warning', 'Mật khẩu đang để trống...');
         }
 
-        $user = NguoiDung::where('TenTaiKhoan', $TenTaiKhoan)->first();
+        $user = NguoiDung::where('TenTaiKhoan', $TenTaiKhoan)->where('TrangThai', 1)->first();
 
         if (!$user) {
             return back()->with('swal_error', 'Tài khoản không tồn tại...');
@@ -57,16 +60,18 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
+        if ($user->LanDauDangNhap) {
+            return redirect()->route('changePassFirst.form', ['username' => $user->TenTaiKhoan])
+                ->with('swal_success', 'Đăng nhập thành công. Vui lòng đổi mật khẩu trong lần đăng nhập đầu tiên');
+        }
+
         $role = $user->MaVaiTro;
 
         if ($role == 1) {
             return redirect('/admin');
         } elseif ($role == 2) {
             return redirect('/teacher');
-        } elseif ($role == 3) {
-            return redirect('/');
         }
-
         return redirect('/')->with('swal_success', 'Đăng nhập thành công');
     }
     public function logout(Request $request)
@@ -82,10 +87,149 @@ class AuthController extends Controller
         return view('login.khoiPhucMatKhau');
     }
 
+    public function guiOtpKhoiPhuc(Request $request, EmailService $emailService)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $email = $request->email;
+        $exists = NguoiDung::where('Email', $email)->exists();
+
+        if (!$exists) {
+            return back()->with('swal_error', 'Email không tồn tại trong hệ thống.');
+        }
+
+        $otp = rand(100000, 999999);
+        $body = "
+            <p>Xin chào,</p>
+            <p>Bạn đã yêu cầu khôi phục mật khẩu. Mã OTP của bạn là:</p>
+            <h2 style='color: #2d3748;'>$otp</h2>
+            <p>Mã này có giá trị trong vòng 5 phút.</p>
+            <p>Vui lòng không chia sẻ mã này với bất kỳ ai.</p>
+            <p>Thân mến,<br>Hệ thống Quản lý Bài giảng</p>
+        ";
+
+        $success = $emailService->sendEmail($email, 'Mã OTP khôi phục mật khẩu', $body);
+
+        if ($success) {
+            Session::put('otp_data' . $email, [
+                'email' => $email,
+                'otp' => $otp,
+                'expires_at' => now()->addMinutes(5)
+            ]);
+            return redirect()->route('otp.form', ['email' => $request->email])
+                ->with('swal_success', 'OTP đã được gửi đến email.');
+        }
+        return back()->with('swal_error', 'Gửi email thất bại. Vui lòng thử lại sau.');
+    }
+
+    public function hienThiFormXacNhanOTP()
+    {
+        return view('login.xacNhanOTP');
+    }
+
+    public function xacNhanOTP(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required'
+        ]);
+
+        $email = $request->email;
+        $exists = NguoiDung::where('Email', $email)->exists();
+
+        if (!$exists) {
+            return back()->with('swal_error', 'Email không tồn tại trong hệ thống.');
+        }
+
+        $otpData = Session::get('otp_data' . $email);
+        if (!$otpData || $otpData['email'] !== $email) {
+            return back()->with('swal_error', 'Không tìm thấy OTP cho email này.');
+        }
+
+        if ($otpData['otp'] !== (int)$request->otp) {
+            return back()->with('swal_error', 'OTP không chính xác.');
+        }
+
+        if (now()->gt($otpData['expires_at'])) {
+            Session::forget('otp_data' . $email);
+            return back()->with('swal_error', 'Mã OTP đã hết hạn.');
+        }
+        Session::forget('otp_data' . $email);
+        return redirect()->route('resetPass.form', ['email' => $email])
+            ->with('swal_success', 'Xác nhận OTP thành công.');
+    }
+
     public function hienThiFormDatLaiMatKhau()
     {
         return view('login.datLaiMatKhau');
     }
+
+    public function datLaiMatKhau(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => [
+                'required',
+                'string',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^_-])[A-Za-z\d@$!%*#?&^_-]{8,}$/',
+                'confirmed'
+            ],
+        ], [
+            'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->with('swal_error', $validator->errors()->first());
+        }
+
+        $user = NguoiDung::where('Email', $request->email)->first();
+
+        if (!$user) {
+            return back()->with('swal_error', 'Email không tồn tại.');
+        }
+
+        $user->MatKhau = Hash::make($request->password);
+        $user->save();
+        return redirect()->route('login')->with('swal_success', 'Mật khẩu đã được đặt lại. Vui lòng đăng nhập lại.');
+    }
+
+    public function hienThiFormDoiMatKhauLanDau()
+    {
+        return view('login.doiMatKhauLanDau');
+    }
+
+    public function doiMatKhauLanDau(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => [
+                'required',
+                'string',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^_-])[A-Za-z\d@$!%*#?&^_-]{8,}$/',
+                'confirmed'
+            ],
+        ], [
+            'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->with('swal_error', $validator->errors()->first());
+        }
+
+        $user = NguoiDung::where('TenTaiKhoan', $request->username)->first();
+
+        if (!$user) {
+            return back()->with('swal_error', 'Tài khoản không tồn tại.');
+        }
+
+        $user->MatKhau = Hash::make($request->password);
+        $user->LanDauDangNhap = 0;
+        $user->save();
+        return redirect()->route('login');
+    }
+
 
     public function username()
     {
