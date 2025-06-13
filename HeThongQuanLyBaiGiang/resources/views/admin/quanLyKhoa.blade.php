@@ -1,5 +1,5 @@
 @extends('layouts.adminLayout')
-@section('title','Quản lý Khoa')
+@section('title','Admin - Quản lý Khoa')
 @section('content')
 <div class="container">
     <h2 class="mb-4">Quản lý Khoa</h2>
