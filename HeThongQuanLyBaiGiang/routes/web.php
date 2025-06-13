@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Login;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Elfinder\ElfinderController;
 
@@ -16,33 +18,24 @@ Route::get('/editor', function () {
 
 Route::get('/teacher', function () {
     return view('layouts.teacherLayout');
-});
+})->middleware(['auth', RoleMiddleware::class . ':2']);
 
 Route::get('/', function () {
     return view('layouts.studentLayout');
 });
 
-Route::get('/dang-nhap', function () {
-    return view('login.dangNhap');
-})->name('login');
-
-Route::get('/khoi-phuc-mat-khau', function () {
-    return view('login.khoiPhucMatKhau');
-})->name('forgot');
-
-Route::get('/xac-nhan-otp', function () {
-    return view('login.xacNhanOTP');
-})->name('OTP');
-
-Route::get('/dat-lai-mat-khau', function () {
-    return view('login.datLaiMatKhau');
-})->name('reset');
+Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
+Route::post('/dang-nhap', [AuthController::class, 'dangNhap'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/xac-nhan-otp', [AuthController::class, 'xacNhanOTP'])->name('OTP');
+Route::get('/khoi-phuc-mat-khau', [AuthController::class, 'hienThiFormKhoiPhuc'])->name('forgot');
+Route::get('/dat-lai-mat-khau', [AuthController::class, 'hienThiFormDatLaiMatKhau'])->name('reset');
 
 
 
 
 Route::prefix('admin')->group(function () {
-   Route::get('/quan-ly-khoa', function () {
-    return view('admin.quanLyKhoa');
-   })->name('quanLyKhoa');
+    Route::get('/quan-ly-khoa', function () {
+        return view('admin.quanLyKhoa');
+    })->name('quanLyKhoa');
 });

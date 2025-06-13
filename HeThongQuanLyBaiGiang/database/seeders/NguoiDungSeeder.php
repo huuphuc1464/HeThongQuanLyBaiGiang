@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class NguoiDungSeeder extends Seeder
 {
@@ -45,7 +46,7 @@ class NguoiDungSeeder extends Seeder
             [
                 'MaVaiTro' => 2, // teacher
                 'TenTaiKhoan' => '0306221464@caothang.edu.vn',
-                'MatKhau' => bcrypt('Teacher123@'),
+                'MatKhau' => Hash::make('Teacher123@'),
                 'Email' => '0306221464@caothang.edu.vn',
                 'HoTen' => 'Trần Hửu Phúc',
                 'SoDienThoai' => '0901234566',
@@ -59,7 +60,7 @@ class NguoiDungSeeder extends Seeder
             [
                 'MaVaiTro' => 2, // Teacher
                 'TenTaiKhoan' => '0306221407@caothang.edu.vn',
-                'MatKhau' => bcrypt('Teacher123@'),
+                'MatKhau' => Hash::make('Teacher123@'),
                 'Email' => '0306221407@caothang.edu.vn',
                 'HoTen' => 'Ngô Võ Đức Duy',
                 'SoDienThoai' => '0912345677',
