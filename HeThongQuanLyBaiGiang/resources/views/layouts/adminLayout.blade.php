@@ -47,10 +47,10 @@
         <h5 class="text-white">Quản trị hệ thống</h5>
     </div>
     <a href="{{ route('admin') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
-    <a href="{{ route('quanLyKhoa') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
-    <a href="{{ route('quanLyMonHoc') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-    <a href="{{ route('quanLyGiangVien') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
-    <a href="{{ route('quanLySinhVien') }}"><i class="fas fa-user-graduate me-2"></i> Quản lý Sinh viên</a>
+    <a href="{{ route('admin.quan-ly-khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
+    <a href="{{ route('admin.quan-ly-mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
+    <a href="{{ route('admin.quan-ly-giang-vien.danh-sach') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
+    <a href="{{ route('admin.quan-ly-sinh-vien.danh-sach') }}"><i class="fas fa-user-graduate me-2"></i> Quản lý Sinh viên</a>
     <a href="/admin/caidat"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
 </div>
 

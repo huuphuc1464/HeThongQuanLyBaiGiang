@@ -11,9 +11,9 @@
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThemKhoa">Thêm Khoa</button>
         </div>
         <div class="card-body">
-            <form class="row g-3">
+            <form class="row g-3" method="GET" action="{{ route('admin.quan-ly-khoa.danh-sach') }}">
                 <div class="col-md-10">
-                    <input type="text" class="form-control" placeholder="Nhập tên khoa cần tìm">
+                    <input type="text" class="form-control" name="search" placeholder="Nhập tên khoa cần tìm" value="{{ $search ?? '' }}">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
@@ -22,10 +22,22 @@
         </div>
     </div>
 
-    <!-- Danh sách các khoa (mẫu cứng) -->
+    <!-- Danh sách các khoa -->
     <div class="card">
         <div class="card-header">Danh sách Khoa</div>
         <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -36,34 +48,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for ($i = 1; $i <= 10; $i++)
+                    @forelse($danhSachKhoa as $index => $khoa)
                     <tr>
-                        <td>{{ $i }}</td>
-                        <td>Khoa {{ $i }}</td>
-                        <td>Mô tả khoa {{ $i }}</td>
+                        <td>{{ $danhSachKhoa->firstItem() + $index }}</td>
+                        <td>{{ $khoa->TenKhoa }}</td>
+                        <td>{{ $khoa->MoTa }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalSuaKhoa">Sửa</button>
-                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa">Xóa</button>
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalSuaKhoa" 
+                                data-id="{{ $khoa->MaKhoa }}"
+                                data-ten="{{ $khoa->TenKhoa }}"
+                                data-mota="{{ $khoa->MoTa }}">Sửa</button>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa"
+                                data-id="{{ $khoa->MaKhoa }}">Xóa</button>
                         </td>
                     </tr>
-                    @endfor
+                    @empty
+                    <tr>
+                        <td colspan="4" class="text-center">Không có dữ liệu</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
 
             <!-- Phân trang -->
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Trước</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Sau</a>
-                    </li>
-                </ul>
-            </nav>
+            <div class="d-flex justify-content-center">
+                {{ $danhSachKhoa->appends(['search' => $search])->links() }}
+            </div>
         </div>
     </div>
 </div>
@@ -77,14 +87,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form action="{{ route('admin.quan-ly-khoa.them-moi') }}" method="POST">
+                    @csrf
                     <div class="mb-3">
                         <label for="tenKhoa" class="form-label">Tên Khoa</label>
-                        <input type="text" class="form-control" id="tenKhoa" name="tenKhoa" required>
+                        <input type="text" class="form-control" id="tenKhoa" name="TenKhoa" required>
                     </div>
                     <div class="mb-3">
                         <label for="moTa" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="moTa" name="moTa" rows="3"></textarea>
+                        <textarea class="form-control" id="moTa" name="MoTa" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </form>
@@ -93,7 +104,7 @@
     </div>
 </div>
 
-<!-- Modal Sửa Khoa (mẫu cứng, sau này load động dữ liệu vào) -->
+<!-- Modal Sửa Khoa -->
 <div class="modal fade" id="modalSuaKhoa" tabindex="-1" aria-labelledby="suaKhoaLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -102,14 +113,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="formSuaKhoa" method="POST">
+                    @csrf
+                    @method('PUT')
                     <div class="mb-3">
                         <label for="tenKhoaSua" class="form-label">Tên Khoa</label>
-                        <input type="text" class="form-control" id="tenKhoaSua" name="tenKhoaSua" value="Công nghệ thông tin">
+                        <input type="text" class="form-control" id="tenKhoaSua" name="TenKhoa" required>
                     </div>
                     <div class="mb-3">
                         <label for="moTaSua" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="moTaSua" name="moTaSua" rows="3">Khoa CNTT</textarea>
+                        <textarea class="form-control" id="moTaSua" name="MoTa" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
@@ -131,9 +144,39 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-danger">Xóa</button>
+                <form id="formXoaKhoa" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-@endsection
+
+@push('scripts')
+<script>
+    // Xử lý sự kiện khi mở modal sửa
+    $('#modalSuaKhoa').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        var ten = button.data('ten');
+        var mota = button.data('mota');
+        
+        var modal = $(this);
+        modal.find('#formSuaKhoa').attr('action', '/admin/quan-ly-khoa/' + id);
+        modal.find('#tenKhoaSua').val(ten);
+        modal.find('#moTaSua').val(mota);
+    });
+
+    // Xử lý sự kiện khi mở modal xóa
+    $('#modalXacNhanXoa').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        
+        var modal = $(this);
+        modal.find('#formXoaKhoa').attr('action', '/admin/quan-ly-khoa/' + id);
+    });
+</script>
+@endpush
+@endsection 
