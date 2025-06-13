@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             KhoaSeeder::class,
             MonHocSeeder::class,
             HocPhanSeeder::class,
-            LopHocPhanSeeder::class
+            LopHocPhanSeeder::class,
+            DanhSachLopSeeder::class
         ]);
     }
 }
