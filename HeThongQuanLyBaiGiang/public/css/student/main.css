@@ -252,6 +252,15 @@ a.text-decoration-none.text-dark:hover {
     z-index: 1050;
 }
 
+.dropdown-submenu {
+    width: 230px;
+}
+
+.dropdown-menu {
+    min-width: unset;
+    width: 230px !important;
+}
+
 .dropdown-submenu:hover>.dropdown-menu,
 .dropdown-submenu>.dropdown-menu.show {
     display: block !important;
@@ -305,4 +314,12 @@ a.text-decoration-none.text-dark:hover {
     .sidebar.collapsed+main.content-area {
         margin-left: 60px;
     }
+}
+
+/* Hiện ... khi chữ quá dài*/
+.text-truncate {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

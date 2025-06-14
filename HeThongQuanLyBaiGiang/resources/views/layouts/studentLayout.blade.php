@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <title>
-        Trang chủ
+        @yield('title')
     </title>
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
@@ -18,43 +18,41 @@
             <button class="navbar-toggler me-2" type="button" id="anHienSidebarBtn" title="Thu gọn / Mở rộng thanh sidebar" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-
             <!-- Logo -->
             <a class="navbar-brand d-flex align-items-center gap-2" href="#">
                 <img alt="Website logo placeholder image" height="24" src="https://placehold.co/50" width="30" />
                 <span>Tên website</span>
             </a>
-
             <!-- Nút toggle menu navbar -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#anHienNavbar" aria-controls="anHienNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-ellipsis-v"></i>
             </button>
-
             <!-- Nội dung navbar -->
             <div class="collapse navbar-collapse justify-content-between" id="anHienNavbar">
                 <!-- Trái: Dropdown Khoa -->
                 <div class="d-flex align-items-center">
                     <div class="dropdown">
-                        <button class="btn dropdown-toggle text-dark fw-bold text-nowrap" type="button" id="khoaDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn dropdown-toggle text-dark fw-bold text-nowrap" style="border: none; box-shadow: none;" type="button" id="khoaDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
                             Khoa
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="khoaDropdownBtn">
+                            @foreach ($danhSachKhoa as $khoa)
                             <li class="dropdown-submenu dropend">
-                                <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown">Khoa 1</a>
+                                <a class="dropdown-item dropdown-toggle text-truncate" href="#" data-bs-toggle="dropdown">{{ $khoa['TenKhoa'] }}</a>
                                 <ul class="dropdown-menu">
+                                    @foreach ($khoa['MonHoc'] as $mon)
                                     <li class="dropdown-submenu dropend">
-                                        <a class="dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown">Môn
-                                            học
-                                            1</a>
+                                        <a class="dropdown-item dropdown-toggle text-truncate" href="#" data-bs-toggle="dropdown">{{ $mon['TenMonHoc'] }}</a>
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item" href="#">Giảng viên 1</a></li>
-                                            <li><a class="dropdown-item" href="#">Giảng viên 2</a></li>
+                                            @foreach ($mon['GiangVien'] as $gv)
+                                            <li><a class="dropdown-item text-truncate" href="#">{{ $gv['TenGiangVien'] }}</a></li>
+                                            @endforeach
                                         </ul>
                                     </li>
-                                    <li><a class="dropdown-item" href="#">Môn học 2</a></li>
+                                    @endforeach
                                 </ul>
                             </li>
-                            <li><a class="dropdown-item" href="#">Khoa 2</a></li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
@@ -76,17 +74,23 @@
                         </button>
                         <div class="dropdown-menu shadow border-0 p-3 mt-2" aria-labelledby="notificationDropdown" style="width: 300px; border-radius: 12px;">
                             <h6 class="fw-bold mb-2">Thông báo</h6>
-                            <div class="dropdown-item-text mb-0">Bạn có bài tập mới</div>
-                            <div class="dropdown-item-text mb-0">Lớp học bắt đầu lúc 14h</div>
-                            <!-- Nếu không có thông báo -->
-                            <!-- <p class="text-muted mb-0">Chưa có thông báo nào</p> -->
+                            @if ($thongBao->isEmpty())
+                            <p class="text-muted mb-0">Chưa có thông báo nào</p>
+                            @else
+                            @foreach ($thongBao as $tb)
+                            <div class="dropdown-item-text mb-0 text-truncate" title="{{ $tb->NoiDung }}">
+                                {{ $tb->NoiDung }}
+                            </div>
+                            @endforeach
+                            @endif
                         </div>
                     </div>
 
                     <!-- Tên người dùng -->
                     <div class="dropdown d-flex align-items-center text-nowrap">
                         <button class="btn btn-link dropdown-toggle d-flex align-items-center text-dark fw-bold text-decoration-none" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="me-2">Xin chào Tên sinh viên</span>
+                            <input type="hidden" name="maNguoiDung" value="{{ $maNguoiDung }}">
+                            <span class="me-2">Xin chào {{ $tenNguoiDung }}</span>
                             <i class="fas fa-user-circle fa-lg"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -98,7 +102,8 @@
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
                             </form>
-                            <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng
+                                    xuất</a></li>
                         </ul>
                     </div>
                 </div>
@@ -106,9 +111,6 @@
         </div>
     </nav>
     <nav class="sidebar" id="sidebar" aria-label="Sidebar navigation">
-        {{-- @include('layouts.sidebarTrangChu') --}}
-        {{-- @include('layouts.sidebarLopHocPhan') --}}
-        {{-- Render sidebar --}}
         @yield('sidebar')
     </nav>
 
@@ -117,7 +119,8 @@
         @yield('content')
     </main>
 
-    <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+    </script>
     <script src="{{ asset('/js/student/main.js') }}"></script>
 </body>
 
