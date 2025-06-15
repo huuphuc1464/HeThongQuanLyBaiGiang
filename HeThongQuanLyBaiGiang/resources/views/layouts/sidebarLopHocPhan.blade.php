@@ -1,7 +1,7 @@
  <!-- Trang chủ -->
  <ul class="nav flex-column duongKe">
      <li class="nav-item mt-2">
-         <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
+         <a class="nav-link d-flex align-items-center gap-2 text-dark" href="/">
              <i class="fas fa-home"></i>
              <span>Trang chủ</span>
          </a>

@@ -9,6 +9,7 @@
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/student/main.css') }}">
+    @yield('style')
 </head>
 
 <body>
@@ -19,7 +20,7 @@
                 <i class="fas fa-bars"></i>
             </button>
             <!-- Logo -->
-            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
                 <img alt="Website logo placeholder image" height="24" src="https://placehold.co/50" width="30" />
                 <span>Tên website</span>
             </a>
@@ -95,7 +96,8 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="#">Thay đổi thông tin cá nhân</a></li>
-                            <li><a class="dropdown-item" href="#">Đổi mật khẩu</a></li>
+                            <li><a class="dropdown-item" href="{{ route('sinhvien.doi-mat-khau') }}">Đổi mật khẩu</a></li>
+
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -115,6 +117,20 @@
     </nav>
 
     <main class="content-area" id="mainContent" tabindex="-1">
+        @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         {{-- Render nội dung --}}
         @yield('content')
     </main>
@@ -122,6 +138,7 @@
     <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
     </script>
     <script src="{{ asset('/js/student/main.js') }}"></script>
+    @yield('scripts')
 </body>
 
 </html>

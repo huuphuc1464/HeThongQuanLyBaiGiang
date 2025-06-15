@@ -41,4 +41,9 @@ class HomeController extends Controller
             ->get();
         return view('sinhvien.trangChu', compact('danhSachBaiGiang'));
     }
+
+    public function hienFormDoiMatKhau()
+    {
+        return view('sinhvien.doiMatKhau');
+    }
 }

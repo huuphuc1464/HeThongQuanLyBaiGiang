@@ -36,16 +36,15 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="#">Thông tin tài khoản</a></li>
-                        <li><a class="dropdown-item" href="#">Đổi mật khẩu</a></li>
+                        <li><a class="dropdown-item " href="{{ route('giangvien.doi-mat-khau') }}">Đổi mật khẩu</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
-
                         <li>
-                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 Đăng xuất
                             </a>
                         </li>
@@ -68,6 +67,20 @@
             </div>
 
             <div class="row">
+                @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+
+                @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
                 <!-- Nội dung chính -->
                 @yield('content')
             </div>

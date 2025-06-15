@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Models\NguoiDung;
 use App\Services\EmailService;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class AuthController extends Controller
 
             return match ((int) $role) {
                 1 => redirect('/admin'),
-                2 => redirect('/teacher'),
+                2 => redirect('/giang-vien'),
                 3 => redirect('/')
             };
         }
@@ -228,6 +229,38 @@ class AuthController extends Controller
         $user->LanDauDangNhap = 0;
         $user->save();
         return redirect()->route('login');
+    }
+
+    public function doiMatKhau(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'oldPassword' => 'required',
+            'newPassword' => [
+                'required',
+                'string',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^_-])[A-Za-z\d@$!%*#?&^_-]{8,}$/',
+                'confirmed'
+            ]
+        ], [
+            'oldPassword.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+            'newPassword.required' => 'Vui lòng nhập mật khẩu mới.',
+            'newPassword.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'newPassword.confirmed' => 'Xác nhận mật khẩu không khớp.'
+        ]);
+
+        $userId = Auth::id();
+        $user = NguoiDung::find($userId);
+        if (!$user || !Hash::check($request->oldPassword, $user->MatKhau)) {
+            return back()->withErrors(['oldPassword' => 'Mật khẩu hiện tại không đúng.']);
+        }
+        $user->MatKhau = Hash::make($request->newPassword);
+        $user->save();
+
+        return redirect()->back()->with('success', 'Đổi mật khẩu thành công.');
     }
 
 

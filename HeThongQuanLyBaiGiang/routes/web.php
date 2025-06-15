@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\GiangVien\HomeController as GiangVienHomeController;
 use App\Http\Controllers\Login;
-use App\Http\Controllers\SinhVien\HomeController;
+use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Elfinder\ElfinderController;
@@ -18,7 +19,7 @@ Route::get('/editor', function () {
     return view('editor');
 });
 
-Route::get('/teacher', function () {
+Route::get('/giang-vien', function () {
     return view('layouts.teacherLayout');
 })->middleware(['auth', RoleMiddleware::class . ':2']);
 
@@ -34,9 +35,10 @@ Route::post('/dat-lai-mat-khau', [AuthController::class, 'datLaiMatKhau'])->name
 Route::get('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'hienThiFormDoiMatKhauLanDau'])->name('changePassFirst.form');
 Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKhauLanDau'])->name('changePassFirst.submit');
 
-Route::get('/', [HomeController::class, 'hienThiDanhSachBaiGiang'])->name('sinhvien.bai-giang')->middleware(['auth', RoleMiddleware::class . ':3']);
-
-
+Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->name('sinhvien.bai-giang')->middleware(['auth', RoleMiddleware::class . ':3']);
+Route::get('/doi-mat-khau', [SinhVienHomeController::class, 'hienFormDoiMatKhau'])->name('sinhvien.doi-mat-khau');
+Route::get('/giang-vien/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('giangvien.doi-mat-khau');
+Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');
 
 
 Route::prefix('admin')->group(function () {

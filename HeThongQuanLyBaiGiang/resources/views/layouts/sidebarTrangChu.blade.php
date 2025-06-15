@@ -1,6 +1,6 @@
 <ul class="nav flex-column duongke">
     <li class="nav-item mt-2">
-        <a aria-current="page" class="nav-link active d-flex align-items-center gap-2 text-dark" href="#">
+        <a aria-current="page" class="nav-link active d-flex align-items-center gap-2 text-dark" href="/">
             <i class="fas fa-home"></i>
             <span>
                 Trang chủ
