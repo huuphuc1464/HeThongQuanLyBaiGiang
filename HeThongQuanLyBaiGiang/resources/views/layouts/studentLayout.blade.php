@@ -95,7 +95,7 @@
                             <i class="fas fa-user-circle fa-lg"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="#">Thay đổi thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" href="{{ route('sinhvien.doi-thong-tin') }}">Thay đổi thông tin cá nhân</a></li>
                             <li><a class="dropdown-item" href="{{ route('sinhvien.doi-mat-khau') }}">Đổi mật khẩu</a></li>
 
                             <li>
