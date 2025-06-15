@@ -1,5 +1,5 @@
 @extends('layouts.teacherLayout')
-@section('title','Admin - Quản lý Khoa')
+@section('title','Giảng viên - Đổi mật khẩu')
 @section('tenTrang', 'Đổi mật khẩu')
 @section('content')
 @include('components.doiMatKhau')

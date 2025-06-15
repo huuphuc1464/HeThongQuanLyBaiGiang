@@ -229,7 +229,10 @@ a.text-decoration-none.text-dark:hover {
 
 .anh-giang-vien {
     border-radius: 50%;
-    width: 20px;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+        border: 1px solid #ccc;
 }
 
 /* === Đường kẻ ngay nút trang chủ === */

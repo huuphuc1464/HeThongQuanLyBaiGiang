@@ -11,7 +11,11 @@
                         <span class="icon-lock-key">
                             <i class="fas fa-key"></i>
                         </span>
+
                     </div>
+                    @error('oldPassword')
+                    <div class="text-danger mb-2" style="margin-top: -10px">{{ $message }}</div>
+                    @enderror
                     <div class="form-group col-12">
                         <input autocomplete="off" class=" form-control" type="password" placeholder="Nhập mật khẩu mới" name="newPassword" id="newPassword" required>
                         <span toggle="#newPassword" class="far fa-fw fa-eye field-icon click-eye"></span>
@@ -19,6 +23,9 @@
                             <i class="fas fa-unlock-alt"></i>
                         </span>
                     </div>
+                    @error('newPassword')
+                    <div class="text-danger mb-2" style="margin-top: -10px">{{ $message }}</div>
+                    @enderror
                     <div class="form-group col-12">
                         <input autocomplete="off" class=" form-control" type="password" placeholder="Nhập xác nhận mật khẩu mới" name="newPassword_confirmation" id="newPassword_confirmation" required>
                         <span toggle="#newPassword_confirmation" class="far fa-fw fa-eye field-icon click-eye"></span>

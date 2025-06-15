@@ -39,7 +39,8 @@ Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->nam
 Route::get('/doi-mat-khau', [SinhVienHomeController::class, 'hienFormDoiMatKhau'])->name('sinhvien.doi-mat-khau');
 Route::get('/giang-vien/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('giangvien.doi-mat-khau');
 Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');
-
+Route::get('/giang-vien/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('giangvien.doi-thong-tin');
+Route::post('/doi-thong-tin', [AuthController::class, 'doiThongTin'])->name('doi-thong-tin.submit');
 
 Route::prefix('admin')->group(function () {
     Route::get('/', function () {

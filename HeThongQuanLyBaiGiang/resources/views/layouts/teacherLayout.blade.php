@@ -31,11 +31,12 @@
         <nav class="navbar navbar-light bg-light mb-3">
             <div class="container-fluid justify-content-end">
                 <div class="dropdown">
+                    <input type="hidden" name="maNguoiDung" value="{{ $maNguoiDung }}">
                     <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> Giảng viên
+                        <i class="fas fa-user-circle"></i> {{ $tenNguoiDung }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="#">Thông tin tài khoản</a></li>
+                        <li><a class="dropdown-item" href="{{ route('giangvien.doi-thong-tin') }}">Thay đổi thông tin cá nhân</a></li>
                         <li><a class="dropdown-item " href="{{ route('giangvien.doi-mat-khau') }}">Đổi mật khẩu</a></li>
                         <li>
                             <hr class="dropdown-divider">
@@ -71,20 +72,20 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                @if($errors->any())
+                {{-- @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">
                         @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-
-                <!-- Nội dung chính -->
-                @yield('content')
+                @endforeach
+                </ul>
             </div>
-        </main>
+            @endif --}}
+
+            <!-- Nội dung chính -->
+            @yield('content')
+    </div>
+    </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('/js/teacher/main.js') }}"></script>

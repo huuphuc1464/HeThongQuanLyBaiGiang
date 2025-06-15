@@ -71,7 +71,7 @@ class AuthController extends Controller
         if ($role == 1) {
             return redirect('/admin');
         } elseif ($role == 2) {
-            return redirect('/teacher');
+            return redirect('/giang-vien');
         }
         return redirect('/')->with('swal_success', 'Đăng nhập thành công');
     }
@@ -263,6 +263,73 @@ class AuthController extends Controller
         return redirect()->back()->with('success', 'Đổi mật khẩu thành công.');
     }
 
+    public function doiThongTin(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'HoTen' => 'required|string|max:100',
+            'DiaChi' => 'required|string|max:255',
+            'SoDienThoai' => 'required|regex:/^0\d{9}$/',
+            'NgaySinh' => [
+                'required',
+                'date',
+                'before_or_equal:' . now()->subYears(17)->format('Y-m-d'),
+                'after_or_equal:1950-01-01',
+            ],
+            'GioiTinh' => 'required|in:Nam,Nữ',
+            'AnhDaiDien' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'HoTen.required' => 'Vui lòng nhập họ và tên.',
+            'HoTen.max' => 'Họ tên không được vượt quá 100 ký tự.',
+            'DiaChi.required' => 'Vui lòng nhập địa chỉ thường trú.',
+            'DiaChi.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
+            'SoDienThoai.required' => 'Vui lòng nhập số điện thoại.',
+            'SoDienThoai.regex' => 'Số điện thoại không hợp lệ. Phải bắt đầu bằng số 0 và có 10 chữ số.',
+            'NgaySinh.required' => 'Vui lòng chọn ngày sinh.',
+            'NgaySinh.date' => 'Ngày sinh không hợp lệ.',
+            'NgaySinh.before_or_equal' => 'Bạn phải đủ 17 tuổi trở lên.',
+            'NgaySinh.after_or_equal' => 'Ngày sinh không được trước năm 1950.',
+            'GioiTinh.required' => 'Vui lòng chọn giới tính.',
+            'GioiTinh.in' => 'Giới tính không hợp lệ.',
+            'AnhDaiDien.image' => 'Tệp tải lên phải là hình ảnh.',
+            'AnhDaiDien.mimes' => 'Chỉ chấp nhận tệp JPG, JPEG hoặc PNG.',
+            'AnhDaiDien.max' => 'Ảnh không được lớn hơn 2MB.'
+        ]);
+
+        $user = NguoiDung::find(Auth::id());
+
+        if (!$user) {
+            return back()->withErrors(['user' => 'Không tìm thấy người dùng.']);
+        }
+        if ($request->hasFile('AnhDaiDien')) {
+            $file = $request->file('AnhDaiDien');
+
+            // Xóa ảnh cũ nếu tồn tại
+            if ($user->AnhDaiDien && file_exists(public_path($user->AnhDaiDien))) {
+                unlink(public_path($user->AnhDaiDien));
+            }
+
+            // Tạo tên file duy nhất
+            $fileName = 'nguoidung_' . $user->MaNguoiDung . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+            // Di chuyển ảnh vào thư mục public/AnhDaiDien/
+            $file->move(public_path('AnhDaiDien'), $fileName);
+
+            $user->AnhDaiDien = 'AnhDaiDien/' . $fileName;
+        }
+
+        $user->HoTen = $request->HoTen;
+        $user->DiaChi = $request->DiaChi;
+        $user->SoDienThoai = $request->SoDienThoai;
+        $user->NgaySinh = $request->NgaySinh;
+        $user->GioiTinh = $request->GioiTinh;
+        $user->save();
+
+        return back()->with('success', 'Cập nhật thông tin thành công.');
+    }
 
     public function username()
     {
