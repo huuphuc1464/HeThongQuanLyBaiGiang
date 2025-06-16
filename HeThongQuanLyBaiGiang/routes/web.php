@@ -44,19 +44,19 @@ Route::get('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'hienThiFo
 Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKhauLanDau'])->name('changePassFirst.submit');
 
 
-Route::prefix('admin')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('admin');
-    Route::get('/quan-ly-khoa', [KhoaController::class, 'danhSach'])->name('admin.quan-ly-khoa.danh-sach');
-    Route::post('/quan-ly-khoa', [KhoaController::class, 'themMoi'])->name('admin.quan-ly-khoa.them-moi');
-    Route::put('/quan-ly-khoa/{khoa}', [KhoaController::class, 'capNhat'])->name('admin.quan-ly-khoa.cap-nhat');
-    Route::delete('/quan-ly-khoa/{khoa}', [KhoaController::class, 'xoa'])->name('admin.quan-ly-khoa.xoa');
-    Route::get('/quan-ly-mon-hoc', [MonHocController::class, 'danhSach'])->name('admin.quan-ly-mon-hoc.danh-sach');
-    Route::get('/quan-ly-giang-vien', [GiangVienController::class, 'danhSach'])->name('admin.quan-ly-giang-vien.danh-sach');
-    Route::post('/quan-ly-giang-vien', [GiangVienController::class, 'themMoi'])->name('admin.quan-ly-giang-vien.them-moi');
-    Route::put('/quan-ly-giang-vien/{giangVien}', [GiangVienController::class, 'capNhat'])->name('admin.quan-ly-giang-vien.cap-nhat');
-    Route::delete('/quan-ly-giang-vien/{giangVien}', [GiangVienController::class, 'xoa'])->name('admin.quan-ly-giang-vien.xoa');
-    Route::get('/quan-ly-sinh-vien', [SinhVienController::class, 'danhSach'])->name('admin.quan-ly-sinh-vien.danh-sach');
-    Route::post('/quan-ly-sinh-vien', [SinhVienController::class, 'themMoi'])->name('admin.quan-ly-sinh-vien.them-moi');
-    Route::put('/quan-ly-sinh-vien/{sinhVien}', [SinhVienController::class, 'capNhat'])->name('admin.quan-ly-sinh-vien.cap-nhat');
-    Route::delete('/quan-ly-sinh-vien/{sinhVien}', [SinhVienController::class, 'xoa'])->name('admin.quan-ly-sinh-vien.xoa');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Routes cho quản lý khoa
+    Route::get('/khoa', [KhoaController::class, 'danhSach'])->name('khoa.danh-sach');
+    Route::post('/khoa', [KhoaController::class, 'themMoi'])->name('khoa.them-moi');
+    Route::put('/khoa/{khoa}', [KhoaController::class, 'capNhat'])->name('khoa.cap-nhat');
+    Route::delete('/khoa/{khoa}', [KhoaController::class, 'xoa'])->name('khoa.xoa');
+
+    // Routes cho quản lý môn học
+    Route::get('/mon-hoc', [MonHocController::class, 'danhSach'])->name('mon-hoc.danh-sach');
+    Route::post('/mon-hoc', [MonHocController::class, 'themMoi'])->name('mon-hoc.them-moi');
+    Route::put('/mon-hoc/{monHoc}', [MonHocController::class, 'capNhat'])->name('mon-hoc.cap-nhat');
+    Route::delete('/mon-hoc/{monHoc}', [MonHocController::class, 'xoa'])->name('mon-hoc.xoa');
+    Route::get('/mon-hoc/check-ten', [MonHocController::class, 'checkTenMonHoc'])->name('mon-hoc.check-ten');
 });
