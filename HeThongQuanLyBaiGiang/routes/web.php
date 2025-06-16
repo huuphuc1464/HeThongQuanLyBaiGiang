@@ -8,7 +8,9 @@ use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Elfinder\ElfinderController;
 use Illuminate\Support\Facades\Mail;
-
+use App\Http\Controllers\Admin\KhoaController;
+use App\Http\Controllers\Admin\MonHocController;
+use App\Http\Controllers\Admin\DashboardController;
 Route::get('/', function () {
     return view('welcome');
 });

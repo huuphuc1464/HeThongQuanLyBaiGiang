@@ -59,6 +59,7 @@ class KhoaController extends Controller
         return redirect()->route('admin.khoa.danh-sach')
             ->with('success', 'Cập nhật khoa thành công');
     }
+    
     public function xoa(Khoa $khoa)
     {
         //  dd($khoa->monHocs);
