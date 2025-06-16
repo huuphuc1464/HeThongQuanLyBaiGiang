@@ -4,40 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title','Admin - Hệ thống quản lý bài giảng')</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-            <style>
-                body {
-                    min-height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                }
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-                .sidebar {
-                    width: 250px;
-                    min-height: 100vh;
-                    background-color: #343a40;
-                }
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background-color: #343a40;
+        }
 
-                .sidebar a {
-                    color: #fff;
-                    padding: 15px;
-                    display: block;
-                    text-decoration: none;
-                }
+        .sidebar a {
+            color: #fff;
+            padding: 15px;
+            display: block;
+            text-decoration: none;
+        }
 
-                .sidebar a:hover {
-                    background-color: #495057;
-                }
+        .sidebar a:hover {
+            background-color: #495057;
+        }
 
-                .content {
-                    flex: 1;
-                    padding: 20px;
-                    margin-left: 250px;
-                }
+        .content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 250px;
+        }
 
-            </style>
-            @yield('styles')
+    </style>
+    @yield('styles')
 </head>
 <body>
 
@@ -46,12 +47,11 @@
     <div class="p-3 text-center border-bottom border-secondary">
         <h5 class="text-white">Quản trị hệ thống</h5>
     </div>
-    <a href="{{ route('admin') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
-    <a href="{{ route('admin.quan-ly-khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
-    <a href="{{ route('admin.quan-ly-mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-    <a href="{{ route('admin.quan-ly-giang-vien.danh-sach') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
-    <a href="{{ route('admin.quan-ly-sinh-vien.danh-sach') }}"><i class="fas fa-user-graduate me-2"></i> Quản lý Sinh viên</a>
-    <a href="/admin/caidat"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
+    <a href="{{ route('admin.dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+    <a href="{{ route('admin.khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
+    <a href="{{ route('admin.mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
+    <a href="#"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
+    <a href="#"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
 </div>
 
     <!-- Content -->
