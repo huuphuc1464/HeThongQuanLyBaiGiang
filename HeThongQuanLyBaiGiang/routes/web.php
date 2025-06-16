@@ -1,16 +1,12 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\GiangVien\HomeController as GiangVienHomeController;
 use App\Http\Controllers\Login;
+use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Elfinder\ElfinderController;
-use App\Http\Controllers\Admin\KhoaController;
-use App\Http\Controllers\Admin\MonHocController;
-use App\Http\Controllers\Admin\GiangVienController;
-use App\Http\Controllers\Admin\SinhVienController;
-use App\Http\Controllers\Admin\DashboardController;
-
 use Illuminate\Support\Facades\Mail;
 
 Route::get('/', function () {
@@ -23,13 +19,9 @@ Route::get('/editor', function () {
     return view('editor');
 });
 
-Route::get('/teacher', function () {
+Route::get('/giang-vien', function () {
     return view('layouts.teacherLayout');
 })->middleware(['auth', RoleMiddleware::class . ':2']);
-
-Route::get('/', function () {
-    return view('layouts.studentLayout');
-});
 
 Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
 Route::post('/dang-nhap', [AuthController::class, 'dangNhap'])->name('login.submit');

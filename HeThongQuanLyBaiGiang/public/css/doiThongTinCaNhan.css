@@ -1,0 +1,107 @@
+.form-control {
+    font-size: 15px;
+    margin-top: 5px;
+    line-height: 1.5;
+    color: black;
+    background-color: #f1f1f1;
+    background-clip: padding-box;
+    height: 45px;
+    border: 1px solid #dadada;
+    border-radius: .357rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-shadow: none !important;
+}
+
+.form-control:active,
+.form-control:focus {
+    background: #ffffff;
+    border: 1px solid #FFD43B !important;
+}
+
+.tile {
+    position: relative;
+    background: #ffffff;
+    border-radius: .375rem;
+    padding: 20px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+    transition: all 0.3s ease-in-out;
+}
+
+.tile .tile-title {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 20px;
+    border-bottom: 2px solid #FFD43B;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    color: black;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.control-label {
+    font-weight: 500;
+}
+
+.Choicefile {
+    display: block;
+    background: #206ad2;
+    border: 1px solid #fff;
+    color: #fff;
+    width: 200px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 5px 0px;
+    border-radius: 8px;
+    font-weight: 500;
+    align-items: center;
+    justify-content: center;
+}
+
+#uploadfile,
+.removeimg {
+    display: none;
+}
+
+#thumbbox {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.removeimg {
+    height: 25px;
+    position: absolute;
+    background-repeat: no-repeat;
+    top: 5px;
+    left: 5px;
+    background-size: 25px;
+    width: 25px;
+    border-radius: 50%;
+}
+
+.removeimg::before {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    content: '';
+    border: 1px solid red;
+    background: red;
+    text-align: center;
+    display: block;
+    margin-top: 11px;
+    transform: rotate(45deg);
+}
+
+.removeimg::after {
+    content: '';
+    background: red;
+    border: 1px solid red;
+    text-align: center;
+    display: block;
+    transform: rotate(-45deg);
+    margin-top: -2px;
+}

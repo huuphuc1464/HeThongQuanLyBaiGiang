@@ -229,7 +229,10 @@ a.text-decoration-none.text-dark:hover {
 
 .anh-giang-vien {
     border-radius: 50%;
-    width: 20px;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+        border: 1px solid #ccc;
 }
 
 /* === Đường kẻ ngay nút trang chủ === */
@@ -250,6 +253,15 @@ a.text-decoration-none.text-dark:hover {
     display: none;
     position: absolute;
     z-index: 1050;
+}
+
+.dropdown-submenu {
+    width: 230px;
+}
+
+.dropdown-menu {
+    min-width: unset;
+    width: 230px !important;
 }
 
 .dropdown-submenu:hover>.dropdown-menu,
@@ -305,4 +317,12 @@ a.text-decoration-none.text-dark:hover {
     .sidebar.collapsed+main.content-area {
         margin-left: 60px;
     }
+}
+
+/* Hiện ... khi chữ quá dài*/
+.text-truncate {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
