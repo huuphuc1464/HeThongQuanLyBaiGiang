@@ -1,0 +1,44 @@
+.tile {
+    position: relative;
+    background: #ffffff;
+    border-radius: .375rem;
+    padding: 20px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+    transition: all 0.3s ease-in-out;
+}
+
+.tile .tile-title {
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 25px;
+    border-bottom: 2px solid #FFD43B;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    color: black;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0 30px 0 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: black;
+    background-color: #f1f1f1;
+    background-clip: padding-box;
+    height: 45px;
+    border: 1px solid #dadada;
+    border-radius: .357rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-shadow: none !important;
+}
+
+.form-control:active,
+.form-control:focus {
+    background: #ffffff;
+    border: 1px solid #FFD43B !important;
+}

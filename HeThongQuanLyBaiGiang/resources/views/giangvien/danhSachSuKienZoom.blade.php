@@ -8,7 +8,7 @@
         <div class="tile-body">
             <div class="row pb-2 align-items-center">
                 <div class="col-12 col-md-4 p-0 mb-2 mb-md-0">
-                    <a class="btn btn-success btn-sm" href="#" title="Thêm sự kiện Zoom">
+                    <a class="btn btn-success btn-sm" href="{{ route('giangvien.su-kien-zoom.form-them') }}" title="Thêm sự kiện Zoom">
                         <i class="fas fa-plus"></i> Thêm sự kiện Zoom
                     </a>
                 </div>
@@ -30,7 +30,8 @@
                         <th>Mô tả</th>
                         <th>Thời gian bắt đầu</th>
                         <th>Thời gian kết thúc</th>
-                        <th>Link sự kiện</th>
+                        <th>Link bắt đầu sự kiện</th>
+                        <th>Link tham gia sự kiện</th>
                         <th>Mật khẩu</th>
                         <th>Trạng thái</th>
                         <th>Tính năng</th>
@@ -45,7 +46,12 @@
                         <td>{{ $suKien->MoTa }}</td>
                         <td>{{ \Carbon\Carbon::parse($suKien->ThoiGianBatDau)->format('H:i:s d/m/Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($suKien->ThoiGianKetThuc)->format('H:i:s d/m/Y') }}</td>
-                        <td><a href="{{ $suKien->LinkSuKien }}" target="_blank">{{ $suKien->LinkSuKien }}</a></td>
+                        <td style="word-break: break-all;">
+                            <a href="{{ $suKien->LinkBatDauSuKien }}" target="_blank">{{ Str::Limit($suKien->LinkBatDauSuKien, 37) }}</a>
+                        </td>
+                        <td style="word-break: break-all;">
+                            <a href="{{ $suKien->LinkThamGiaSuKien }}" target="_blank">{{ $suKien->LinkThamGiaSuKien }}</a>
+                        </td>
                         <td>{{ $suKien->MatKhauSuKien }}</td>
                         <td>
                             @if ($suKien->ThoiGianBatDau > now())

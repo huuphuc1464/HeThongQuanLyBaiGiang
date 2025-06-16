@@ -72,6 +72,10 @@
                 <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
+                @if(session('errorSystem'))
+                <div class="alert alert-danger">{{ session('errorSystem') }}</div>
+                @endif
+
                 {{-- @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0">

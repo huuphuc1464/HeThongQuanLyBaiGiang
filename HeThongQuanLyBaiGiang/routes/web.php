@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\MonHocController;
 use App\Http\Controllers\Admin\DashboardController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -26,6 +27,10 @@ Route::get('/giang-vien', function () {
     return view('layouts.teacherLayout');
 })->middleware(['auth', RoleMiddleware::class . ':2']);
 
+Route::get('/', function () {
+    return view('layouts.studentLayout');
+});
+
 Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
 Route::post('/dang-nhap', [AuthController::class, 'dangNhap'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -37,11 +42,17 @@ Route::get('/dat-lai-mat-khau', [AuthController::class, 'hienThiFormDatLaiMatKha
 Route::post('/dat-lai-mat-khau', [AuthController::class, 'datLaiMatKhau'])->name('resetPass.submit');
 Route::get('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'hienThiFormDoiMatKhauLanDau'])->name('changePassFirst.form');
 Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKhauLanDau'])->name('changePassFirst.submit');
-
+Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->name('sinhvien.bai-giang')->middleware(['auth', RoleMiddleware::class . ':3']);
+Route::get('/doi-mat-khau', [SinhVienHomeController::class, 'hienFormDoiMatKhau'])->name('sinhvien.doi-mat-khau');
+Route::get('/giang-vien/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('giangvien.doi-mat-khau');
+Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');
+Route::get('/giang-vien/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('giangvien.doi-thong-tin');
+Route::post('/doi-thong-tin', [AuthController::class, 'doiThongTin'])->name('doi-thong-tin.submit');
+Route::get('/thay-doi-thong-tin-ca-nhan', [SinhVienHomeController::class, 'hienFormThayDoiThongTin'])->name('sinhvien.doi-thong-tin');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Routes cho quản lý khoa
     Route::get('/khoa', [KhoaController::class, 'danhSach'])->name('khoa.danh-sach');
     Route::post('/khoa', [KhoaController::class, 'themMoi'])->name('khoa.them-moi');
@@ -56,7 +67,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
-<<<<<<< HEAD
-=======
 Route::get('/giang-vien/su-kien-zoom', [SuKienZoomController::class, 'danhSachSuKien'])->name('giangvien.su-kien-zoom.danhsach');
->>>>>>> ffdbde21bde249125995daebe9f5d25167930f1d
+Route::get('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'hienFormThemZoom'])->name('giangvien.su-kien-zoom.form-them');
+Route::post('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'themSuKienZoom'])->name('giangvien.su-kien-zoom.them');

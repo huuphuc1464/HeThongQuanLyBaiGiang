@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('MoTa', 255)->nullable();
             $table->dateTime('ThoiGianBatDau');
             $table->dateTime('ThoiGianKetThuc');
-            $table->string('LinkSuKien', 255);
+            $table->string('LinkThamGiaSuKien', 255);
+            $table->text('LinkBatDauSuKien');
             $table->string('MatKhauSuKien', 100)->nullable();
             $table->timestamps();
         });
