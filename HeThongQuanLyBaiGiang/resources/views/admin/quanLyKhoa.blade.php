@@ -1,5 +1,5 @@
 @extends('layouts.adminLayout')
-@section('title','Admin - Quản lý Khoa')
+@section('title', 'Admin - Quản lý Khoa')
 @section('content')
 <div class="container">
     <h2 class="mb-4">Quản lý Khoa</h2>
@@ -96,7 +96,7 @@
                                 {{ $message }}
                             </div>
                         @enderror
-                        <div id="tenKhoaCheckFeedback" class=""></div> <!-- For real-time feedback -->
+                        <div id="tenKhoaCheckFeedback" class=""></div>
                     </div>
                     <div class="mb-3">
                         <label for="moTa" class="form-label">Mô tả</label>
@@ -126,13 +126,24 @@
                 <form id="formSuaKhoa" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" id="khoaId" name="id">
                     <div class="mb-3">
                         <label for="tenKhoaSua" class="form-label">Tên Khoa</label>
-                        <input type="text" class="form-control" id="tenKhoaSua" name="TenKhoa" required>
+                        <input type="text" class="form-control @error('TenKhoa') is-invalid @enderror" id="tenKhoaSua" name="TenKhoa" value="{{ old('TenKhoa') }}" required>
+                        @error('TenKhoa')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="moTaSua" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="moTaSua" name="MoTa" rows="3"></textarea>
+                        <textarea class="form-control @error('MoTa') is-invalid @enderror" id="moTaSua" name="MoTa" rows="3">{{ old('MoTa') }}</textarea>
+                        @error('MoTa')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
@@ -163,8 +174,8 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
+@endsection
+@section('scripts')
 <script>
     const modalSuaKhoa = document.getElementById('modalSuaKhoa');
     modalSuaKhoa.addEventListener('show.bs.modal', function (event) {
@@ -172,12 +183,19 @@
         const id = button.getAttribute('data-id');
         const ten = button.getAttribute('data-ten');
         const mota = button.getAttribute('data-mota');
+
         const formSuaKhoa = this.querySelector('#formSuaKhoa');
+        const khoaId = this.querySelector('#khoaId');
         const tenKhoaSua = this.querySelector('#tenKhoaSua');
         const moTaSua = this.querySelector('#moTaSua');
-        formSuaKhoa.setAttribute('action', `/admin/quan-ly-khoa/${id}`);
-        tenKhoaSua.value = ten;
-        moTaSua.value = mota;
+
+        // Đặt action cho form
+        formSuaKhoa.action = '{{ route("admin.khoa.cap-nhat", ":id") }}'.replace(':id', id);
+
+        // Điền dữ liệu vào các trường
+        khoaId.value = id;
+        tenKhoaSua.value = ten || '';
+        moTaSua.value = mota || '';
     });
 
     modalSuaKhoa.addEventListener('hidden.bs.modal', function () {
@@ -190,68 +208,18 @@
         const id = button.getAttribute('data-id');
         
         const formXoaKhoa = this.querySelector('#formXoaKhoa');
-        formXoaKhoa.setAttribute('action', `/admin/quan-ly-khoa/${id}`);
+        formXoaKhoa.action = '{{ route("admin.khoa.xoa", ":id") }}'.replace(':id', id);
     });
 
     document.addEventListener('DOMContentLoaded', function () {
         const modalThemKhoa = document.getElementById('modalThemKhoa');
+        const modalSuaKhoa = document.getElementById('modalSuaKhoa');
         
-     
         @if($errors->any() && (old('TenKhoa') || old('MoTa')))
-            const bsModal = new bootstrap.Modal(modalThemKhoa);
+            const targetModal = @if(old('id')) modalSuaKhoa @else modalThemKhoa @endif;
+            const bsModal = new bootstrap.Modal(targetModal);
             bsModal.show();
         @endif
     });
-
-    
-    const tenKhoaInput = document.getElementById('tenKhoa');
-    const tenKhoaCheckFeedback = document.getElementById('tenKhoaCheckFeedback');
-    const btnThemKhoa = document.getElementById('btnThemKhoa');
-
-    let typingTimer;
-    const doneTypingInterval = 500; 
-
-    tenKhoaInput.addEventListener('input', function () {
-        clearTimeout(typingTimer);
-        const tenKhoa = this.value.trim();
-        
-      
-        this.classList.remove('is-invalid', 'is-valid');
-        tenKhoaCheckFeedback.innerHTML = '';
-        btnThemKhoa.disabled = false;
-
-        if (tenKhoa.length === 0) {
-            return; 
-        }
-
-        typingTimer = setTimeout(() => {
-            fetch('/api/khoa/check-ten-khoa', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Assuming CSRF token is available in meta tag
-                },
-                body: JSON.stringify({ TenKhoa: tenKhoa })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.exists) {
-                    tenKhoaInput.classList.add('is-invalid');
-                    tenKhoaCheckFeedback.classList.add('invalid-feedback');
-                    tenKhoaCheckFeedback.innerHTML = 'Tên khoa đã tồn tại trong hệ thống.';
-                    btnThemKhoa.disabled = true;
-                } else {
-                    tenKhoaInput.classList.add('is-valid');
-                    tenKhoaCheckFeedback.classList.remove('invalid-feedback');
-                    tenKhoaCheckFeedback.innerHTML = '';
-                    btnThemKhoa.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error checking TenKhoa:', error);
-            });
-        }, doneTypingInterval);
-    });
 </script>
-@endpush
-@endsection 
+@endsection

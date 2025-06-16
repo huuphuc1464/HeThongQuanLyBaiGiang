@@ -87,13 +87,4 @@ class MonHocController extends Controller
             ->with('success', 'Xóa môn học thành công');
     }
 
-    public function checkTenMonHoc(Request $request)
-    {
-        $tenMonHoc = $request->input('TenMonHoc');
-        $exists = MonHoc::where('TenMonHoc', $tenMonHoc)
-                      ->where('TrangThai', 1)
-                      ->exists();
-
-        return response()->json(['exists' => $exists]);
-    }
 }

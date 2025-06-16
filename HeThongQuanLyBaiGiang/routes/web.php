@@ -58,5 +58,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/mon-hoc', [MonHocController::class, 'themMoi'])->name('mon-hoc.them-moi');
     Route::put('/mon-hoc/{monHoc}', [MonHocController::class, 'capNhat'])->name('mon-hoc.cap-nhat');
     Route::delete('/mon-hoc/{monHoc}', [MonHocController::class, 'xoa'])->name('mon-hoc.xoa');
-    Route::get('/mon-hoc/check-ten', [MonHocController::class, 'checkTenMonHoc'])->name('mon-hoc.check-ten');
 });

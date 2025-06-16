@@ -200,8 +200,9 @@
         </div>
     </div>
 </div>
+@endsection
 
-@push('scripts')
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Xử lý modal sửa môn học
@@ -228,5 +229,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
 @endsection
