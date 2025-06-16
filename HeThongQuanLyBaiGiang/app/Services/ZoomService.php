@@ -90,7 +90,7 @@ class ZoomService
         return $response->json();
     }
 
-    public function deleteMeeting(string $meetingId)
+    public function xoaSuKienZoom(string $meetingId)
     {
         $accessToken = $this->getAccessToken();
 

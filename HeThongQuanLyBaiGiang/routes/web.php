@@ -70,3 +70,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/giang-vien/su-kien-zoom', [SuKienZoomController::class, 'danhSachSuKien'])->name('giangvien.su-kien-zoom.danhsach');
 Route::get('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'hienFormThemZoom'])->name('giangvien.su-kien-zoom.form-them');
 Route::post('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'themSuKienZoom'])->name('giangvien.su-kien-zoom.them');
+Route::delete('/giangvien/su-kien-zoom/{id}', [SuKienZoomController::class, 'xoaSuKienZoom'])->name('giangvien.su-kien-zoom.xoa');

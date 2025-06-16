@@ -62,7 +62,9 @@
                                 @endif
                         </td>
                         <td>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa" data-id="{{ $suKien->MaSuKienZoom }}" data-ten="{{ $suKien->TenSuKien }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                             <button class="btn btn-warning btn-sm mt-1"><i class="fas fa-edit"></i></button>
                         </td>
                     </tr>
@@ -78,19 +80,34 @@
     </div>
 </div>
 </div>
+
+<!-- Modal Xác nhận Xóa -->
+<div class="modal fade" id="modalXacNhanXoa" tabindex="-1" aria-labelledby="xacNhanXoaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="xacNhanXoaLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa sự kiện Zoom <strong id="tenSuKienZoom"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="formXoaSuKien" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('style')
 <style>
-    .app-content {
-        min-height: calc(100vh - 50px);
-        padding: 10px;
-        background-color: #f5f5f5;
-        transition: margin-left 0.3s ease;
-        margin-left: 250px;
-        margin-top: 10px;
-    }
-
     .tile {
         position: relative;
         background: #ffffff;
@@ -115,12 +132,24 @@
         position: relative;
         padding-bottom: 10px;
         margin-bottom: 10px;
-
     }
 
 </style>
 @endsection
 
 @section('scripts')
+<script>
+    const modalXoa = document.getElementById('modalXacNhanXoa');
+    modalXoa.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const suKienId = button.getAttribute('data-id');
+        const tenSuKien = button.getAttribute('data-ten');
 
+        modalXoa.querySelector('#tenSuKienZoom').textContent = `"${tenSuKien}"`;
+
+        const form = modalXoa.querySelector('#formXoaSuKien');
+        form.action = `/giangvien/su-kien-zoom/${suKienId}`;
+    });
+
+</script>
 @endsection

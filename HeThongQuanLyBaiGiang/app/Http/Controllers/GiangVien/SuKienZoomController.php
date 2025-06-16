@@ -106,4 +106,26 @@ class SuKienZoomController extends Controller
             return redirect()->back()->withInput()->with('errorSystem', 'Lỗi khi tạo Zoom: ' . $e->getMessage());
         }
     }
+
+    public function xoaSuKienZoom($id)
+    {
+        $suKien = SuKienZoom::findOrFail($id);
+        try {
+            $this->zoom->xoaSuKienZoom($this->layZoomId($suKien->LinkThamGiaSuKien));
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('errorSystem', 'Lỗi khi xóa sự kiện Zoom: ' . $e->getMessage());
+        }
+
+        $suKien->delete();
+
+        return redirect()->back()->with('success', 'Xóa sự kiện Zoom thành công.');
+    }
+
+    function layZoomId($zoomLink)
+    {
+        if (preg_match('/zoom\.us\/[jw]\/([0-9]+)/', $zoomLink, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
 }
