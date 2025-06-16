@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\GiangVien\HomeController as GiangVienHomeController;
 use App\Http\Controllers\Login;
 use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
+use App\Http\Controllers\GiangVien\SuKienZoomController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Elfinder\ElfinderController;
@@ -55,3 +56,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
+<<<<<<< HEAD
+=======
+Route::get('/giang-vien/su-kien-zoom', [SuKienZoomController::class, 'danhSachSuKien'])->name('giangvien.su-kien-zoom.danhsach');
+>>>>>>> ffdbde21bde249125995daebe9f5d25167930f1d
