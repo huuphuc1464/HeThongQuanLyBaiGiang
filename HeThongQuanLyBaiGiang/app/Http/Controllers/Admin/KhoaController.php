@@ -64,7 +64,7 @@ class KhoaController extends Controller
     {
         //  dd($khoa->monHocs);
         // Kiểm tra xem khoa có môn học nào không
-        if ($khoa->monHocs()->count() > 0) {
+        if ($khoa->monHocs()->where('TrangThai', 1)->count() > 0) {    
             return redirect()->route('admin.khoa.danh-sach')
                 ->with('error', 'Không thể xóa khoa này vì đang có môn học thuộc khoa');
         }

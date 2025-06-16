@@ -53,3 +53,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/mon-hoc/{monHoc}', [MonHocController::class, 'capNhat'])->name('mon-hoc.cap-nhat');
     Route::delete('/mon-hoc/{monHoc}', [MonHocController::class, 'xoa'])->name('mon-hoc.xoa');
 });
+
+

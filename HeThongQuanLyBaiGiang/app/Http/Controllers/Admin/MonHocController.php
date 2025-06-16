@@ -9,12 +9,12 @@ use App\Models\Khoa;
 
 class MonHocController extends Controller
 {
-    public function danhSach(Request $request) {
+    public function danhSach(Request $request)
+    {
         $search = $request->input('search');
         $filterKhoa = $request->input('filterKhoa');
         
-        $query = MonHoc::where('TrangThai', 1)
-                       ->with('khoa'); // Eager load relationship with khoa
+        $query = MonHoc::where('TrangThai', 1)->with('khoa');
         
         if ($search) {
             $query->where('TenMonHoc', 'like', '%' . $search . '%');
@@ -33,11 +33,11 @@ class MonHocController extends Controller
     public function themMoi(Request $request)
     {
         $request->validate([
-            'TenMonHoc' => 'required|string|max:255|unique:monhoc,TenMonHoc,NULL,MaMonHoc,TrangThai,1',
+            'TenMonHoc' => 'required|string|max:255|unique:mon_hoc,TenMonHoc,NULL,MaMonHoc,MaKhoa,' . $request->MaKhoa . ',TrangThai,1',
             'MaKhoa' => 'required|exists:khoa,MaKhoa',
             'MoTa' => 'nullable|string'
-        ],[
-            'TenMonHoc.unique' => 'Tên môn học đã tồn tại trong hệ thống.',
+        ], [
+            'TenMonHoc.unique' => 'Tên môn học đã tồn tại trong khoa này.',
             'MaKhoa.exists' => 'Khoa không tồn tại trong hệ thống.'
         ]);
 
@@ -48,18 +48,18 @@ class MonHocController extends Controller
             'TrangThai' => 1
         ]);
 
-        return redirect()->route('admin.quan-ly-mon-hoc.danh-sach')
+        return redirect()->route('admin.mon-hoc.danh-sach')
             ->with('success', 'Thêm môn học thành công');
     }
 
     public function capNhat(Request $request, MonHoc $monHoc)
     {
         $request->validate([
-            'TenMonHoc' => 'required|string|max:255|unique:monhoc,TenMonHoc,' . $monHoc->MaMonHoc . ',MaMonHoc,TrangThai,1',
+       'TenMonHoc' => 'required|string|max:255|unique:mon_hoc,TenMonHoc,' . $monHoc->MaMonHoc . ',MaMonHoc,MaKhoa,' . $request->MaKhoa . ',TrangThai,1',
             'MaKhoa' => 'required|exists:khoa,MaKhoa',
             'MoTa' => 'nullable|string'
-        ],[
-            'TenMonHoc.unique' => 'Tên môn học đã tồn tại trong hệ thống.',
+        ], [
+            'TenMonHoc.unique' => 'Tên môn học đã tồn tại trong khoa này.',
             'MaKhoa.exists' => 'Khoa không tồn tại trong hệ thống.'
         ]);
 
@@ -69,22 +69,20 @@ class MonHocController extends Controller
             'MoTa' => $request->MoTa
         ]);
 
-        return redirect()->route('admin.quan-ly-mon-hoc.danh-sach')
+        return redirect()->route('admin.mon-hoc.danh-sach')
             ->with('success', 'Cập nhật môn học thành công');
     }
 
     public function xoa(MonHoc $monHoc)
     {
-        // Kiểm tra xem môn học có bài giảng nào không
-        if ($monHoc->baiGiangs()->count() > 0) {
-            return redirect()->route('admin.quan-ly-mon-hoc.danh-sach')
-                ->with('error', 'Không thể xóa môn học này vì đang có bài giảng thuộc môn học');
+        if ($monHoc->hocPhans()->count() > 0) {
+            return redirect()->route('admin.mon-hoc.danh-sach')
+                ->with('error', 'Không thể xóa môn học này vì đang có học phần thuộc môn học');
         }
         
         $monHoc->update(['TrangThai' => 0]);
 
-        return redirect()->route('admin.quan-ly-mon-hoc.danh-sach')
+        return redirect()->route('admin.mon-hoc.danh-sach')
             ->with('success', 'Xóa môn học thành công');
     }
-
 }

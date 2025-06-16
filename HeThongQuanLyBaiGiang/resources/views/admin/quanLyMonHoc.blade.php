@@ -1,5 +1,5 @@
 @extends('layouts.adminLayout')
-
+@section('title', 'Admin - Quản lý Môn học')
 @section('content')
 <div class="container">
     <h2 class="mb-4">Quản lý Môn học</h2>
@@ -66,14 +66,13 @@
                         <td>{{ $monHoc->khoa->TenKhoa }}</td>
                         <td>{{ $monHoc->MoTa }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#modalSuaMonHoc"
-                                    data-monhoc="{{ json_encode($monHoc) }}">Sửa</button>
-                            <button class="btn btn-sm btn-danger" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#modalXacNhanXoa"
-                                    data-monhoc-id="{{ $monHoc->MaMonHoc }}">Xóa</button>
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalSuaMonHoc"
+                                data-id="{{ $monHoc->MaMonHoc }}"
+                                data-ten="{{ e($monHoc->TenMonHoc) }}"
+                                data-makhoa="{{ $monHoc->MaKhoa }}"
+                                data-mota="{{ e($monHoc->MoTa) }}">Sửa</button>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa"
+                                data-id="{{ $monHoc->MaMonHoc }}">Xóa</button>
                         </td>
                     </tr>
                     @empty
@@ -85,7 +84,9 @@
             </table>
 
             <!-- Phân trang -->
-            {{ $danhSachMonHoc->appends(request()->query())->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $danhSachMonHoc->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
         </div>
     </div>
 </div>
@@ -103,16 +104,14 @@
                     @csrf
                     <div class="mb-3">
                         <label for="tenMonHoc" class="form-label">Tên Môn học</label>
-                        <input type="text" class="form-control @error('TenMonHoc') is-invalid @enderror" 
-                               id="tenMonHoc" name="TenMonHoc" required value="{{ old('TenMonHoc') }}">
+                        <input type="text" class="form-control @error('TenMonHoc') is-invalid @enderror" id="tenMonHoc" name="TenMonHoc" value="{{ old('TenMonHoc') }}" required>
                         @error('TenMonHoc')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label for="khoa" class="form-label">Khoa</label>
-                        <select class="form-select @error('MaKhoa') is-invalid @enderror" 
-                                id="khoa" name="MaKhoa" required>
+                        <select class="form-select @error('MaKhoa') is-invalid @enderror" id="khoa" name="MaKhoa" required>
                             <option value="">-- Chọn Khoa --</option>
                             @foreach($danhSachKhoa as $khoa)
                                 <option value="{{ $khoa->MaKhoa }}" {{ old('MaKhoa') == $khoa->MaKhoa ? 'selected' : '' }}>
@@ -126,7 +125,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="moTa" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="moTa" name="MoTa" rows="3">{{ old('MoTa') }}</textarea>
+                        <textarea class="form-control @error('MoTa') is-invalid @enderror" id="moTa" name="MoTa" rows="3">{{ old('MoTa') }}</textarea>
+                        @error('MoTa')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu</button>
                 </form>
@@ -147,18 +149,17 @@
                 <form id="formSuaMonHoc" method="POST">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" id="monHocId" name="id">
                     <div class="mb-3">
                         <label for="tenMonHocSua" class="form-label">Tên Môn học</label>
-                        <input type="text" class="form-control @error('TenMonHoc') is-invalid @enderror" 
-                               id="tenMonHocSua" name="TenMonHoc" required>
+                        <input type="text" class="form-control @error('TenMonHoc') is-invalid @enderror" id="tenMonHocSua" name="TenMonHoc" value="{{ old('TenMonHoc') }}" required>
                         @error('TenMonHoc')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label for="khoaSua" class="form-label">Khoa</label>
-                        <select class="form-select @error('MaKhoa') is-invalid @enderror" 
-                                id="khoaSua" name="MaKhoa" required>
+                        <select class="form-select @error('MaKhoa') is-invalid @enderror" id="khoaSua" name="MaKhoa" required>
                             @foreach($danhSachKhoa as $khoa)
                                 <option value="{{ $khoa->MaKhoa }}">{{ $khoa->TenKhoa }}</option>
                             @endforeach
@@ -169,7 +170,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="moTaSua" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="moTaSua" name="MoTa" rows="3"></textarea>
+                        <textarea class="form-control @error('MoTa') is-invalid @enderror" id="moTaSua" name="MoTa" rows="3">{{ old('MoTa') }}</textarea>
+                        @error('MoTa')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                 </form>
@@ -204,29 +208,62 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Xử lý modal sửa môn học
     const modalSuaMonHoc = document.getElementById('modalSuaMonHoc');
-    modalSuaMonHoc.addEventListener('show.bs.modal', function(event) {
+    modalSuaMonHoc.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
-        const monHoc = JSON.parse(button.getAttribute('data-monhoc'));
-        const form = document.getElementById('formSuaMonHoc');
-        
-        form.action = `/admin/mon-hoc/${monHoc.MaMonHoc}`;
-        form.querySelector('#tenMonHocSua').value = monHoc.TenMonHoc;
-        form.querySelector('#khoaSua').value = monHoc.MaKhoa;
-        form.querySelector('#moTaSua').value = monHoc.MoTa;
+        const id = button.getAttribute('data-id');
+        const ten = button.getAttribute('data-ten');
+        const maKhoa = button.getAttribute('data-makhoa');
+        const mota = button.getAttribute('data-mota');
+
+        const formSuaMonHoc = this.querySelector('#formSuaMonHoc');
+        const monHocId = this.querySelector('#monHocId');
+        const tenMonHocSua = this.querySelector('#tenMonHocSua');
+        const khoaSua = this.querySelector('#khoaSua');
+        const moTaSua = this.querySelector('#moTaSua');
+
+        // Đặt action cho form
+        formSuaMonHoc.action = '{{ route("admin.mon-hoc.cap-nhat", ":id") }}'.replace(':id', id);
+
+        // Điền dữ liệu vào các trường
+        monHocId.value = id;
+        tenMonHocSua.value = ten || '';
+        khoaSua.value = maKhoa || '';
+        moTaSua.value = mota || '';
+
+        // Xóa lỗi và reset trạng thái khi mở modal
+        tenMonHocSua.classList.remove('is-invalid');
+        moTaSua.classList.remove('is-invalid');
+        khoaSua.classList.remove('is-invalid');
+        this.querySelectorAll('.invalid-feedback').forEach(feedback => feedback.innerHTML = '');
     });
 
-    // Xử lý modal xóa môn học
-    const modalXacNhanXoa = document.getElementById('modalXacNhanXoa');
-    modalXacNhanXoa.addEventListener('show.bs.modal', function(event) {
-        const button = event.relatedTarget;
-        const monHocId = button.getAttribute('data-monhoc-id');
-        const form = document.getElementById('formXoaMonHoc');
-        
-        form.action = `/admin/mon-hoc/${monHocId}`;
+    modalSuaMonHoc.addEventListener('hidden.bs.modal', function () {
+        const form = this.querySelector('#formSuaMonHoc');
+        form.reset(); // Reset form về trạng thái ban đầu
+        // Xóa tất cả các lớp lỗi và thông báo
+        form.querySelectorAll('.form-control, .form-select').forEach(input => input.classList.remove('is-invalid'));
+        form.querySelectorAll('.invalid-feedback').forEach(feedback => feedback.innerHTML = '');
     });
-});
+
+    const modalXacNhanXoa = document.getElementById('modalXacNhanXoa');
+    modalXacNhanXoa.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        
+        const formXoaMonHoc = this.querySelector('#formXoaMonHoc');
+        formXoaMonHoc.action = '{{ route("admin.mon-hoc.xoa", ":id") }}'.replace(':id', id);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalThemMonHoc = document.getElementById('modalThemMonHoc');
+        const modalSuaMonHoc = document.getElementById('modalSuaMonHoc');
+        
+        @if($errors->any() && (old('TenMonHoc') || old('MoTa')))
+            const targetModal = @if(old('id')) modalSuaMonHoc @else modalThemMonHoc @endif;
+            const bsModal = new bootstrap.Modal(targetModal);
+            bsModal.show();
+        @endif
+    });
 </script>
 @endsection
