@@ -13,10 +13,10 @@
                     </a>
                 </div>
                 <div class="col-12 col-md-8 p-0 d-flex justify-content-end">
-                    <div class="input-group" style="max-width: 420px; width: 100%;">
-                        <button class="btn btn-secondary" type="button" id="searchBtn">Tìm kiếm</button>
-                        <input type="text" class="form-control" placeholder="Tìm kiếm tên sự kiện, tên lớp học phần, ..." id="searchQuery">
-                    </div>
+                    <form method="GET" action="{{ route('giangvien.su-kien-zoom.danhsach') }}" class="d-flex input-group" style="max-width: 420px; width: 100%;">
+                        <input type="text" name="search" class="form-control" placeholder="Tìm kiếm tên sự kiện, tên lớp học phần, ..." value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
         </div>
     </div>
 </div>
-</div>
+
 
 <!-- Modal Xác nhận Xóa -->
 <div class="modal fade" id="modalXacNhanXoa" tabindex="-1" aria-labelledby="xacNhanXoaLabel" aria-hidden="true">

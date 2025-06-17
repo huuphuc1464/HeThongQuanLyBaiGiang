@@ -20,14 +20,32 @@ class SuKienZoomController extends Controller
         $this->zoom = $zoom;
     }
 
-    public function danhSachSuKien()
+    public function danhSachSuKien(Request $request)
     {
-        $danhSachSuKien = DB::table('su_kien_zoom')
+        $query = DB::table('su_kien_zoom')
             ->join('lop_hoc_phan', 'su_kien_zoom.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
             ->select('su_kien_zoom.*', 'lop_hoc_phan.TenLopHocPhan')
-            ->paginate(10);
+            ->where('su_kien_zoom.MaGiangVien', Auth::id());
+
+        if ($request->filled('search')) {
+            $keywords = preg_split('/\s+/', trim($request->search));
+
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $kw = strtolower($kw);
+                    $q->orWhereRaw('LOWER(su_kien_zoom.TenSuKien) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(su_kien_zoom.MoTa) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(su_kien_zoom.LinkSuKien) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(lop_hoc_phan.TenLopHocPhan) LIKE ?', ["%$kw%"]);
+                }
+            });
+        }
+
+        $danhSachSuKien = $query->paginate(10)->withQueryString();
+
         return view('giangvien.danhSachSuKienZoom', compact('danhSachSuKien'));
     }
+
 
     public function hienFormThemZoom()
     {
