@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\MonHocController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\GiangVienController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -79,4 +80,12 @@ Route::get('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'hienF
 Route::post('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'themSuKienZoom'])->name('giangvien.su-kien-zoom.them');
 Route::delete('/giangvien/su-kien-zoom/xoa/{id}', [SuKienZoomController::class, 'xoaSuKienZoom'])->name('giangvien.su-kien-zoom.xoa');
 Route::get('/giang-vien/su-kien-zoom/sua/{id}', [SuKienZoomController::class, 'hienFormCapNhatZoom'])->name('giangvien.su-kien-zoom.form-sua');
-Route::put('/giangvien/su-kien-zoom/sua/{id}', [SuKienZoomController::class, 'capNhatSuKienZoom'])->name('giangvien.su-kien-zoom.sua');
+Route::put('/giang-vien/su-kien-zoom/sua/{id}', [SuKienZoomController::class, 'capNhatSuKienZoom'])->name('giangvien.su-kien-zoom.sua');
+
+Route::get('/admin/giang-vien', [GiangVienController::class, 'danhSachGiangVien'])->name('admin.giang-vien.danh-sach');
+Route::get('/admin/giang-vien/them', [GiangVienController::class, 'hienFormThemGiangVien'])->name('admin.giang-vien.form-them');
+Route::post('/admin/giang-vien/them', [GiangVienController::class, 'themGiangVien'])->name('admin.giang-vien.them');
+Route::delete('/admin/giang-vien/xoa/{id}', [GiangVienController::class, 'xoaGiangVien'])->name('admin.giang-vien.xoa');
+Route::post('/admin/giang-vien/khoi-phuc/{id}', [GiangVienController::class, 'khoiPhucGiangVien'])->name('admin.giang-vien.khoi-phuc');
+Route::get('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('admin.giang-vien.form-sua');
+Route::put('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('admin.giang-vien.sua');

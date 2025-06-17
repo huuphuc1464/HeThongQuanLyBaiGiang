@@ -272,7 +272,7 @@ class AuthController extends Controller
         $request->validate([
             'HoTen' => 'required|string|max:100',
             'DiaChi' => 'required|string|max:255',
-            'SoDienThoai' => 'required|regex:/^0\d{9}$/',
+            'SoDienThoai' => 'required|regex:/^0\d{9}$/|unique:nguoi_dung,SoDienThoai',
             'NgaySinh' => [
                 'required',
                 'date',
@@ -288,6 +288,7 @@ class AuthController extends Controller
             'DiaChi.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
             'SoDienThoai.required' => 'Vui lòng nhập số điện thoại.',
             'SoDienThoai.regex' => 'Số điện thoại không hợp lệ. Phải bắt đầu bằng số 0 và có 10 chữ số.',
+            'SoDienThoai.unique' => 'Số điện thoại đã tồn tại.',
             'NgaySinh.required' => 'Vui lòng chọn ngày sinh.',
             'NgaySinh.date' => 'Ngày sinh không hợp lệ.',
             'NgaySinh.before_or_equal' => 'Bạn phải đủ 17 tuổi trở lên.',
