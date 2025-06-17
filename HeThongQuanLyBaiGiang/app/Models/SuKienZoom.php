@@ -15,8 +15,8 @@ class SuKienZoom extends Model
         'MoTa',
         'ThoiGianBatDau',
         'ThoiGianKetThuc',
-        'LinkThamGiaSuKien',
-        'LinkBatDauSuKien',
+        'LinkSuKien',
+        'KhoaChuTri',
         'MatKhauSuKien'
     ];
     public $timestamps = true;

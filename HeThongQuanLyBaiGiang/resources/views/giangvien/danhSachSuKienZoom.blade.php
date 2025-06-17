@@ -30,7 +30,7 @@
                         <th>Mô tả</th>
                         <th>Thời gian bắt đầu</th>
                         <th>Thời gian kết thúc</th>
-                        <th>Link bắt đầu sự kiện</th>
+                        <th>Khóa chủ trì</th>
                         <th>Link tham gia sự kiện</th>
                         <th>Mật khẩu</th>
                         <th>Trạng thái</th>
@@ -39,18 +39,16 @@
                 </thead>
                 <tbody>
                     @forelse($danhSachSuKien as $suKien)
-                    <tr>
+                    <tr style="cursor: pointer;" data-href="{{ route('giangvien.su-kien-zoom.chi-tiet', ['id' => $suKien->MaSuKienZoom]) }}">
                         <td>#{{ $suKien->MaSuKienZoom }}</td>
                         <td>{{ $suKien->TenLopHocPhan ?? '' }}</td>
                         <td>{{ $suKien->TenSuKien }}</td>
                         <td>{{ $suKien->MoTa }}</td>
                         <td>{{ \Carbon\Carbon::parse($suKien->ThoiGianBatDau)->format('H:i:s d/m/Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($suKien->ThoiGianKetThuc)->format('H:i:s d/m/Y') }}</td>
+                        <td>{{ $suKien->KhoaChuTri }}</td>
                         <td style="word-break: break-all;">
-                            <a href="{{ $suKien->LinkBatDauSuKien }}" target="_blank">{{ Str::Limit($suKien->LinkBatDauSuKien, 37) }}</a>
-                        </td>
-                        <td style="word-break: break-all;">
-                            <a href="{{ $suKien->LinkThamGiaSuKien }}" target="_blank">{{ $suKien->LinkThamGiaSuKien }}</a>
+                            <a href="{{ $suKien->LinkSuKien }}" target="_blank">{{ $suKien->LinkSuKien }}</a>
                         </td>
                         <td>{{ $suKien->MatKhauSuKien }}</td>
                         <td>
@@ -65,12 +63,12 @@
                             <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa" data-id="{{ $suKien->MaSuKienZoom }}" data-ten="{{ $suKien->TenSuKien }}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
-                            <button class="btn btn-warning btn-sm mt-1"><i class="fas fa-edit"></i></button>
+                            <a class="btn btn-warning btn-sm mt-1" href="{{ route('giangvien.su-kien-zoom.form-sua', ['id' => $suKien->MaSuKienZoom]) }}"><i class="fas fa-edit"></i></a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="10" class="text-center text-muted">Không tìm thấy kết quả nào.</td>
+                        <td colspan="11" class="text-center text-muted">Không tìm thấy kết quả nào.</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -148,7 +146,20 @@
         modalXoa.querySelector('#tenSuKienZoom').textContent = `"${tenSuKien}"`;
 
         const form = modalXoa.querySelector('#formXoaSuKien');
-        form.action = `/giangvien/su-kien-zoom/${suKienId}`;
+        form.action = `/giangvien/su-kien-zoom/xoa/${suKienId}`;
+    });
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('tr[data-href]');
+        rows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (e.target.closest('a') || e.target.closest('button')) return;
+                window.location.href = row.dataset.href;
+            });
+        });
     });
 
 </script>

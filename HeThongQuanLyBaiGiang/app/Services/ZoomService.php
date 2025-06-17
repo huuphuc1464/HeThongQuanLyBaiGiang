@@ -45,10 +45,10 @@ class ZoomService
             ->post('https://api.zoom.us/v2/users/me/meetings', [
                 'topic' => $data['topic'] ?? 'Không có tiêu đề',
                 'type' => 2,
-                'start_time' => $data['start_time'] ?? now()->addMinutes(15)->toIso8601String(),
-                'duration' => $data['duration'] ?? 30,
+                'start_time' => $data['start_time'],
+                'duration' => $data['duration'],
                 'timezone' => 'Asia/Ho_Chi_Minh',
-                'password' => $data['password'] ?? '',
+                'password' => $data['password'],
                 'agenda' => $data['agenda'] ?? 'Không có mô tả',
                 'settings' => [
                     'host_video' => true,
@@ -68,15 +68,16 @@ class ZoomService
         return $response->json();
     }
 
-    public function updateMeeting(string $meetingId, array $data)
+    public function capNhatSuKienZoom(string $meetingId, array $data)
     {
         $accessToken = $this->getAccessToken();
 
         $payload = [
-            'topic' => $data['topic'] ?? 'Cập nhật tiêu đề',
-            'start_time' => $data['start_time'] ?? now()->addMinutes(30)->toIso8601String(),
-            'duration' => $data['duration'] ?? 30,
-            'agenda' => $data['agenda'] ?? 'Cập nhật mô tả',
+            'topic' => $data['topic'],
+            'start_time' => $data['start_time'],
+            'duration' => $data['duration'],
+            'agenda' => $data['agenda'] ?? 'Không có mô tả',
+            'password' => $data['password'],
             'timezone' => 'Asia/Ho_Chi_Minh',
         ];
 

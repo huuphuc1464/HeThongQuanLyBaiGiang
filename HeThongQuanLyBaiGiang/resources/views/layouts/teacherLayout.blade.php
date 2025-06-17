@@ -21,7 +21,7 @@
         </div>
         <a href="/teacher/dashboard"><i class="fas fa-home me-2"></i> Dashboard</a>
         <a href="/teacher/quanLyHocPhan"><i class="fas fa-book-open me-2"></i> Quản lý Học Phần</a>
-        <a href="/teacher/quanLySuKienZoom"><i class="fas fa-video me-2"></i> Quản lý Sự Kiện Zoom</a>
+        <a href="{{ route('giangvien.su-kien-zoom.danhsach') }}"><i class="fas fa-video me-2"></i> Quản lý Sự Kiện Zoom</a>
         <a href="/teacher/baiKiemTra"><i class="fas fa-clipboard-list me-2"></i> Quản lý Bài Kiểm Tra</a>
         <a href="/teacher/lopHocPhan"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Lớp Học Phần</a>
     </div>
@@ -60,7 +60,7 @@
                 <div class="col-md-12">
                     <div class="tieuDe d-flex align-center justify-content-between bg-white">
                         <ul class="mb-0 breadcrumb">
-                            <li class="breadcrumb-item"><a href="#" class="text-dark"><b>@yield('tenTrang')</b></a></li>
+                            <li class="breadcrumb-item"><div class="text-dark"><b>@yield('tenTrang')</b></div></li>
                         </ul>
                         <div id="clock"></div>
                     </div>
