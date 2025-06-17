@@ -49,6 +49,12 @@ Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-m
 Route::get('/giang-vien/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('giangvien.doi-thong-tin');
 Route::post('/doi-thong-tin', [AuthController::class, 'doiThongTin'])->name('doi-thong-tin.submit');
 Route::get('/thay-doi-thong-tin-ca-nhan', [SinhVienHomeController::class, 'hienFormThayDoiThongTin'])->name('sinhvien.doi-thong-tin');
+Route::get('/admin/doi-mat-khau', [DashboardController::class, 'hienFormDoiMatKhau'])->name('admin.doi-mat-khau');
+Route::get('/admin/thay-doi-thong-tin-ca-nhan', [DashboardController::class, 'hienFormThayDoiThongTin'])->name('admin.doi-thong-tin');
+
+
+
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

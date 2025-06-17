@@ -1,15 +1,11 @@
-@extends('layouts.studentLayout')
-@section('title','Thay đổi thông tin cá nhân')
-
-@section('sidebar')
-@include('layouts.sidebarTrangChu', ['danhSachLopHocPhanSidebar' => $danhSachLopHocPhanSidebar])
-@endsection
+@extends('layouts.adminLayout')
+@section('title','Quản trị viên - Thay đổi thông tin cá nhân')
 
 @section('content')
 @include('components.thayDoiThongTinCaNhan')
 @endsection
 
-@section('style')
+@section('styles')
 <link rel="stylesheet" href="{{ asset('./css/doiThongTinCaNhan.css') }}">
 @endsection
 

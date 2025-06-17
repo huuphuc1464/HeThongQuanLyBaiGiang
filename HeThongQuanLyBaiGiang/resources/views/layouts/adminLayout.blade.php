@@ -42,17 +42,17 @@
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar position-fixed">
-    <div class="p-3 text-center border-bottom border-secondary">
-        <h5 class="text-white">Quản trị hệ thống</h5>
+    <!-- Sidebar -->
+    <div class="sidebar position-fixed">
+        <div class="p-3 text-center border-bottom border-secondary">
+            <h5 class="text-white">Quản trị hệ thống</h5>
+        </div>
+        <a href="{{ route('admin.dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+        <a href="{{ route('admin.khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
+        <a href="{{ route('admin.mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
+        <a href="#"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
+        <a href="#"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
     </div>
-    <a href="{{ route('admin.dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
-    <a href="{{ route('admin.khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
-    <a href="{{ route('admin.mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-    <a href="#"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
-    <a href="#"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
-</div>
 
     <!-- Content -->
     <div class="content">
@@ -63,19 +63,24 @@
                         <i class="fas fa-user-circle"></i> Admin
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="#">Thông tin tài khoản</a></li>
-                        <li><a class="dropdown-item" href="#">Đổi mật khẩu</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.doi-thong-tin') }}">Thông tin tài khoản</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.doi-mat-khau') }}">Đổi mật khẩu</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
-                        <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
+
                     </ul>
                 </div>
             </div>
         </nav>
+
+        @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
         <!-- Nội dung chính -->
         @yield('content')
