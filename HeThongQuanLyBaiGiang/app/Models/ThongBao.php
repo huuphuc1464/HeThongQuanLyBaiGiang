@@ -9,7 +9,7 @@ class ThongBao extends Model
     protected $table = 'thong_bao';
     protected $primaryKey = 'MaThongBao';
     protected $fillable = ['MaLopHocPhan', 'MaNguoiTao', 'NoiDung', 'ThoiGianTao', 'TrangThai'];
-    public $timestamps = true;
+    public $timestamps = false;
 
     // Relationships
     public function lopHocPhan()

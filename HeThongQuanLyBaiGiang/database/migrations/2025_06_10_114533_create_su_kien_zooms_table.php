@@ -20,8 +20,8 @@ return new class extends Migration
             $table->dateTime('ThoiGianBatDau');
             $table->dateTime('ThoiGianKetThuc');
             $table->string('LinkSuKien', 255);
-            $table->string('KhoaChuTri', 50);
-            $table->string('MatKhauSuKien', 100)->nullable();
+            $table->string('KhoaChuTri', 6);
+            $table->string('MatKhauSuKien', 10)->nullable();
             $table->timestamps();
         });
     }

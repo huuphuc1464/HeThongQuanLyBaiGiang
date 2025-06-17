@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('NoiDung', 255);
             $table->dateTime('ThoiGianTao');
             $table->boolean('TrangThai')->default(true);
-            $table->timestamps();
         });
     }
 

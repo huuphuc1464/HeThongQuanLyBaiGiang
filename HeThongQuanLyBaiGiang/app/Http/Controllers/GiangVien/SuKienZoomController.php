@@ -4,20 +4,24 @@ namespace App\Http\Controllers\GiangVien;
 
 use App\Http\Controllers\Controller;
 use App\Models\SuKienZoom;
+use App\Services\EmailService;
 use App\Services\Zoom;
 use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SuKienZoomController extends Controller
 {
     protected $zoom;
+    protected $email;
 
-    public function __construct(ZoomService $zoom)
+    public function __construct(ZoomService $zoom, EmailService $email)
     {
         $this->zoom = $zoom;
+        $this->email = $email;
     }
 
     public function danhSachSuKien(Request $request)
@@ -40,6 +44,8 @@ class SuKienZoomController extends Controller
                 }
             });
         }
+
+        $query->orderByRaw('ABS(TIMESTAMPDIFF(SECOND, NOW(), su_kien_zoom.ThoiGianBatDau))');
 
         $danhSachSuKien = $query->paginate(10)->withQueryString();
 
@@ -95,7 +101,7 @@ class SuKienZoomController extends Controller
                 'date_format:Y-m-d\TH:i',
                 'after:ThoiGianBatDau',
             ],
-            'MatKhauSuKien' => 'required|string|min:6|max:100',
+            'MatKhauSuKien' => 'required|string|min:6|max:10',
         ], [
             'MaLopHocPhan.required' => 'Vui lòng chọn lớp học phần.',
             'MaLopHocPhan.exists' => 'Lớp học phần không tồn tại.',
@@ -110,7 +116,7 @@ class SuKienZoomController extends Controller
             'ThoiGianKetThuc.after' => 'Thời gian kết thúc phải sau thời gian bắt đầu.',
             'MatKhauSuKien.required' => 'Vui lòng nhập mật khẩu sự kiện.',
             'MatKhauSuKien.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'MatKhauSuKien.max' => 'Mật khẩu không được vượt quá 100 ký tự.',
+            'MatKhauSuKien.max' => 'Mật khẩu không được vượt quá 10 ký tự.',
         ]);
 
 
@@ -141,6 +147,13 @@ class SuKienZoomController extends Controller
                 'KhoaChuTri' => env('ZOOM_HOST_KEY')
             ]);
 
+            $this->luuThongBaoVaGuiEmail(
+                $suKien->MaLopHocPhan,
+                Auth::id(),
+                $suKien,
+                'them'
+            );
+
             return redirect()->route('giangvien.su-kien-zoom.danhsach')->with('success', 'Tạo sự kiện Zoom thành công.');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('errorSystem', 'Lỗi khi tạo Zoom: ' . $e->getMessage());
@@ -155,11 +168,19 @@ class SuKienZoomController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('errorSystem', 'Lỗi khi xóa sự kiện Zoom: ' . $e->getMessage());
         }
+        $copySuKien = clone $suKien;
 
         $suKien->delete();
 
+        $this->luuThongBaoVaGuiEmail(
+            $copySuKien->MaLopHocPhan,
+            Auth::id(),
+            $copySuKien,
+            'xoa'
+        );
         return redirect()->back()->with('success', 'Xóa sự kiện Zoom thành công.');
     }
+
     public function capNhatSuKienZoom(Request $request, $id)
     {
         $suKien = SuKienZoom::findOrFail($id);
@@ -177,7 +198,7 @@ class SuKienZoomController extends Controller
                 'date_format:Y-m-d\TH:i',
                 'after:ThoiGianBatDau',
             ],
-            'MatKhauSuKien' => 'required|string|min:6|max:100',
+            'MatKhauSuKien' => 'required|string|min:6|max:10',
         ], [
             'TenSuKien.required' => 'Vui lòng nhập tên sự kiện.',
             'TenSuKien.max' => 'Tên sự kiện không được vượt quá 100 ký tự.',
@@ -190,7 +211,7 @@ class SuKienZoomController extends Controller
             'ThoiGianKetThuc.after' => 'Thời gian kết thúc phải sau thời gian bắt đầu.',
             'MatKhauSuKien.required' => 'Vui lòng nhập mật khẩu sự kiện.',
             'MatKhauSuKien.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'MatKhauSuKien.max' => 'Mật khẩu không được vượt quá 100 ký tự.',
+            'MatKhauSuKien.max' => 'Mật khẩu không được vượt quá 10 ký tự.',
         ]);
 
         try {
@@ -206,8 +227,93 @@ class SuKienZoomController extends Controller
         }
 
         $suKien->update($validated);
-
+        $this->luuThongBaoVaGuiEmail(
+            $suKien->MaLopHocPhan,
+            Auth::id(),
+            $suKien,
+            'sua'
+        );
         return redirect()->route('giangvien.su-kien-zoom.danhsach')->with('success', 'Cập nhật sự kiện Zoom thành công.');
+    }
+
+    public function luuThongBaoVaGuiEmail($maLopHocPhan, $maNguoiTao, $suKien, $hanhDong = 'them')
+    {
+        try {
+            $lopHocPhan = DB::table('lop_hoc_phan')->where('MaLopHocPhan', $maLopHocPhan)->first();
+
+            $danhSachThongTin = DB::table('danh_sach_lop')
+                ->join('nguoi_dung', 'danh_sach_lop.MaSinhVien', '=', 'nguoi_dung.MaNguoiDung')
+                ->where('danh_sach_lop.MaLopHocPhan', $maLopHocPhan)
+                ->select('nguoi_dung.MaNguoiDung', 'nguoi_dung.HoTen', 'nguoi_dung.Email')
+                ->get();
+
+            $giangVien = DB::table('nguoi_dung')
+                ->where('MaNguoiDung', $maNguoiTao)
+                ->select('MaNguoiDung', 'HoTen', 'Email')
+                ->first();
+
+            if ($giangVien) {
+                $danhSachThongTin->push($giangVien);
+            }
+
+            $start = \Carbon\Carbon::parse($suKien->ThoiGianBatDau)->format('H:i:s d/m/Y');
+            $end = \Carbon\Carbon::parse($suKien->ThoiGianKetThuc)->format('H:i:s d/m/Y');
+
+            switch ($hanhDong) {
+                case 'them':
+                    $noiDungThongBao = "Một sự kiện Zoom mới đã được thêm vào lớp {$lopHocPhan->TenLopHocPhan}.";
+                    $tieuDeEmail = "🔔 Thêm sự kiện Zoom mới";
+                    break;
+                case 'sua':
+                    $noiDungThongBao = "Sự kiện Zoom trong lớp {$lopHocPhan->TenLopHocPhan} đã được cập nhật.";
+                    $tieuDeEmail = "🔄 Cập nhật sự kiện Zoom";
+                    break;
+                case 'xoa':
+                    $noiDungThongBao = "Một sự kiện Zoom trong lớp {$lopHocPhan->TenLopHocPhan} đã bị xóa.";
+                    $tieuDeEmail = "❌ Xóa sự kiện Zoom";
+                    break;
+                default:
+                    $noiDungThongBao = "Có thay đổi liên quan đến sự kiện Zoom trong lớp {$lopHocPhan->TenLopHocPhan}.";
+                    $tieuDeEmail = "🔔 Thông báo sự kiện Zoom";
+                    break;
+            }
+
+            DB::table('thong_bao')->insert([
+                'MaLopHocPhan' => $maLopHocPhan,
+                'MaNguoiTao' => $maNguoiTao,
+                'NoiDung' => $noiDungThongBao,
+                'ThoiGianTao' => now(),
+            ]);
+            foreach ($danhSachThongTin as $nd) {
+                $studentName = $nd->HoTen;
+                $email = $nd->Email;
+                $isTeacher = ($nd->MaNguoiDung == $maNguoiTao);
+
+                $body = "Chào {$studentName},<br><br>";
+                $body .= "{$noiDungThongBao}<br><br>";
+                $body .= "📄 Tên sự kiện: {$suKien->TenSuKien}<br>";
+                $body .= "📄 Nội dung sự kiện: {$suKien->MoTa}<br>";
+                $body .= "🔗 Link tham gia: {$suKien->LinkSuKien}<br>";
+                $body .= "⌚ Bắt đầu: {$start}<br>";
+                $body .= "⏳ Kết thúc: {$end}<br>";
+                $body .= "🔑 Mật khẩu: {$suKien->MatKhauSuKien}<br>";
+
+                if ($isTeacher && !empty($suKien->KhoaChuTri)) {
+                    $body .= "🔑 Mã Host Key: {$suKien->KhoaChuTri}<br>";
+                    $body .= "Lưu ý: không chia sẻ mã này với bất kỳ ai.<br>";
+                }
+
+                $body .= "<br>Trân trọng,<br>Hệ thống quản lý bài giảng trực tuyến.";
+
+                try {
+                    $this->email->sendEmail($email, $tieuDeEmail, $body);
+                } catch (\Throwable $e) {
+                    Log::error("Không thể gửi email đến {$email}: " . $e->getMessage());
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('Lỗi xử lý thông báo và email sự kiện Zoom: ' . $e->getMessage());
+        }
     }
 
     function layZoomId($zoomLink)
