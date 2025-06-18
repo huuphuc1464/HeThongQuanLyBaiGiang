@@ -50,7 +50,7 @@
         <a href="{{ route('admin.dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
         <a href="{{ route('admin.khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
         <a href="{{ route('admin.mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-        <a href="#"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
+        <a href="{{route('admin.giang-vien.danh-sach') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
         <a href="#"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
     </div>
 
