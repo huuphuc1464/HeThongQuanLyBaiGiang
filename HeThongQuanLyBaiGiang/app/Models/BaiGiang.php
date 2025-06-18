@@ -13,7 +13,6 @@ class BaiGiang extends Model
         'MaHocPhan',
         'TenChuong',
         'TenBai',
-        'TenMuc',
         'TenBaiGiang',
         'NoiDung',
         'MoTa',

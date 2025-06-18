@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('MaHocPhan')->constrained('hoc_phan', 'MaHocPhan');
             $table->string('TenChuong', 255);
             $table->string('TenBai', 255);
-            $table->string('TenMuc', 255);
             $table->string('TenBaiGiang', 255);
             $table->text('NoiDung');
             $table->string('MoTa', 255)->nullable();

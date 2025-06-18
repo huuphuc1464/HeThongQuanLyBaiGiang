@@ -7,18 +7,20 @@ use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
 use App\Http\Controllers\GiangVien\SuKienZoomController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
-use Barryvdh\Elfinder\ElfinderController;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\MonHocController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GiangVienController;
+use App\Http\Controllers\ElfinderController;
+use App\Http\Controllers\GiangVien\BaiGiangController;
+use App\Models\BaiGiang;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::any('elfinder/connector', [ElfinderController::class, 'showConnector'])->name('elfinder.connector');
+// Route::any('elfinder/connector', [ElfinderController::class, 'showConnector'])->name('elfinder.connector');
 
 Route::get('/editor', function () {
     return view('editor');
@@ -89,3 +91,15 @@ Route::delete('/admin/giang-vien/xoa/{id}', [GiangVienController::class, 'xoaGia
 Route::post('/admin/giang-vien/khoi-phuc/{id}', [GiangVienController::class, 'khoiPhucGiangVien'])->name('admin.giang-vien.khoi-phuc');
 Route::get('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('admin.giang-vien.form-sua');
 Route::put('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('admin.giang-vien.sua');
+
+Route::get('/giang-vien/hoc-phan/{id}/bai-giang', [BaiGiangController::class, 'danhSachBaiGiang'])->name('giang-vien.bai-giang');
+Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/{maBaiGiang}/thay-doi-trang-thai', [BaiGiangController::class, 'thayDoiTrangThai'])->name('baiGiang.thayDoiTrangThai');
+Route::get('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'hienFormThem'])->name('giang-vien.bai-giang.form-them');
+Route::post('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'themBaiGiang'])
+    ->name('giang-vien.bai-giang.them');
+Route::post('/giang-vien/bai-giang/xoa-tam', [BaiGiangController::class, 'xoaFileTam'])
+    ->name('baiGiang.xoaTamUploads');
+
+
+
+Route::any('/elfinder/connector', [ElfinderController::class, 'connector'])->name('elfinder.connector');
