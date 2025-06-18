@@ -1,6 +1,6 @@
 @extends('layouts.adminLayout')
 
-@section('content')
+@section('styles')
 <style>
 .card {
     transition: transform 0.2s;
@@ -52,7 +52,9 @@
     font-style: italic;
 }
 </style>
+@endsection
 
+@section('content')
 <div class="container">
     <h2 class="mb-4">Thống kê hệ thống</h2>
 
@@ -250,8 +252,9 @@
         </div>
     </div>
 </div>
+@endsection
 
-<!-- Chart.js -->
+@section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -303,3 +306,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
+
