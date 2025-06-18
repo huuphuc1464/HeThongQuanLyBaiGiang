@@ -55,11 +55,7 @@ Route::get('/thay-doi-thong-tin-ca-nhan', [SinhVienHomeController::class, 'hienF
 Route::get('/admin/doi-mat-khau', [DashboardController::class, 'hienFormDoiMatKhau'])->name('admin.doi-mat-khau');
 Route::get('/admin/thay-doi-thong-tin-ca-nhan', [DashboardController::class, 'hienFormThayDoiThongTin'])->name('admin.doi-thong-tin');
 
-
-
-
-
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::class . ':1'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Routes cho quản lý khoa
@@ -73,8 +69,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/mon-hoc', [MonHocController::class, 'themMoi'])->name('mon-hoc.them-moi');
     Route::put('/mon-hoc/{monHoc}', [MonHocController::class, 'capNhat'])->name('mon-hoc.cap-nhat');
     Route::delete('/mon-hoc/{monHoc}', [MonHocController::class, 'xoa'])->name('mon-hoc.xoa');
-});
 
+    // Routes cho quản lý giảng viên
+    Route::get('/giang-vien', [GiangVienController::class, 'danhSachGiangVien'])->name('giang-vien.danh-sach');
+    Route::get('/giang-vien/them', [GiangVienController::class, 'hienFormThemGiangVien'])->name('giang-vien.form-them');
+    Route::post('/giang-vien/them', [GiangVienController::class, 'themGiangVien'])->name('giang-vien.them');
+    Route::delete('/giang-vien/xoa/{id}', [GiangVienController::class, 'xoaGiangVien'])->name('giang-vien.xoa');
+    Route::post('/giang-vien/khoi-phuc/{id}', [GiangVienController::class, 'khoiPhucGiangVien'])->name('giang-vien.khoi-phuc');
+    Route::get('/giang-vien/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('giang-vien.form-sua');
+    Route::put('/giang-vien/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('giang-vien.sua');
+});
 
 Route::get('/giang-vien/su-kien-zoom', [SuKienZoomController::class, 'danhSachSuKien'])->name('giangvien.su-kien-zoom.danhsach');
 Route::get('/giang-vien/su-kien-zoom/chi-tiet/{id}', [SuKienZoomController::class, 'chiTietSuKien'])->name('giangvien.su-kien-zoom.chi-tiet');
@@ -91,6 +95,7 @@ Route::delete('/admin/giang-vien/xoa/{id}', [GiangVienController::class, 'xoaGia
 Route::post('/admin/giang-vien/khoi-phuc/{id}', [GiangVienController::class, 'khoiPhucGiangVien'])->name('admin.giang-vien.khoi-phuc');
 Route::get('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('admin.giang-vien.form-sua');
 Route::put('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('admin.giang-vien.sua');
+
 
 Route::get('/giang-vien/hoc-phan/{id}/bai-giang', [BaiGiangController::class, 'danhSachBaiGiang'])->name('giang-vien.bai-giang');
 Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/{maBaiGiang}/thay-doi-trang-thai', [BaiGiangController::class, 'thayDoiTrangThai'])->name('baiGiang.thayDoiTrangThai');
