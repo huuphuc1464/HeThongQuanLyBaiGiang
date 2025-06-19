@@ -111,7 +111,7 @@
 <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 <script>
     window.APP_URL = "{{ url('/') }}";
-    window.ELFINDER_URL = '{{ route("elfinder.connector") }}';
+    window.ELFINDER_URL = {!! json_encode(url()->route('elfinder.connector', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang ?? null])) !!};
     window.ELFINDER_SOUND = '{{ asset("assets/sounds") }}';
     window.chuongBai = @json($chuongBai);
 </script>

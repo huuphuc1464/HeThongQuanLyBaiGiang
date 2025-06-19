@@ -16,8 +16,17 @@ class ElfinderController extends Controller
     public function connector(Request $request)
     {
         $maHocPhan = $request->query('maHocPhan');
-        $path = public_path("BaiGiang/HocPhan_$maHocPhan");
-        $url  = asset("BaiGiang/HocPhan_$maHocPhan");
+        $maBaiGiang = $request->query('maBaiGiang');
+        $maNguoiDung = Auth::id();
+        if ($maBaiGiang) {
+            // Sửa bài giảng
+            $path = public_path("BaiGiang/HocPhan_{$maHocPhan}/{$maBaiGiang}");
+            $url  = asset("BaiGiang/HocPhan_{$maHocPhan}/{$maBaiGiang}");
+        } else {
+            // Thêm bài giảng
+            $path = public_path("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
+            $url  = asset("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
+        }
 
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
@@ -26,16 +35,16 @@ class ElfinderController extends Controller
         $roots = [
             [
                 'driver' => 'LocalFileSystem',
-                'path'   => $path,
-                'URL'    => $url,
+                'path' => $path,
+                'URL' => $url,
                 'accessControl' => function ($attr, $path, $data, $volume, $isDir, $relpath) {
                     return null;
                 },
-                'alias'  => "Tài liệu bài giảng",
+                'alias' => 'Tài liệu bài giảng',
                 'attributes' => [
                     [
                         'pattern' => '/\.tmb$/',
-                        'hidden'  => true,
+                        'hidden' => true,
                     ]
                 ]
             ]

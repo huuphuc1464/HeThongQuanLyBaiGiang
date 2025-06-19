@@ -112,7 +112,7 @@ function initTinyMCE(maHocPhan, csrfToken) {
                     if (!window.elfinderInstance) {
                         window.elfinderInstance = $('#elfinder').elfinder({
                             lang: 'en',
-                            url: window.ELFINDER_URL + '?maHocPhan=' + maHocPhan,
+                            url: window.ELFINDER_URL,
                             soundPath: window.ELFINDER_SOUND,
                             getFileCallback: function (file) {
                                 editor.insertContent('<img src="' + file.url + '" />');
@@ -124,6 +124,35 @@ function initTinyMCE(maHocPhan, csrfToken) {
                             },
                             transport: {
                                 withCredentials: true
+                            },
+                            handlers: {
+                                remove: function (event, elfinderInstance) {
+                                    const removedFiles = event.data.removed || [];
+                                    removedFiles.forEach(path => {
+                                        const isUpdate = !!window.maBaiGiang;
+
+                                        const apiUrl = isUpdate
+                                            ? '/bai-giang/them-file-xoa'
+                                            : '/bai-giang/xoa-file-elfinder';
+
+                                        const payload = {
+                                            path: path,
+                                            ...(isUpdate && { maBaiGiang: window.maBaiGiang })
+                                        };
+
+                                        fetch(apiUrl, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': csrfToken
+                                            },
+                                            body: JSON.stringify(payload)
+                                        })
+                                            .then(res => res.json())
+                                            .then(data => console.log('File xử lý xoá:', data))
+                                            .catch(err => console.error('Lỗi khi gọi API xoá:', err));
+                                    });
+                                }
                             }
                         }).elfinder('instance');
                     }
