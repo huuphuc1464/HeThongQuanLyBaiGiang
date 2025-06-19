@@ -82,7 +82,7 @@
                                                         <a href="#" class="btn btn-warning btn-sm me-1">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <a href="#" class="btn btn-primary btn-sm">
+                                                        <a href="{{ route('giang-vien.bai-giang.form-sua', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-primary btn-sm">
                                                             <i class="fas fa-info-circle"></i>
                                                         </a>
                                                     </div>

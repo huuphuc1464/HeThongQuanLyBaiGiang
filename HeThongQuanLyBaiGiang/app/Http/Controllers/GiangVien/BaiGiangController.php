@@ -49,6 +49,46 @@ class BaiGiangController extends Controller
         return view('giangvien.quanLyBaiGiang.danhSachBaiGiang', compact('baiGiangs', 'hocPhan'));
     }
 
+    public function hienFormSua(Request $request, $maHocPhan, $maBaiGiang)
+    {
+        $baiGiang = DB::table('bai_giang')
+            ->where('MaGiangVien', Auth::id())
+            ->where('MaHocPhan', $maHocPhan)
+            ->where('MaBaiGiang', $maBaiGiang)
+            ->first();
+
+        $hocPhan = DB::table('hoc_phan')
+            ->where('MaHocPhan', $maHocPhan)
+            ->where('MaNguoiTao', Auth::id())
+            ->select('MaHocPhan', 'TenHocPhan')
+            ->first();
+        $baiGiangs = BaiGiang::where('MaHocPhan', $maHocPhan)
+            ->select('TenChuong', 'TenBai')
+            ->whereNotNull('TenChuong')
+            ->whereNotNull('TenBai')
+            ->get();
+
+        // Gom nhóm theo chương
+        $chuongBai = [];
+
+        foreach ($baiGiangs as $bg) {
+            $tenChuong = trim($bg->TenChuong);
+            $tenBai = trim($bg->TenBai);
+
+            if (!$tenChuong || !$tenBai) continue;
+
+            if (!isset($chuongBai[$tenChuong])) {
+                $chuongBai[$tenChuong] = [];
+            }
+
+            if (!in_array($tenBai, $chuongBai[$tenChuong])) {
+                $chuongBai[$tenChuong][] = $tenBai;
+            }
+        }
+
+        return view('giangvien.quanLyBaiGiang.suaBaiGiang', compact('baiGiang', 'hocPhan', 'chuongBai'));
+    }
+
     public function thayDoiTrangThai($maHocPhan, $maBaiGiang)
     {
         $baiGiang = BaiGiang::where('MaHocPhan', $maHocPhan)
@@ -170,6 +210,56 @@ class BaiGiangController extends Controller
         }
     }
 
+    public function capNhatBaiGiang(Request $request, $maHocPhan, $maBaiGiang)
+    {
+        $request->validate([
+            'TenChuong' => 'required|string|max:255',
+            'TenBai' => 'required|string|max:255',
+            'TenBaiGiang' => 'required|string|max:255',
+            'NoiDung' => 'required|string',
+            'MoTa' => 'nullable|string|max:255',
+        ], [
+            'TenChuong.required' => 'Tên chương không được để trống.',
+            'TenChuong.string' => 'Tên chương phải là chuỗi.',
+            'TenChuong.max' => 'Tên chương không được vượt quá 255 ký tự.',
+            'TenBai.required' => 'Tên bài không được để trống.',
+            'TenBai.string' => 'Tên bài phải là chuỗi.',
+            'TenBai.max' => 'Tên bài không được vượt quá 255 ký tự.',
+            'TenBaiGiang.required' => 'Tên bài giảng không được để trống.',
+            'TenBaiGiang.string' => 'Tên bài giảng phải là chuỗi.',
+            'TenBaiGiang.max' => 'Tên bài giảng không được vượt quá 255 ký tự.',
+            'NoiDung.required' => 'Nội dung bài giảng không được để trống.',
+            'NoiDung.string' => 'Nội dung phải là chuỗi.',
+            'MoTa.string' => 'Mô tả phải là chuỗi.',
+            'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự.',
+        ]);
+
+        try {
+            $maNguoiDung = Auth::id();
+
+            $baiGiang = BaiGiang::where('MaBaiGiang', $maBaiGiang)
+                ->where('MaGiangVien', $maNguoiDung)
+                ->where('MaHocPhan', $maHocPhan)
+                ->firstOrFail();
+
+            $baiGiang->TenChuong = $request->TenChuong;
+            $baiGiang->TenBai = $request->TenBai;
+            $baiGiang->TenBaiGiang = $request->TenBaiGiang;
+            $baiGiang->NoiDung = $request->NoiDung;
+            $baiGiang->MoTa = $request->MoTa;
+            $baiGiang->updated_at = now('Asia/Ho_Chi_Minh');
+            $baiGiang->save();
+
+            Log::info('Đã cập nhật bài giảng', ['MaBaiGiang' => $baiGiang->MaBaiGiang]);
+
+            return redirect()->route('giang-vien.bai-giang', ['id' => $maHocPhan])
+                ->with('success', 'Cập nhật bài giảng thành công!');
+        } catch (\Exception $e) {
+            Log::error('Lỗi khi cập nhật bài giảng', ['message' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Lỗi khi cập nhật: ' . $e->getMessage());
+        }
+    }
+
 
     public function xoaFileTam(Request $request)
     {
@@ -180,8 +270,9 @@ class BaiGiangController extends Controller
             $data = json_decode(file_get_contents($jsonPath), true);
 
             if (!empty($data['tenFile']) && is_array($data['tenFile'])) {
-                foreach ($data['tenFile'] as $filePath) {
-                    $fullPath = public_path($filePath);
+                foreach ($data['tenFile'] as $duongDan) {
+                    $duongDan = urldecode($duongDan);
+                    $fullPath = public_path($duongDan);
                     if (file_exists($fullPath)) {
                         unlink($fullPath);
                         Log::info("Đã xóa file: $fullPath");

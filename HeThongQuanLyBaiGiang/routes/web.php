@@ -100,10 +100,13 @@ Route::put('/admin/giang-vien/sua/{id}', [GiangVienController::class, 'capNhatGi
 Route::get('/giang-vien/hoc-phan/{id}/bai-giang', [BaiGiangController::class, 'danhSachBaiGiang'])->name('giang-vien.bai-giang');
 Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/{maBaiGiang}/thay-doi-trang-thai', [BaiGiangController::class, 'thayDoiTrangThai'])->name('baiGiang.thayDoiTrangThai');
 Route::get('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'hienFormThem'])->name('giang-vien.bai-giang.form-them');
+Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/sua/{maBaiGiang}', [BaiGiangController::class, 'hienFormSua'])->name('giang-vien.bai-giang.form-sua');
 Route::post('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'themBaiGiang'])
     ->name('giang-vien.bai-giang.them');
 Route::post('/giang-vien/bai-giang/xoa-tam', [BaiGiangController::class, 'xoaFileTam'])
     ->name('baiGiang.xoaTamUploads');
+Route::put('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/cap-nhat/{maBaiGiang}', [BaiGiangController::class, 'capNhatBaiGiang'])
+    ->name('giang-vien.bai-giang.cap-nhat');
 
 
 
