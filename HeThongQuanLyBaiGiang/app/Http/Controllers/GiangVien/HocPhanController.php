@@ -19,7 +19,9 @@ class HocPhanController extends Controller
 
     public function danhSach(Request $request)
     {
-        $query = HocPhan::with(['monHoc', 'nguoiTao'])
+        $perPage = $request->input('per_page', 10);
+
+        $query = HocPhan::with(['monHoc', 'nguoiTao'])->withCount('baiGiang')
             ->where('MaNguoiTao', Auth::id());
 
         // Tìm kiếm
@@ -33,7 +35,7 @@ class HocPhanController extends Controller
             });
         }
 
-        $danhSachHocPhan = $query->orderBy('created_at', 'desc')->paginate(10);
+        $danhSachHocPhan = $query->orderBy('created_at', 'desc')->paginate($perPage);
         $danhSachMonHoc = MonHoc::where('TrangThai', 1)->get();
 
         return view('giangvien.quanLyHocPhan', compact('danhSachHocPhan', 'danhSachMonHoc'));
