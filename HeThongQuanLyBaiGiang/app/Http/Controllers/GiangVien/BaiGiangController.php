@@ -161,9 +161,13 @@ class BaiGiangController extends Controller
             'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự.',
         ]);
 
-        try {
-            $maNguoiDung = Auth::id();
+        $maNguoiDung = Auth::id();
+        $oldPath = "BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}";
+        $oldFolder = public_path($oldPath);
 
+        DB::beginTransaction();
+
+        try {
             $baiGiang = new BaiGiang();
             $baiGiang->MaGiangVien = $maNguoiDung;
             $baiGiang->MaHocPhan = $maHocPhan;
@@ -174,57 +178,60 @@ class BaiGiangController extends Controller
             $baiGiang->MoTa = $request->MoTa;
             $baiGiang->TrangThai = 1;
             $baiGiang->created_at = now('Asia/Ho_Chi_Minh');
-            $baiGiang->updated_at =  now('Asia/Ho_Chi_Minh');
+            $baiGiang->updated_at = now('Asia/Ho_Chi_Minh');
             $baiGiang->save();
-            Log::info('Đã lưu bài giảng', ['MaBaiGiang' => $baiGiang->MaBaiGiang]);
 
-            $oldFolder = public_path("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
-            $newFolder = public_path("BaiGiang/HocPhan_{$maHocPhan}/{$baiGiang->MaBaiGiang}");
+            // Đổi tên thư mục chứa file
+            $newPath = "BaiGiang/HocPhan_{$maHocPhan}/{$baiGiang->MaBaiGiang}";
+            $newFolder = public_path($newPath);
 
             if (file_exists($oldFolder)) {
                 rename($oldFolder, $newFolder);
             }
 
-            $oldPath = "BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}";
-            $newPath = "BaiGiang/HocPhan_{$maHocPhan}/{$baiGiang->MaBaiGiang}";
-
             // Cập nhật đường dẫn ảnh trong nội dung bài giảng
             $baiGiang->NoiDung = str_replace($oldPath, $newPath, $baiGiang->NoiDung);
             $baiGiang->save();
 
-            // Đọc file JSON tạm lưu thông tin file đã upload
-            $jsonPath = storage_path("app/file_bai_giang/{$maNguoiDung}.json");
+            // Lưu danh sách file
+            if (File::exists($newFolder)) {
+                $files = File::files($newFolder);
 
-            if (file_exists($jsonPath)) {
-                $data = json_decode(file_get_contents($jsonPath), true);
-                Log::info('File JSON đọc được:', $data);
+                foreach ($files as $file) {
+                    $relativePath = str_replace(public_path(), '', $file->getPathname());
+                    $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
 
-                foreach ($data['tenFile'] as $duongDanCu) {
-                    $duongDan = str_replace("temp_{$maNguoiDung}", $baiGiang->MaBaiGiang, $duongDanCu);
                     FileBaiGiang::create([
                         'MaBaiGiang' => $baiGiang->MaBaiGiang,
-                        'DuongDan' => $duongDan,
-                        'LoaiFile' => pathinfo($duongDan, PATHINFO_EXTENSION),
-                        'TrangThai' => 1,
+                        'DuongDan'   => $relativePath,
+                        'LoaiFile'   => $file->getExtension(),
+                        'TrangThai'  => 1,
                         'created_at' => now('Asia/Ho_Chi_Minh'),
-                        'updated_at' => now('Asia/Ho_Chi_Minh')
+                        'updated_at' => now('Asia/Ho_Chi_Minh'),
                     ]);
                 }
-
-                // Xóa file tạm
-                unlink($jsonPath);
             }
+
+            DB::commit();
             return redirect()->route('giang-vien.bai-giang', ['id' => $maHocPhan])->with('success', 'Thêm bài giảng thành công!');
         } catch (\Exception $e) {
-            // Xóa bài giảng nếu đã được lưu mà lỗi xảy ra sau đó
+            DB::rollBack();
+
+            // Xoá bản ghi bài giảng nếu đã tạo
             if (isset($baiGiang) && $baiGiang->exists) {
                 $baiGiang->delete();
+            }
+
+            // Xoá thư mục đã di chuyển (nếu có)
+            if (isset($newFolder) && File::exists($newFolder)) {
+                File::deleteDirectory($newFolder);
             }
 
             Log::error('Lỗi khi lưu bài giảng', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Lỗi khi lưu bài giảng: ' . $e->getMessage());
         }
     }
+
 
     public function capNhatBaiGiang(Request $request, $maHocPhan, $maBaiGiang)
     {
@@ -234,6 +241,7 @@ class BaiGiangController extends Controller
             'TenBaiGiang' => 'required|string|max:255',
             'NoiDung' => 'required|string',
             'MoTa' => 'nullable|string|max:255',
+            'TrangThai' => 'required|in:0,1',
         ], [
             'TenChuong.required' => 'Tên chương không được để trống.',
             'TenChuong.string' => 'Tên chương phải là chuỗi.',
@@ -248,7 +256,11 @@ class BaiGiangController extends Controller
             'NoiDung.string' => 'Nội dung phải là chuỗi.',
             'MoTa.string' => 'Mô tả phải là chuỗi.',
             'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự.',
+            'TrangThai.required' => 'Trạng thái bài giảng không được để trống.',
+            'TrangThai.in' => 'Trạng thái bài giảng chỉ chấp nhận giá trị 0 và 1.'
         ]);
+
+        DB::beginTransaction();
 
         try {
             $maNguoiDung = Auth::id();
@@ -263,68 +275,47 @@ class BaiGiangController extends Controller
             $baiGiang->TenBaiGiang = $request->TenBaiGiang;
             $baiGiang->NoiDung = $request->NoiDung;
             $baiGiang->MoTa = $request->MoTa;
+            $baiGiang->TrangThai = $request->TrangThai;
             $baiGiang->updated_at = now('Asia/Ho_Chi_Minh');
             $baiGiang->save();
 
-            Log::info('Đã cập nhật bài giảng', ['MaBaiGiang' => $baiGiang->MaBaiGiang]);
+            $folderPath = public_path("BaiGiang/HocPhan_{$maHocPhan}/{$maBaiGiang}");
+            if (File::exists($folderPath)) {
+                $filePathsOnDisk = collect(File::files($folderPath))->map(function ($file) {
+                    return ltrim(str_replace(public_path(), '', $file->getPathname()), '/');
+                })->toArray();
 
-            // Lưu file mới nếu người dùng đã upload trong quá trình cập nhật
-            $jsonPath = storage_path("app/file_bai_giang/{$maNguoiDung}.json");
-            if (file_exists($jsonPath)) {
-                $data = json_decode(file_get_contents($jsonPath), true);
-                if (!empty($data['tenFile']) && is_array($data['tenFile'])) {
-                    foreach ($data['tenFile'] as $duongDan) {
-                        $exists = FileBaiGiang::where('MaBaiGiang', $baiGiang->MaBaiGiang)
-                            ->where('DuongDan', $duongDan)
-                            ->exists();
-                        if (!$exists) {
-                            FileBaiGiang::create([
-                                'MaBaiGiang' => $baiGiang->MaBaiGiang,
-                                'DuongDan' => $duongDan,
-                                'LoaiFile' => pathinfo($duongDan, PATHINFO_EXTENSION),
-                                'TrangThai' => 1,
-                                'created_at' => now('Asia/Ho_Chi_Minh'),
-                                'updated_at' => now('Asia/Ho_Chi_Minh'),
-                            ]);
-                        }
+                $filePathsInDb = FileBaiGiang::where('MaBaiGiang', $maBaiGiang)->pluck('DuongDan')->toArray();
+
+                // Xóa khỏi DB nếu file không còn trong thư mục
+                foreach ($filePathsInDb as $dbPath) {
+                    if (!in_array($dbPath, $filePathsOnDisk)) {
+                        FileBaiGiang::where('MaBaiGiang', $maBaiGiang)
+                            ->where('DuongDan', $dbPath)
+                            ->delete();
+
+                        Log::info("Đã xóa bản ghi file không tồn tại trên ổ đĩa: $dbPath");
                     }
                 }
-                Log::info("Đã xóa file JSON sau cập nhật bài giảng", ['path' => $jsonPath]);
-            }
 
-            $jsonDeletePath = storage_path("app/file_bai_giang/deletedFiles_{$maNguoiDung}_{$maBaiGiang}.json");
-            if (file_exists($jsonDeletePath)) {
-                $deletedFiles = json_decode(file_get_contents($jsonDeletePath), true);
-                foreach ($deletedFiles as $duongDan) {
-                    FileBaiGiang::where('MaBaiGiang', $maBaiGiang)
-                        ->where('DuongDan', $duongDan)
-                        ->delete();
-
-                    $fullPath = public_path($duongDan);
-                    if (file_exists($fullPath)) {
-                        unlink($fullPath);
-                        Log::info("Đã xóa file khỏi ổ đĩa: $fullPath");
+                // Thêm file vào DB nếu tồn tại trong thư mục mà chưa có trong DB
+                foreach ($filePathsOnDisk as $diskPath) {
+                    if (!in_array($diskPath, $filePathsInDb)) {
+                        FileBaiGiang::create([
+                            'MaBaiGiang' => $maBaiGiang,
+                            'DuongDan'   => $diskPath,
+                            'LoaiFile'   => pathinfo($diskPath, PATHINFO_EXTENSION),
+                            'TrangThai'  => 1,
+                            'created_at' => now('Asia/Ho_Chi_Minh'),
+                            'updated_at' => now('Asia/Ho_Chi_Minh'),
+                        ]);
                     }
-
-                    Log::info("Đã xóa file trong DB: $duongDan");
                 }
             }
-            $paths = [
-                storage_path("app/file_bai_giang/{$maNguoiDung}.json"),
-                storage_path("app/file_bai_giang/deletedFiles_{$maNguoiDung}_{$maBaiGiang}.json"),
-            ];
-
-            foreach ($paths as $path) {
-                if (file_exists($path)) {
-                    unlink($path);
-                    Log::info("Đã dọn sạch file tạm: $path");
-                }
-            }
-
-            return redirect()->route('giang-vien.bai-giang', ['id' => $maHocPhan])
-                ->with('success', 'Cập nhật bài giảng thành công!');
+            DB::commit();
+            return redirect()->route('giang-vien.bai-giang', ['id' => $maHocPhan])->with('success', 'Cập nhật bài giảng thành công!');
         } catch (\Exception $e) {
-            Log::error('Lỗi khi cập nhật bài giảng', ['message' => $e->getMessage()]);
+            DB::rollBack();
             return redirect()->back()->with('error', 'Lỗi khi cập nhật: ' . $e->getMessage());
         }
     }
@@ -346,95 +337,33 @@ class BaiGiangController extends Controller
         return view('giangvien.quanLyBaiGiang.chiTietBaiGiang', compact('baiGiang', 'hocPhan', 'files'));
     }
 
-
-    public function xoaFileTam(Request $request)
+    public function huyBoBaiGiang(Request $request)
     {
+        $maHocPhan = $request->MaHocPhan;
+        $maBaiGiang = $request->MaBaiGiang ?? null;
         $maNguoiDung = Auth::id();
-        $maHocPhan = $request->input('MaHocPhan');
-        $jsonPath = storage_path("app/file_bai_giang/{$maNguoiDung}.json");
-        $thuMucTam = public_path("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
-
-        // Xóa file từ JSON
-        if (file_exists($jsonPath)) {
-            $data = json_decode(file_get_contents($jsonPath), true);
-
-            if (!empty($data['tenFile']) && is_array($data['tenFile'])) {
-                foreach ($data['tenFile'] as $duongDan) {
-                    $duongDan = urldecode($duongDan);
-                    $fullPath = public_path($duongDan);
-                    if (file_exists($fullPath)) {
-                        unlink($fullPath);
-                        Log::info("Đã xóa file: $fullPath");
-                    } else {
-                        Log::warning("Không tìm thấy file: $fullPath");
-                    }
-                }
-            }
-
-            // Xóa file JSON
-            unlink($jsonPath);
-            Log::info("Đã xóa file JSON: $jsonPath");
-        } else {
-            Log::warning("Không tìm thấy file JSON: $jsonPath");
-        }
-
-        // Xóa thư mục tạm nếu tồn tại
-        if (file_exists($thuMucTam)) {
-            File::deleteDirectory($thuMucTam);
-            Log::info("Đã xóa thư mục tạm: $thuMucTam");
-        }
-
-        return response()->json(['message' => 'Đã xóa tệp và thư mục tạm']);
-    }
-
-    public function xoaFileElfinder(Request $request)
-    {
-        $maNguoiDung = Auth::id();
-        $filePath = urldecode($request->input('path'));
-        $maBaiGiang = $request->input('maBaiGiang'); // null nếu là form thêm
-
-        Log::info("Đang xử lý xóa file elfinder: $filePath | baiGiang: $maBaiGiang");
 
         if ($maBaiGiang) {
-            // FORM SỬA - thêm vào JSON tạm deletedFiles
-            $jsonPath = storage_path("app/file_bai_giang/deletedFiles_{$maNguoiDung}_{$maBaiGiang}.json");
-            $data = file_exists($jsonPath) ? json_decode(file_get_contents($jsonPath), true) : [];
-            if (!in_array($filePath, $data)) {
-                $data[] = $filePath;
-                file_put_contents($jsonPath, json_encode($data));
-                Log::info("Đã thêm file cần xóa vào JSON: $filePath");
-            }
+            // Form cập nhật
+            $folderPath = public_path("BaiGiang/HocPhan_{$maHocPhan}/{$maBaiGiang}");
+            $duongDanDB = FileBaiGiang::where('MaBaiGiang', $maBaiGiang)->pluck('DuongDan')->toArray();
         } else {
-            // FORM THÊM - xóa khỏi file JSON tạm
-            $jsonPath = storage_path("app/file_bai_giang/{$maNguoiDung}.json");
-            if (file_exists($jsonPath)) {
-                $data = json_decode(file_get_contents($jsonPath), true);
-                $data['tenFile'] = array_values(array_filter($data['tenFile'], fn($f) => $f !== $filePath));
-                file_put_contents($jsonPath, json_encode($data));
-                Log::info("Đã cập nhật JSON sau khi xóa elfinder: $filePath");
+            // Form thêm
+            $folderPath = public_path("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
+            $duongDanDB = []; // chưa có gì trong DB
+        }
+
+        if (File::exists($folderPath)) {
+            foreach (File::files($folderPath) as $file) {
+                $relativePath = ltrim(str_replace(public_path(), '', $file->getPathname()), '/');
+
+                if (!in_array($relativePath, $duongDanDB)) {
+                    unlink($file->getPathname());
+                    Log::info("Đã xóa file chưa lưu DB: $relativePath");
+                }
             }
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['status' => 'success']);
     }
-
-    public function themFileXoa(Request $request)
-    {
-        $maNguoiDung = Auth::id();
-        $maBaiGiang = $request->input('maBaiGiang');
-        $filePath = $request->input('path');
-        $filePath = urldecode($filePath);
-
-        $jsonPath = storage_path("app/file_bai_giang/deletedFiles_{$maNguoiDung}_{$maBaiGiang}.json");
-        $data = file_exists($jsonPath) ? json_decode(file_get_contents($jsonPath), true) : [];
-
-        if (!in_array($filePath, $data)) {
-            $data[] = $filePath;
-            file_put_contents($jsonPath, json_encode($data));
-            Log::info("Đã thêm file cần xóa: $filePath");
-        }
-
-        return response()->json(['success' => true]);
-    }
-
 }

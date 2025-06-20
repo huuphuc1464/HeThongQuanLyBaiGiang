@@ -124,35 +124,6 @@ function initTinyMCE(maHocPhan, csrfToken) {
                             },
                             transport: {
                                 withCredentials: true
-                            },
-                            handlers: {
-                                remove: function (event, elfinderInstance) {
-                                    const removedFiles = event.data.removed || [];
-                                    removedFiles.forEach(path => {
-                                        const isUpdate = !!window.maBaiGiang;
-
-                                        const apiUrl = isUpdate
-                                            ? '/bai-giang/them-file-xoa'
-                                            : '/bai-giang/xoa-file-elfinder';
-
-                                        const payload = {
-                                            path: path,
-                                            ...(isUpdate && { maBaiGiang: window.maBaiGiang })
-                                        };
-
-                                        fetch(apiUrl, {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'X-CSRF-TOKEN': csrfToken
-                                            },
-                                            body: JSON.stringify(payload)
-                                        })
-                                            .then(res => res.json())
-                                            .then(data => console.log('File xử lý xoá:', data))
-                                            .catch(err => console.error('Lỗi khi gọi API xoá:', err));
-                                    });
-                                }
                             }
                         }).elfinder('instance');
                     }
@@ -162,22 +133,34 @@ function initTinyMCE(maHocPhan, csrfToken) {
     });
 }
 
-// Gửi yêu cầu xoá tệp tạm khi hủy
-function initCancelUpload(maHocPhan, routeUrl, csrfToken) {
-    document.getElementById('btn-cancel').addEventListener('click', function () {
-        if (confirm('Bạn có chắc muốn hủy bỏ thêm mới bài giảng ko?')) {
-            fetch(routeUrl, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ MaHocPhan: maHocPhan })
+// Nút hủy
+function handleCancelBaiGiang({ routeUrl, maHocPhan, maBaiGiang = null }) {
+    if (confirm('Bạn có chắc muốn hủy bỏ bài giảng không?')) {
+        fetch(routeUrl, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': window.csrfToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                MaHocPhan: maHocPhan,
+                MaBaiGiang: maBaiGiang
             })
-                .then(res => res.json())
-                .then(data => {
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Lỗi mạng');
+                return res.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
                     window.location.href = document.referrer;
-                });
-        }
-    });
+                } else {
+                    alert('Hủy bỏ thất bại.');
+                }
+            })
+            .catch(err => {
+                console.error('Lỗi khi hủy bỏ:', err);
+                alert('Đã xảy ra lỗi khi hủy bỏ.');
+            });
+    }
 }

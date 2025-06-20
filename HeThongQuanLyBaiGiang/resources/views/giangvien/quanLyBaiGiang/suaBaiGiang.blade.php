@@ -19,7 +19,7 @@
                         @enderror
                     </div>
 
-                    <!-- Tên chương -->
+                    {{-- Tên chương --}}
                     <div class="form-group col-md-4">
                         <label for="TenChuong">Tên chương</label>
                         <select class="form-control" id="selectChuong" onchange="onChangeChuong()" {{ $baiGiang->TenChuong == 'other' ? '' : 'name=TenChuong required' }}>
@@ -39,7 +39,7 @@
                         @enderror
                     </div>
 
-                    <!-- Tên bài -->
+                    {{-- Tên bài --}}
                     <div class="form-group col-md-4">
                         <label for="TenBai">Tên bài</label>
                         <select class="form-control" id="selectBai" onchange="onChangeBai()" {{ $baiGiang->TenBai == 'other' ? '' : 'name=TenBai required' }} data-selected="{{ $baiGiang->TenBai }}">
@@ -53,7 +53,7 @@
                         @enderror
                     </div>
 
-                    <!-- Tên bài giảng -->
+                    {{-- Tên bài giảng --}}
                     <div class="form-group col-md-4">
                         <label for="TenBaiGiang">Tên bài giảng</label>
                         <input type="text" name="TenBaiGiang" class="form-control" value="{{ $baiGiang->TenBaiGiang }}" required>
@@ -62,7 +62,7 @@
                         @enderror
                     </div>
 
-                    <!-- Mô tả -->
+                    {{-- Mô tả --}}
                     <div class="form-group col-md-4">
                         <label for="MoTa">Mô tả</label>
                         <input type="text" name="MoTa" class="form-control" value="{{ $baiGiang->MoTa }}">
@@ -70,6 +70,19 @@
                         <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    {{-- Trạng thái --}}
+                    <div class="form-group col-md-4">
+                        <label for="TrangThai">Trạng thái</label>
+                        <select name="TrangThai" class="form-control" required>
+                            <option value="1" {{ $baiGiang->TrangThai == 1 ? 'selected' : '' }}>Hiển thị</option>
+                            <option value="0" {{ $baiGiang->TrangThai == 0 ? 'selected' : '' }}>Ẩn</option>
+                        </select>
+                        @error('TrangThai')
+                        <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
 
                     {{-- Nội dung bài giảng --}}
                     <div class="form-group col-md-12">
@@ -90,7 +103,7 @@
     </div>
 </div>
 
-<!-- Modal elFinder -->
+{{-- Modal elFinder --}}
 <div class="modal fade" id="elfinderModal">
     <div class="modal-dialog modal-lg" style="max-width: 90%;">
         <div class="modal-content">
@@ -115,69 +128,49 @@
 <script src="{{ asset('assets/js/elfinder.min.js') }}"></script>
 <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 <script>
-    window.APP_URL = "{{ url('/') }}";
-    window.ELFINDER_URL = {!! json_encode(url()->route('elfinder.connector', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang ?? null])) !!};
-    window.ELFINDER_SOUND = '{{ asset("assets/sounds") }}';
+    window.APP_URL = @json(url('/'));
+    window.ELFINDER_URL = @json(route('elfinder.connector', [
+        'maHocPhan' => $hocPhan->MaHocPhan,
+        'maBaiGiang' => $baiGiang->MaBaiGiang ?? null
+    ]));
+    window.ELFINDER_SOUND = @json(asset('assets/sounds'));
     window.chuongBai = @json($chuongBai);
-    window.maBaiGiang = '{{ $baiGiang->MaBaiGiang ?? '' }}';
-</script>
-<script src="{{ asset('./js/teacher/baigiang.js') }}"></script>
-<script>
-    initTinyMCE({{ $hocPhan -> MaHocPhan}}, '{{ csrf_token() }}');
-    initCancelUpload({{ $hocPhan -> MaHocPhan }}, '{{ route("baiGiang.xoaTamUploads") }}', '{{ csrf_token() }}');
+    window.csrfToken = @json(csrf_token());
+    window.maHocPhan = @json($hocPhan->MaHocPhan);
+    window.maBaiGiang = @json($baiGiang->MaBaiGiang ?? null);
+
 </script>
 
+<script src="{{ asset('./js/teacher/baigiang.js') }}"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
+        initTinyMCE(window.maHocPhan, window.csrfToken);
+
         const chuong = @json($baiGiang -> TenChuong ?? '');
         const bai = @json($baiGiang -> TenBai ?? '');
         const chuongBai = @json($chuongBai);
-
         const selectBai = document.getElementById('selectBai');
 
-        if (chuong && chuongBai.hasOwnProperty(chuong)) {
+        if (chuong && window.chuongBai?.[chuong]) {
             // Xóa các option cũ
             selectBai.innerHTML = '<option value="">-- Chọn bài --</option>';
-
-            // Render lại danh sách bài
-            chuongBai[chuong].forEach(function(tenBai) {
-                const option = document.createElement('option');
-                option.value = tenBai;
-                option.text = tenBai;
+            window.chuongBai[chuong].forEach(tenBai => {
+                const option = new Option(tenBai, tenBai);
                 selectBai.appendChild(option);
             });
-
-            // Thêm option 'Khác'
-            const optionOther = document.createElement('option');
-            optionOther.value = 'other';
-            optionOther.text = 'Khác';
-            selectBai.appendChild(optionOther);
-
-            // Gán selected cho bài hiện tại
+            selectBai.appendChild(new Option('Khác', 'other'));
             selectBai.value = bai;
         }
     });
-    // Gửi yêu cầu xoá tệp tạm khi hủy
-    function initCancelUpload(maHocPhan, routeUrl, csrfToken) {
-        document.getElementById('btn-cancel').addEventListener('click', function() {
-            if (confirm('Bạn có chắc muốn hủy bỏ cập nhật bài giảng ko?')) {
-                fetch(routeUrl, {
-                        method: 'POST'
-                        , headers: {
-                            'X-CSRF-TOKEN': csrfToken
-                            , 'Content-Type': 'application/json'
-                        , }
-                        , body: JSON.stringify({
-                            MaHocPhan: maHocPhan
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        window.location.href = document.referrer;
-                    });
-            }
-        });
-    }
-</script>
 
+    document.getElementById('btn-cancel')?.addEventListener('click', () => {
+        handleCancelBaiGiang({
+            routeUrl: @json(route('bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan])),
+            maHocPhan: window.maHocPhan,
+            maBaiGiang: window.maBaiGiang
+        });
+    });
+
+</script>
 @endsection

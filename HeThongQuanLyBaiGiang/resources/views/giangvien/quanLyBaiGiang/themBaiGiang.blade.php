@@ -18,7 +18,7 @@
                         @enderror
                     </div>
 
-                    <!-- Tên chương -->
+                    {{-- Tên chương --}}
                     <div class="form-group col-md-4">
                         <label for="TenChuong">Tên chương</label>
                         <select class="form-control" id="selectChuong" onchange="onChangeChuong()" required>
@@ -34,7 +34,7 @@
                         @enderror
                     </div>
 
-                    <!-- Tên bài -->
+                    {{-- Tên bài --}}
                     <div class="form-group col-md-4">
                         <label for="TenBai">Tên bài</label>
                         <select class="form-control" id="selectBai" onchange="onChangeBai()" required>
@@ -46,7 +46,7 @@
                         @enderror
                     </div>
 
-                    <!-- Tên bài giảng -->
+                    {{-- Tên bài giảng --}}
                     <div class="form-group col-md-4">
                         <label for="TenBaiGiang">Tên bài giảng</label>
                         <input type="text" name="TenBaiGiang" class="form-control" required>
@@ -55,11 +55,23 @@
                         @enderror
                     </div>
 
-                    <!-- Mô tả -->
+                    {{-- Mô tả --}}
                     <div class="form-group col-md-4">
                         <label for="MoTa">Mô tả</label>
                         <input type="text" name="MoTa" class="form-control">
                         @error('MoTa')
+                        <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Trạng thái --}}
+                    <div class="form-group col-md-4">
+                        <label for="TrangThai">Trạng thái</label>
+                        <select name="TrangThai" class="form-control" required>
+                            <option value="1" {{ old('TrangThai', 1) ? 'selected' : '' }}>Hiển thị</option>
+                            <option value="0" {{ old('TrangThai', 0) ? 'selected' : '' }}>Ẩn</option>
+                        </select>
+                        @error('TrangThai')
                         <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
                     </div>
@@ -83,7 +95,7 @@
     </div>
 </div>
 
-<!-- Modal elFinder -->
+{{-- Modal elFinder --}}
 <div class="modal fade" id="elfinderModal">
     <div class="modal-dialog modal-lg" style="max-width: 90%;">
         <div class="modal-content">
@@ -110,14 +122,31 @@
 <script src="{{ asset('assets/js/elfinder.min.js') }}"></script>
 <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 <script>
-    window.APP_URL = "{{ url('/') }}";
-    window.ELFINDER_URL = {!! json_encode(url()->route('elfinder.connector', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang ?? null])) !!};
-    window.ELFINDER_SOUND = '{{ asset("assets/sounds") }}';
+    window.APP_URL = @json(url('/'));
+    window.ELFINDER_URL = @json(route('elfinder.connector', [
+        'maHocPhan' => $hocPhan->MaHocPhan,
+        'maBaiGiang' => $baiGiang->MaBaiGiang ?? ''
+    ]));
+    window.ELFINDER_SOUND = @json(asset('assets/sounds'));
     window.chuongBai = @json($chuongBai);
+    window.csrfToken = @json(csrf_token());
+    window.maHocPhan = @json($hocPhan->MaHocPhan);
+    window.maBaiGiang = @json($baiGiang->MaBaiGiang ?? '');
+
 </script>
+
 <script src="{{ asset('./js/teacher/baigiang.js') }}"></script>
+
 <script>
-    initTinyMCE({{$hocPhan -> MaHocPhan}}, '{{ csrf_token() }}');
-    initCancelUpload({{$hocPhan -> MaHocPhan}}, '{{ route("baiGiang.xoaTamUploads") }}', '{{ csrf_token() }}');
+    initTinyMCE(window.maHocPhan, window.csrfToken);
+
+    document.getElementById('btn-cancel')?.addEventListener('click', () => {
+        handleCancelBaiGiang({
+            routeUrl: '{{ route('bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan]) }}'
+            , maHocPhan: window.maHocPhan
+            , maBaiGiang: window.maBaiGiang
+        });
+    });
+
 </script>
 @endsection

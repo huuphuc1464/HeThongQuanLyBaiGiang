@@ -109,13 +109,7 @@ Route::post('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::cla
 Route::put('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/cap-nhat/{maBaiGiang}', [BaiGiangController::class, 'capNhatBaiGiang'])
     ->name('giang-vien.bai-giang.cap-nhat');
 Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/chi-tiet/{maBaiGiang}', [BaiGiangController::class, 'chiTietBaiGiang'])->name('giang-vien.bai-giang.chi-tiet');
-
-
-Route::post('/giang-vien/bai-giang/xoa-tam', [BaiGiangController::class, 'xoaFileTam'])
-    ->name('baiGiang.xoaTamUploads');
-
-Route::post('/bai-giang/xoa-file-elfinder', [BaiGiangController::class, 'xoaFileElfinder'])->name('bai-giang.xoa-file-elfinder');
-Route::post('/bai-giang/them-file-xoa', [BaiGiangController::class, 'themFileXoa'])->name('baiGiang.themFileXoa');
+Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/huy', [BaiGiangController::class, 'huyBoBaiGiang'])->name('bai-giang.huy');
 
 
 Route::any('/elfinder/connector', [ElfinderController::class, 'connector'])->name('elfinder.connector');
