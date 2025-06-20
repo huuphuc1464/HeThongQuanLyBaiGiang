@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 
 class BaiGiangController extends Controller
 {
+
     public function danhSachBaiGiang(Request $request, $id)
     {
         $query = DB::table('bai_giang')
@@ -435,4 +436,5 @@ class BaiGiangController extends Controller
 
         return response()->json(['success' => true]);
     }
+
 }

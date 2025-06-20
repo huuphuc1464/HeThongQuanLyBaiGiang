@@ -5,6 +5,7 @@ use App\Http\Controllers\GiangVien\HomeController as GiangVienHomeController;
 use App\Http\Controllers\Login;
 use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
 use App\Http\Controllers\GiangVien\SuKienZoomController;
+use App\Http\Controllers\GiangVien\HocPhanController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Admin\GiangVienController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
 use App\Models\BaiGiang;
+use Illuminate\Support\Facades\Auth;
+use App\Models\MonHoc;
 
 Route::get('/', function () {
     return view('welcome');
@@ -103,14 +106,34 @@ Route::get('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::clas
 Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/sua/{maBaiGiang}', [BaiGiangController::class, 'hienFormSua'])->name('giang-vien.bai-giang.form-sua');
 Route::post('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'themBaiGiang'])
     ->name('giang-vien.bai-giang.them');
-Route::post('/giang-vien/bai-giang/xoa-tam', [BaiGiangController::class, 'xoaFileTam'])
-    ->name('baiGiang.xoaTamUploads');
 Route::put('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/cap-nhat/{maBaiGiang}', [BaiGiangController::class, 'capNhatBaiGiang'])
     ->name('giang-vien.bai-giang.cap-nhat');
 Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/chi-tiet/{maBaiGiang}', [BaiGiangController::class, 'chiTietBaiGiang'])->name('giang-vien.bai-giang.chi-tiet');
+
+
+Route::post('/giang-vien/bai-giang/xoa-tam', [BaiGiangController::class, 'xoaFileTam'])
+    ->name('baiGiang.xoaTamUploads');
 
 Route::post('/bai-giang/xoa-file-elfinder', [BaiGiangController::class, 'xoaFileElfinder'])->name('bai-giang.xoa-file-elfinder');
 Route::post('/bai-giang/them-file-xoa', [BaiGiangController::class, 'themFileXoa'])->name('baiGiang.themFileXoa');
 
 
 Route::any('/elfinder/connector', [ElfinderController::class, 'connector'])->name('elfinder.connector');
+
+// Route cho Giảng viên
+Route::middleware(['auth', 'role:giangvien'])->prefix('teacher')->name('giang-vien.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/quan-ly-bai-giang', [\App\Http\Controllers\GiangVien\BaiGiangController::class, 'danhSachBaiGiang'])->name('bai-giang');
+    Route::get('/them-bai-giang/{maLopHocPhan}', [\App\Http\Controllers\GiangVien\BaiGiangController::class, 'taoBaiGiang'])->name('them-bai-giang');
+    Route::post('/them-bai-giang/{maLopHocPhan}', [\App\Http\Controllers\GiangVien\BaiGiangController::class, 'luuBaiGiang'])->name('luu-bai-giang');
+});
+
+Route::get('/giang-vien/hoc-phan', [HocPhanController::class, 'danhSach'])->name('giangvien.hocphan.danh-sach');
+Route::post('/giang-vien/hoc-phan', [HocPhanController::class, 'themMoi'])->name('giangvien.hocphan.them-moi');
+Route::get('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'chiTiet'])->name('giangvien.hocphan.chi-tiet');
+Route::get('/giang-vien/hoc-phan/{id}/chinh-sua', [HocPhanController::class, 'chinhSua'])->name('giangvien.hocphan.chinh-sua');
+Route::put('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'capNhat'])->name('giangvien.hocphan.cap-nhat');
+Route::delete('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'xoa'])->name('giangvien.hocphan.xoa');
+Route::get('/giang-vien/hoc-phan/mon-hoc/danh-sach', [HocPhanController::class, 'layDanhSachMonHoc'])->name('giangvien.hocphan.mon-hoc.danh-sach');
+
+
