@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GiangVienController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
+use App\Http\Controllers\SinhVien\BaiGiangController as SinhVienBaiGiangController;
 use App\Models\BaiGiang;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MonHoc;
@@ -22,8 +23,6 @@ use App\Models\MonHoc;
 Route::get('/', function () {
     return view('welcome');
 });
-
-// Route::any('elfinder/connector', [ElfinderController::class, 'showConnector'])->name('elfinder.connector');
 
 Route::get('/editor', function () {
     return view('editor');
@@ -125,3 +124,11 @@ Route::get('/giang-vien/hoc-phan/{id}/chinh-sua', [HocPhanController::class, 'ch
 Route::put('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'capNhat'])->name('giangvien.hocphan.cap-nhat');
 Route::delete('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'xoa'])->name('giangvien.hocphan.xoa');
 Route::get('/giang-vien/hoc-phan/mon-hoc/danh-sach', [HocPhanController::class, 'layDanhSachMonHoc'])->name('giangvien.hocphan.mon-hoc.danh-sach');
+
+
+
+
+// Sinh viên
+Route::get('//hoc-phan/{id}/{tab?}', [SinhVienBaiGiangController::class, 'renderTab'])
+    ->name('hoc-phan.bai-giang.tab');
+Route::get('/hoc-phan/{id}/bai-giang/chi-tiet/{maBaiGiang}',[SinhVienBaiGiangController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');

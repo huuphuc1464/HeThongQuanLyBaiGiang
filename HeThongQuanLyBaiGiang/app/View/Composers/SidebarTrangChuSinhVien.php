@@ -18,6 +18,7 @@ class SidebarTrangChuSinhVien
             $danhSachLopHocPhanSidebar = LopHocPhan::select(
                 'lop_hoc_phan.TenLopHocPhan',
                 'lop_hoc_phan.MoTa',
+                'lop_hoc_phan.MaLopHocPhan',
                 'hoc_phan.AnhHocPhan'
             )
                 ->join('hoc_phan', 'lop_hoc_phan.MaHocPhan', '=', 'hoc_phan.MaHocPhan')

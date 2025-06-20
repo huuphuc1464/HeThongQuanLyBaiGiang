@@ -19,7 +19,7 @@
 </div>
 <ul class="nav flex-column mt-3" id="classList" style="max-height: calc(100vh - 150px); overflow-y: auto;">
     @foreach ($danhSachLopHocPhanSidebar as $lop)
-    <a href="#" class="nav-item class-course-item d-flex text-decoration-none text-dark">
+    <a href="{{ route('hoc-phan.bai-giang.tab', ['id' => $lop->MaLopHocPhan]) }}" class="nav-item class-course-item d-flex text-decoration-none text-dark">
         <div class="icon-circle">
             <img src="{{ $lop->AnhHocPhan }}" alt="icon" width="25" height="25" class="rounded-circle" />
         </div>

@@ -1,66 +1,76 @@
- <!-- Trang chủ -->
- <ul class="nav flex-column duongKe">
-     <li class="nav-item mt-2">
-         <a class="nav-link d-flex align-items-center gap-2 text-dark" href="/">
-             <i class="fas fa-home"></i>
-             <span>Trang chủ</span>
-         </a>
-     </li>
- </ul>
+<nav class="sidebar" id="sidebar">
+    <!-- Trang chủ -->
+    <ul class="nav flex-column duongKe">
+        <li class="nav-item mt-2">
+            <a class="nav-link d-flex align-items-center gap-2 text-dark" href="/">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </li>
+    </ul>
 
- <!-- Lớp học phần -->
- <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
-     <div class="d-flex align-items-center gap-2">
-         <img src="https://placehold.co/30" width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
-         <span>Tên lớp học phần</span>
-     </div>
- </div>
- <div style="flex-grow: 1; overflow-y: auto;" id="scrollableClassList">
-     <!-- Danh sách nội dung lớp học phần -->
-     <ul class="nav flex-column mt-1" id="classList">
-         <!-- Mục khác -->
-         <li class="nav-item gachDuoi">
-             <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
-                 <span>Bài kiểm tra trắc nghiệm</span>
-             </a>
-         </li>
-         <li class="nav-item gachDuoi">
-             <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
-                 <span>Sự kiện học trực tuyến qua Zoom</span>
-             </a>
-         </li>
+    <!-- Tên lớp học phần -->
+    <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+            <img src="{{ $lopHocPhan->AnhHocPhan }}" width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
+            <span class="text-truncate d-inline-block" style="max-width: 220px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{{ $lopHocPhan->TenLopHocPhan }}">
+                {{ $lopHocPhan->TenLopHocPhan }}
+            </span>
+        </div>
+    </div>
 
-         <ul id="menuList" class="nav flex-column">
-             <!-- Danh sách bài giảng -->
-             @yield('danhSachBaiGiangSidebar')
+    <!-- Nội dung chính -->
+    <div style="flex-grow: 1; overflow-y: auto;">
+        <ul class="nav flex-column mt-1">
+            <li class="nav-item gachDuoi">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
+                    <span>Bài kiểm tra trắc nghiệm</span>
+                </a>
+            </li>
+            <li class="nav-item gachDuoi">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
+                    <span>Sự kiện học trực tuyến qua Zoom</span>
+                </a>
+            </li>
+        </ul>
 
-             {{-- <ul class="nav flex-column" id="menuList">
-                 @foreach($chapters as $chapter)
-                 <li class="nav-item gachDuoi">
-                     <a href="#" class="nav-link chapter collapsed d-flex justify-content-between align-items-center text-dark">
-                         <span>Chương {{ $chapter['number'] }}</span>
-             <i class="fas fa-chevron-down"></i>
-             </a>
-             <ul class="lesson-list">
-                 @foreach($chapter['lessons'] as $lesson)
-                 <li class="lesson nav-item">
-                     <a href="#" class="nav-link lesson-toggle collapsed d-flex justify-content-between align-items-center text-dark">
-                         <span>Bài {{ $lesson['number'] }}</span>
-                         <i class="fas fa-chevron-down"></i>
-                     </a>
-                     <ul class="subtopic-list">
-                         @foreach($lesson['subtopics'] as $subtopic)
-                         <li class="subtopic nav-item">
-                             <a href="#" class="nav-link text-dark">Mục {{ $subtopic }}</a>
-                         </li>
-                         @endforeach
-                     </ul>
-                 </li>
-                 @endforeach
-             </ul>
-             </li>
-             @endforeach
-         </ul> --}}
-     </ul>
-     </ul>
- </div>
+        <div class="accordion" id="sidebarAccordion">
+            @foreach ($danhSachBaiGiangSidebar as $tenChuong => $dsBai)
+            @php $chuongId = Str::slug($tenChuong) . '-' . uniqid(); @endphp
+            <div class="accordion-item border-0">
+                <h2 class="accordion-header" id="heading-{{ $chuongId }}">
+                    <button class="accordion-button collapsed bg-white text-dark py-2 px-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $chuongId }}" aria-expanded="false" aria-controls="collapse-{{ $chuongId }}">
+                        <span class="w-100 d-inline-block text-truncate" style="font-size:14px;">
+                            {{ $tenChuong }}
+                        </span>
+                    </button>
+                </h2>
+                <div id="collapse-{{ $chuongId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $chuongId }}" data-bs-parent="#sidebarAccordion">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
+                            @foreach ($dsBai as $tenBai => $dsBaiGiang)
+                            {{-- Tên bài --}}
+                            <li class="list-group-item bg-light text-dark fw-semibold px-3 py-2 ps-4">
+                                <div class="d-inline-block text-truncate w-100" style="font-size:14px;" title="{{ $tenBai }}">
+                                    {{ $tenBai }}
+                                </div>
+                            </li>
+                            {{-- Bài giảng --}}
+                            @foreach ($dsBaiGiang as $baiGiang)
+                            <li class="list-group-item p-0 ps-3">
+                                <a href="{{ route('bai-giang.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
+                                    <div class="text-truncate w-100 pe-2" style="font-size:14px;" title="{{ $baiGiang->TenBaiGiang }}">
+                                        {{ $baiGiang->TenBaiGiang }}
+                                    </div>
+                                </a>
+                            </li>
+                            @endforeach
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</nav>

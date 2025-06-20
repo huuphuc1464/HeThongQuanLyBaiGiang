@@ -1,6 +1,5 @@
 body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;
     background-color: #fff;
 }
 
@@ -141,6 +140,17 @@ main.content-area.sidebar-collapsed {
     margin-left: 60px;
 }
 
+.accordion-button {
+    padding: 1rem 1rem;
+    font-size: 18px;
+}
+
+.list-group-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* === SEARCH === */
 .form-control.rounded-pill {
     padding-left: 2.25rem;
@@ -232,7 +242,7 @@ a.text-decoration-none.text-dark:hover {
     width: 40px;
     height: 40px;
     object-fit: cover;
-        border: 1px solid #ccc;
+    border: 1px solid #ccc;
 }
 
 /* === Đường kẻ ngay nút trang chủ === */
@@ -325,4 +335,34 @@ a.text-decoration-none.text-dark:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Tab chuyển giữa các trang */
+.custom-tabs .nav-link {
+    color: #555;
+    font-weight: 500;
+    border: none;
+    position: relative;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.custom-tabs .nav-link:hover {
+    color: #1a73e8;
+}
+
+.custom-tabs .nav-link.active {
+    color: #1a73e8;
+}
+
+.custom-tabs .nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 4px;
+    background-color: #1a73e8;
+    border-radius: 6px 6px 0 0;
 }

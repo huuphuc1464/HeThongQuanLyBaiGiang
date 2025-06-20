@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\View\Composers\DanhSachKhoaSinhVien;
 use App\View\Composers\LayoutSinhVien;
+use App\View\Composers\SidebarBaiGiangSinhVien;
 use App\View\Composers\SidebarTrangChuSinhVien;
 use App\View\Composers\ThongBaoSinhVien;
 use Illuminate\Support\Facades\Auth;
@@ -37,5 +38,6 @@ class AppServiceProvider extends ServiceProvider
         View::composer(['sinhvien.trangChu', 'layouts.sidebarTrangChu', 'sinhvien.doiMatKhau', 'sinhvien.thayDoiThongTinCaNhan'], SidebarTrangChuSinhVien::class);
         View::composer('layouts.studentLayout', ThongBaoSinhVien::class);
         View::composer('layouts.studentLayout', DanhSachKhoaSinhVien::class);
+        View::composer('layouts.lopHocPhanLayout', SidebarBaiGiangSinhVien::class);
     }
 }
