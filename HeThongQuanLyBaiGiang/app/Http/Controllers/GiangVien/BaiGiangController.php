@@ -5,6 +5,7 @@ namespace App\Http\Controllers\GiangVien;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ElfinderController;
 use App\Models\BaiGiang;
+use App\Models\DanhSachLop;
 use App\Models\FileBaiGiang;
 use App\Models\HocPhan;
 use Illuminate\Http\Request;
@@ -365,5 +366,98 @@ class BaiGiangController extends Controller
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function thongKeBaiGiang($id)
+    {
+        $tongBaiGiang = DB::table('bai_giang')
+            ->where('MaHocPhan', $id)
+            ->count();
+
+        $tongChuong = DB::table('bai_giang')
+            ->where('MaHocPhan', $id)
+            ->distinct()
+            ->count('TenChuong');
+
+        $tongBai = DB::table('bai_giang')
+            ->where('MaHocPhan', $id)
+            ->distinct()
+            ->count('TenBai');
+
+        $tongFile = DB::table('file_bai_giang')
+            ->join('bai_giang', 'file_bai_giang.MaBaiGiang', '=', 'bai_giang.MaBaiGiang')
+            ->where('bai_giang.MaHocPhan', $id)
+            ->count();
+
+        $tongSinhVien = DB::table('danh_sach_lop')
+            ->join('lop_hoc_phan', 'danh_sach_lop.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
+            ->where('lop_hoc_phan.MaHocPhan', $id)
+            ->distinct()
+            ->count('danh_sach_lop.MaSinhVien');
+
+        $thongKeTheoThang = DB::table('bai_giang')
+            ->selectRaw('MONTH(created_at) as thang, COUNT(*) as so_luong')
+            ->where('MaHocPhan', $id)
+            ->whereYear('created_at', now()->year)
+            ->groupByRaw('MONTH(created_at)')
+            ->pluck('so_luong', 'thang');
+
+        $filePaths = DB::table('file_bai_giang')
+            ->join('bai_giang', 'bai_giang.MaBaiGiang', '=', 'file_bai_giang.MaBaiGiang')
+            ->where('bai_giang.MaHocPhan', $id)
+            ->pluck('file_bai_giang.DuongDan');
+
+        // Tính tổng dung lượng file trên đĩa
+        $tongDungLuong = 0;
+        foreach ($filePaths as $path) {
+            $fullPath = public_path($path);
+            if (file_exists($fullPath)) {
+                $tongDungLuong += filesize($fullPath);
+            }
+        }
+        $tongDungLuong = round($tongDungLuong / 1024 / 1024, 2);
+
+        $hocPhan = DB::table('hoc_phan')
+            ->where('MaHocPhan', $id)
+            ->select('MaHocPhan', 'TenHocPhan')
+            ->first();
+
+        $namThongKe = DB::table('bai_giang')
+            ->where('MaHocPhan', $id)
+            ->selectRaw('YEAR(created_at) as nam')
+            ->union(
+                DB::table('bai_giang')
+                    ->where('MaHocPhan', $id)
+                    ->selectRaw('YEAR(updated_at) as nam')
+            )
+            ->distinct()
+            ->orderByDesc('nam')
+            ->pluck('nam');
+
+        return view('giangvien.quanLyBaiGiang.thongKeBaiGiang', [
+            'hocPhanId' => $id,
+            'tongBaiGiang' => $tongBaiGiang,
+            'tongChuong' => $tongChuong,
+            'tongBai' => $tongBai,
+            'tongFile' => $tongFile,
+            'tongSinhVien' => $tongSinhVien,
+            'tongDungLuong' => $tongDungLuong,
+            'thongKeTheoThang' => $thongKeTheoThang,
+            'namThongKe' => $namThongKe,
+            'hocPhan' => $hocPhan
+        ]);
+    }
+
+    public function layDuLieuBieuDoThongKe(Request $request, $id)
+    {
+        $nam = $request->query('nam');
+        $data = DB::table('bai_giang')
+            ->select(DB::raw('MONTH(created_at) as thang'), DB::raw('count(*) as tong'))
+            ->whereYear('created_at', $nam)
+            ->where('MaHocPhan', $id)
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->pluck('tong', 'thang');
+
+        return response()->json($data);
     }
 }

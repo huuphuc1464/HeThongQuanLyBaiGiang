@@ -10,9 +10,9 @@
                     <a href="{{ route('giang-vien.bai-giang.form-them', ['id' => $hocPhan->MaHocPhan]) }}" class="btn btn-success">
                         <i class="fas fa-plus"></i> Thêm bài giảng
                     </a>
-                    <button type="button" class="btn btn-warning">
+                    <a href="{{ route('giang-vien.bai-giang.thong-ke', ['id' => $hocPhan->MaHocPhan]) }}" class="btn btn-warning">
                         <i class="fas fa-signal"></i> Thống kê
-                    </button>
+                    </a>
                 </div>
 
                 <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 flex-nowrap" style="min-width: 250px;" title="Tìm kiếm bài giảng theo tên chương, bài, mục, bài giảng, mô tả.">

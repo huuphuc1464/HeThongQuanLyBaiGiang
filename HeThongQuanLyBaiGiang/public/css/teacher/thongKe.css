@@ -1,0 +1,95 @@
+.info-tong {
+    font-size: 12px !important;
+    margin-top: 5px !important;
+    border-top: 1px dashed #e8e8e8;
+    padding-top: 10px !important;
+}
+
+.thongKe {
+    display: flex;
+    border-radius: 2px;
+    color: #FFF;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1);
+}
+
+.thongKe .icon {
+    display: flex;
+    min-width: 85px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 2px 0 0 2px;
+    font-size: 2.3rem;
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.1);
+}
+
+.thongKe .info {
+    flex: 1;
+    padding: 0 20px;
+    align-self: center;
+}
+
+.thongKe .info h4 {
+    text-transform: uppercase;
+    margin: 0;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #d20000;
+    font-size: 15px;
+}
+
+.thongKe .info p {
+    margin: 0;
+    font-size: 16px;
+}
+
+.khungIcon {
+    background-color: #fff;
+    color: #2a2a2a;
+    border-radius: .375rem;
+    padding: 10px;
+}
+
+/*Mục tổng bài giảng*/
+.thongKe.baiGiang .icon {
+    background-color: #b9ffd3;
+    color: #22ad56;
+    border-radius: .375rem;
+}
+
+/*Mục chương*/
+.thongKe.chuong .icon {
+    background-color: #adcbf3;
+    color: #1d5aab;
+    border-radius: .375rem;
+}
+
+/*Mục bài*/
+.thongKe.bai .icon {
+    background-color: #fde1c3;
+    color: #ff8b07;
+    border-radius: .375rem;
+}
+
+/*Mục mục*/
+.thongKe.muc .icon {
+    background-color: #f9baba;
+    color: #de2222;
+    border-radius: .375rem;
+}
+
+/*Mục file*/
+.thongKe.file .icon {
+    background-color: #f9ff89;
+    color: #708307;
+    border-radius: .375rem;
+}
+
+/*Mục sinh viên*/
+.thongKe.sinhVien .icon {
+    background-color: #daa4f3;
+    color: #7811be;
+    border-radius: .375rem;
+}

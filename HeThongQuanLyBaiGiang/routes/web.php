@@ -110,6 +110,8 @@ Route::put('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/cap-nhat/{maBaiGiang}', [
     ->name('giang-vien.bai-giang.cap-nhat');
 Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/chi-tiet/{maBaiGiang}', [BaiGiangController::class, 'chiTietBaiGiang'])->name('giang-vien.bai-giang.chi-tiet');
 Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/huy', [BaiGiangController::class, 'huyBoBaiGiang'])->name('bai-giang.huy');
+Route::get('/giang-vien/hoc-phan/{id}/bai-giang/thong-ke', [BaiGiangController::class, 'thongKeBaiGiang'])->name('giang-vien.bai-giang.thong-ke');
+Route::get('/giang-vien/hoc-phan/{id}/bai-giang/bieu-do-thong-ke', [BaiGiangController::class, 'layDuLieuBieuDoThongKe'])->name('giang-vien.bai-giang.bieu-do-thong-ke');
 
 
 Route::any('/elfinder/connector', [ElfinderController::class, 'connector'])->name('elfinder.connector');
