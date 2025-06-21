@@ -12,11 +12,6 @@ use Illuminate\Validation\Rule;
 
 class HocPhanController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function danhSach(Request $request)
     {
         $perPage = $request->input('per_page', 10);
