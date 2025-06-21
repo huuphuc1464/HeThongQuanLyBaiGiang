@@ -1,7 +1,6 @@
 @extends('layouts.teacherLayout')
-
-@section('title', 'Quản lý Lớp học phần')
-
+@section('title', 'Quản lý lớp học phần')
+@section('tenTrang', 'Quản lý lớp học phần')
 @section('styles')
 <style>
     .card-header {
@@ -142,11 +141,12 @@
                 <table class="table table-bordered table-hover align-middle">
                     <thead class="table-light text-center">
                         <tr>
-                            <th style="width: 10%;">Mã lớp</th>
+                            <th style="width: 5%;">Mã lớp</th>
                             <th style="width: 25%;">Tên lớp học phần</th>
                             <th style="width: 20%;">Học phần</th>
-                            <th style="width: 20%;">Mô tả</th>
+                            <th style="width: 15%;">Mô tả</th>
                             <th style="width: 15%;">Thời gian tạo</th>
+                            <th style="width: 10%;">Danh sách sinh viên</th>
                             <th style="width: 10%;">Thao tác</th>
                         </tr>
                     </thead>
@@ -157,7 +157,12 @@
                             <td>{{ $lop->TenLopHocPhan }}</td>
                             <td>{{ $lop->hocPhan->TenHocPhan ?? '' }}</td>
                             <td>{{ $lop->MoTa }}</td>
-                            <td class="text-center">{{ $lop->created_at ? $lop->created_at->format('d/m/Y') : '' }}</td>
+                            <td class="text-center">{{ $lop->created_at ? $lop->created_at->format('H:i:s d/m/Y') : '' }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('giangvien.lophocphan.sinhvien', ['maLopHocPhan' => $lop->MaLopHocPhan]) }}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-users"></i> Sinh viên
+                                </a>
+                            </td>                            
                             <td class="text-center">
                                 <div class="btn-group">
                                     <button onclick="viewLopHocPhan({{ $lop->MaLopHocPhan }})" class="btn btn-sm btn-info" title="Xem chi tiết"><i class="fas fa-eye"></i></button>

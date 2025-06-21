@@ -1,5 +1,6 @@
 @extends('layouts.teacherLayout')
-
+@section('title', 'Danh sách học phần')
+@section('tenTrang', 'Danh sách học phần')
 @section('content')
 <div class="container-fluid py-4">
     <div class="card">
@@ -38,7 +39,7 @@
                 <table class="table table-bordered table-hover align-middle">
                     <thead class="table-light text-center">
                         <tr>
-                            <th style="width: 10%;">Mã HP</th>
+                            <th style="width: 10%;">Mã học phần</th>
                             <th style="width: 30%;">Tên học phần</th>
                             <th style="width: 20%;">Môn học</th>
                             <th style="width: 15%;">Bài giảng</th>
@@ -66,7 +67,7 @@
                                     <i class="fas fa-chalkboard-teacher me-1"></i> ({{ $hocPhan->bai_giang_count }})
                                 </a>
                             </td>
-                            <td class="text-center">{{ $hocPhan->created_at->format('d/m/Y') }}</td>
+                            <td class="text-center">{{ $hocPhan->created_at->format('H:i:s d/m/Y') }}</td>
                             <td class="text-center">
                                 <div class="btn-group">
                                     <button onclick="viewHocPhan({{ $hocPhan->MaHocPhan }})" class="btn btn-sm btn-info" title="Xem chi tiết"><i class="fas fa-eye"></i></button>
