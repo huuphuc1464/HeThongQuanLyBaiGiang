@@ -20,7 +20,7 @@ class SinhVienSeeder extends Seeder
             ],
             [
                 'MaNguoiDung' => 6,
-                'MSSV' => '0306221453',
+                'MSSV' => '0306221407',
             ],
         ]);
     }

@@ -149,6 +149,35 @@ class HomeController extends Controller
         return ['suKiens' => $suKiens];
     }
 
+    private function danhSachLop($id)
+    {
+        $giangVien = DB::table('nguoi_dung as nd')
+            ->join('lop_hoc_phan as lhp', 'lhp.MaNguoiTao', '=', 'nd.MaNguoiDung')
+            ->where('lhp.MaLopHocPhan', $id)
+            ->select('nd.HoTen', 'nd.AnhDaiDien')
+            ->first();
+
+        $daThamGia = DB::table('danh_sach_lop')
+            ->where('MaLopHocPhan', $id)
+            ->where('MaSinhVien', Auth::id())
+            ->where('TrangThai', 1)
+            ->exists();
+
+        if (!$daThamGia) {
+            abort(404, 'Bạn không có quyền truy cập vào lớp học phần này');
+        }
+
+        $sinhViens = DB::table('nguoi_dung as nd')
+            ->join('danh_sach_lop as dsl', 'nd.MaNguoiDung', '=', 'dsl.MaSinhVien')
+            ->where('dsl.MaLopHocPhan', $id)
+            ->where('dsl.TrangThai', 1)
+            ->select('nd.HoTen', 'nd.AnhDaiDien')
+            ->get();
+
+        return ['sinhViens' => $sinhViens, 'giangVien' => $giangVien];
+    }
+
+
     public function renderTab(Request $request, $id, $tab = 'bai-giang')
     {
         $hocPhan = DB::table('hoc_phan')
@@ -166,7 +195,12 @@ class HomeController extends Controller
                     ...$this->danhSachSuKienZoom($id),
                 ]);
             case 'moi-nguoi':
-                return view('giangvien.lopHocPhan.nguoi', compact('id', 'tab'));
+                return view('sinhvien.danhSachLop', [
+                    'id' => $id,
+                    'tab' => $tab,
+                    'hocPhan' => $hocPhan,
+                    ...$this->danhSachLop($id),
+                ]);
             default:
                 return view('sinhvien.danhSachBaiGiang', [
                     'id' => $id,
