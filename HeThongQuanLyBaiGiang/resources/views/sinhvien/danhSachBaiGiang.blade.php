@@ -3,6 +3,11 @@
 @section('title','Danh sách bài giảng')
 
 @section('tab-content')
+@if ($baiGiangs->isEmpty())
+<div class="text-center text-muted py-4">
+    Hiện tại không có bài giảng nào.
+</div>
+@else
 <div class="container-fluid my-3">
     <div class="card shadow-sm">
         <div class="card-body">
@@ -14,14 +19,12 @@
                     <p>Người tạo: {{ $giangVien->HoTen ?? 'Không rõ' }}</p>
                     <h5 class="fw-bold mt-4">Nội dung bài giảng</h5>
                     <p>
-                        {{ $baiGiangs->count() }} chương &nbsp;&bull;&nbsp;
-                        {{ $baiGiangs->flatMap(fn($bai) => $bai)->count() }} bài học
+                        {{ $baiGiangs->count() }} chương
                     </p>
                 </div>
                 @foreach ($baiGiangs as $tenChuong => $cacBai)
                 @php
                 $chuongId = Str::slug($tenChuong) . '-' . uniqid();
-                $isFirstChuong = $loop->first ? 'show' : '';
                 @endphp
                 <div class="accordion-item border">
                     <h2 class="accordion-header" id="heading-{{ $chuongId }}">
@@ -29,7 +32,7 @@
                             {{ $tenChuong }}
                         </button>
                     </h2>
-                    <div id="collapse-{{ $chuongId }}" class="accordion-collapse collapse {{ $isFirstChuong }}" aria-labelledby="heading-{{ $chuongId }}" data-bs-parent="#chuong">
+                    <div id="collapse-{{ $chuongId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $chuongId }}" data-bs-parent="#chuong">
                         <div class="accordion-body">
                             <div class="accordion" id="bai-{{ $chuongId }}">
                                 @foreach ($cacBai as $key => $baiGiangs)
@@ -77,5 +80,5 @@
         </div>
     </div>
 </div>
-
+@endif
 @endsection

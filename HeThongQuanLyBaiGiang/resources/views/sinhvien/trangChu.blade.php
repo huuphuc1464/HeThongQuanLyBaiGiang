@@ -11,7 +11,7 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" id="classCardContainer">
         @foreach($danhSachBaiGiang as $baiGiang)
         <div class="col">
-            <a href="#" class="text-decoration-none text-dark">
+            <a href="{{ route('hoc-phan.bai-giang.tab', ['id' => $baiGiang->MaLopHocPhan]) }}" class="text-decoration-none text-dark">
                 <div class="card card-class position-relative">
                     <img class="card-img-top" src="{{ $baiGiang->AnhHocPhan }}" alt="Class image">
                     <div class="card-body">

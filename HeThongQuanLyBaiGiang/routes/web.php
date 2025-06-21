@@ -129,6 +129,7 @@ Route::get('/giang-vien/hoc-phan/mon-hoc/danh-sach', [HocPhanController::class, 
 
 
 // Sinh viên
-Route::get('//hoc-phan/{id}/{tab?}', [SinhVienBaiGiangController::class, 'renderTab'])
+Route::get('/hoc-phan/{id}/{tab?}', [SinhVienHomeController::class, 'renderTab'])
     ->name('hoc-phan.bai-giang.tab');
-Route::get('/hoc-phan/{id}/bai-giang/chi-tiet/{maBaiGiang}',[SinhVienBaiGiangController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');
+Route::get('/hoc-phan/{id}/bai-giang/chi-tiet/{maBaiGiang}', [SinhVienHomeController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');
+Route::get('/hoc-phan/{id}/su-kien-zoom/chi-tiet/{maSuKien}', [SinhVienHomeController::class, 'chiTietSuKienZoom'])->name('su-kien-zoom.chi-tiet');

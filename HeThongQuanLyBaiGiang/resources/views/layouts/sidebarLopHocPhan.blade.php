@@ -1,26 +1,25 @@
-<nav class="sidebar" id="sidebar">
-    <!-- Trang chủ -->
-    <ul class="nav flex-column duongKe">
-        <li class="nav-item mt-2">
-            <a class="nav-link d-flex align-items-center gap-2 text-dark" href="/">
-                <i class="fas fa-home"></i>
-                <span>Trang chủ</span>
-            </a>
-        </li>
-    </ul>
+<nav class="sidebar d-flex flex-column" id="sidebar" style="height: 100vh;">
+    <div class="flex-shrink-0">
+        <!-- Trang chủ -->
+        <ul class="nav flex-column duongKe">
+            <li class="nav-item mt-2">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="/">
+                    <i class="fas fa-home"></i>
+                    <span>Trang chủ</span>
+                </a>
+            </li>
+        </ul>
 
-    <!-- Tên lớp học phần -->
-    <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-            <img src="{{ $lopHocPhan->AnhHocPhan }}" width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
-            <span class="text-truncate d-inline-block" style="max-width: 220px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{{ $lopHocPhan->TenLopHocPhan }}">
-                {{ $lopHocPhan->TenLopHocPhan }}
-            </span>
+        <!-- Tên lớp học phần -->
+        <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <img src="{{ $lopHocPhan->AnhHocPhan }}" width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
+                <span class="text-truncate d-inline-block" style="max-width: 220px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{{ $lopHocPhan->TenLopHocPhan }}">
+                    {{ $lopHocPhan->TenLopHocPhan }}
+                </span>
+            </div>
         </div>
-    </div>
 
-    <!-- Nội dung chính -->
-    <div style="flex-grow: 1; overflow-y: auto;">
         <ul class="nav flex-column mt-1">
             <li class="nav-item gachDuoi">
                 <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
@@ -33,7 +32,9 @@
                 </a>
             </li>
         </ul>
+    </div>
 
+    <div style="flex-grow: 1; overflow-y: auto;">
         <div class="accordion" id="sidebarAccordion">
             @foreach ($danhSachBaiGiangSidebar as $tenChuong => $dsBai)
             @php $chuongId = Str::slug($tenChuong) . '-' . uniqid(); @endphp

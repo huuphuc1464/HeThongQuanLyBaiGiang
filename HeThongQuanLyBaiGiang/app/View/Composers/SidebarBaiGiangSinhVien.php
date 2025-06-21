@@ -18,38 +18,40 @@ class SidebarBaiGiangSinhVien
         $lopHocPhan = null;
 
         if ($sinhVien && $maLopHocPhan) {
-            $lopHocPhan = DB::table('lop_hoc_phan')
-                ->select('lop_hoc_phan.TenLopHocPhan', 'lop_hoc_phan.MoTa', 'hoc_phan.AnhHocPhan', 'lop_hoc_phan.MaHocPhan')
-                ->join('hoc_phan', 'lop_hoc_phan.MaHocPhan', '=', 'hoc_phan.MaHocPhan')
-                ->join('danh_sach_lop', 'danh_sach_lop.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
-                ->where('lop_hoc_phan.TrangThai', 1)
-                ->where('hoc_phan.TrangThai', 1)
-                ->where('danh_sach_lop.MaSinhVien', $sinhVien->MaNguoiDung)
-                ->where('lop_hoc_phan.MaLopHocPhan', $maLopHocPhan)
+            $lopHocPhan = DB::table('lop_hoc_phan as lhp')
+                ->select('lhp.TenLopHocPhan', 'lhp.MoTa', 'hp.AnhHocPhan', 'lhp.MaHocPhan')
+                ->join('hoc_phan as hp', 'lhp.MaHocPhan', '=', 'hp.MaHocPhan')
+                ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+                ->where('lhp.TrangThai', 1)
+                ->where('hp.TrangThai', 1)
+                ->where('dsl.MaSinhVien', $sinhVien->MaNguoiDung)
+                ->where('lhp.MaLopHocPhan', $maLopHocPhan)
                 ->first();
 
             if ($lopHocPhan) {
-                $danhSachBaiGiangSidebar = DB::table('bai_giang')
-                    ->join('lop_hoc_phan', function ($join) {
-                        $join->on('bai_giang.MaHocPhan', '=', 'lop_hoc_phan.MaHocPhan')
-                            ->on('lop_hoc_phan.MaNguoiTao', '=', 'bai_giang.MaGiangVien');
+                $danhSachBaiGiangSidebar = DB::table('bai_giang as bg')
+                    ->join('lop_hoc_phan as lhp', function ($join) {
+                        $join->on('bg.MaHocPhan', '=', 'lhp.MaHocPhan')
+                            ->on('lhp.MaNguoiTao', '=', 'bg.MaGiangVien');
                     })
+                    ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+                    ->where('lhp.MaLopHocPhan', $maLopHocPhan)
+                    ->where('dsl.MaSinhVien', '=', Auth::id())
+                    ->where('dsl.TrangThai', '=', 1)
+                    ->where('bg.TrangThai', 1)
                     ->select(
-                        'bai_giang.TenChuong',
-                        'bai_giang.TenBai',
-                        'bai_giang.MaBaiGiang',
-                        'bai_giang.TenBaiGiang'
+                        'bg.TenChuong',
+                        'bg.TenBai',
+                        'bg.MaBaiGiang',
+                        'bg.TenBaiGiang'
                     )
-                    ->where('lop_hoc_phan.MaLopHocPhan', $maLopHocPhan)
-                    ->where('bai_giang.TrangThai', 1)
-                    ->orderBy('bai_giang.TenChuong')
-                    ->orderBy('bai_giang.TenBai')
-                    ->orderBy('bai_giang.TenBaiGiang')
+                    ->orderBy('bg.TenChuong')
+                    ->orderBy('bg.TenBai')
+                    ->orderBy('bg.TenBaiGiang')
+                    ->orderBy('bg.created_at')
                     ->get()
                     ->groupBy('TenChuong')
-                    ->map(function ($itemsByChuong) {
-                        return $itemsByChuong->groupBy('TenBai');
-                    });
+                    ->map(fn($chuong) => $chuong->groupBy('TenBai'));
             }
         }
 

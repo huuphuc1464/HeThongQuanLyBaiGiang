@@ -18,8 +18,17 @@ class HomeController extends Controller
         $danhSachBaiGiang = DB::table('lop_hoc_phan as lhp')
             ->join('hoc_phan as hp', 'lhp.MaHocPhan', '=', 'hp.MaHocPhan')
             ->join('nguoi_dung as nd', 'lhp.MaNguoiTao', '=', 'nd.MaNguoiDung')
-            ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
-            ->where('dsl.MaSinhVien', $maSinhVien)
+            ->join('danh_sach_lop as dsl', function ($join) {
+                $join->on('dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+                    ->where('dsl.TrangThai', '=', 1);
+            })
+            ->whereExists(function ($query) use ($maSinhVien) {
+                $query->select(DB::raw(1))
+                    ->from('danh_sach_lop')
+                    ->whereColumn('MaLopHocPhan', 'lhp.MaLopHocPhan')
+                    ->where('MaSinhVien', $maSinhVien)
+                    ->where('TrangThai', 1);
+            })
             ->select(
                 'lhp.MaLopHocPhan',
                 'lhp.TenLopHocPhan',
@@ -28,7 +37,7 @@ class HomeController extends Controller
                 'nd.HoTen as TenGiangVien',
                 'nd.AnhDaiDien as AnhGiangVien',
                 'hp.AnhHocPhan',
-                DB::raw('COUNT(dsl.MaDanhSachLop) as SoLuongSinhVien')
+                DB::raw('COUNT(DISTINCT dsl.MaSinhVien) as SoLuongSinhVien')
             )
             ->groupBy(
                 'lhp.MaLopHocPhan',
@@ -73,5 +82,155 @@ class HomeController extends Controller
             ->first();
 
         return view('sinhvien.thayDoiThongTinCaNhan', compact('user'));
+    }
+
+    private function danhSachBaiGiang($id)
+    {
+        $lopHocPhan = DB::table('lop_hoc_phan')->where('MaLopHocPhan', $id)->first();
+
+        if (!$lopHocPhan) {
+            return [];
+        }
+
+        $giangVien = DB::table('nguoi_dung')
+            ->where('MaNguoiDung', $lopHocPhan->MaNguoiTao)
+            ->first();
+
+        $baiGiangs = DB::table('bai_giang as bg')
+            ->join('lop_hoc_phan as lhp', function ($join) {
+                $join->on('bg.MaHocPhan', '=', 'lhp.MaHocPhan')
+                    ->on('lhp.MaNguoiTao', '=', 'bg.MaGiangVien');
+            })
+            ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+            ->where('lhp.MaLopHocPhan', $id)
+            ->where('dsl.MaSinhVien', '=', Auth::id())
+            ->where('dsl.TrangThai', '=', 1)
+            ->where('bg.TrangThai', 1)
+            ->select(
+                'bg.TenChuong',
+                'bg.TenBai',
+                'bg.TenBaiGiang',
+                'bg.MaBaiGiang',
+                'bg.updated_at',
+                'bg.created_at'
+            )
+            ->orderBy('bg.TenChuong')
+            ->orderBy('bg.TenBai')
+            ->orderBy('bg.TenBaiGiang')
+            ->orderBy('bg.created_at')
+            ->get()
+            ->groupBy('TenChuong')
+            ->map(fn($chuong) => $chuong->groupBy('TenBai'));
+
+        return compact('lopHocPhan', 'giangVien', 'baiGiangs');
+    }
+
+    private function danhSachSuKienZoom($id)
+    {
+        $suKiens = DB::table('su_kien_zoom as sk')
+            ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'sk.MaLopHocPhan')
+            ->where('dsl.MaSinhVien', '=', Auth::id())
+            ->where('dsl.TrangThai', '=', 1)
+            ->where('sk.MaLopHocPhan', $id)
+            ->select(
+                'sk.MaSuKienZoom',
+                'sk.TenSuKien',
+                'sk.MoTa',
+                'sk.ThoiGianBatDau',
+                'sk.ThoiGianKetThuc',
+                'sk.LinkSuKien',
+                'sk.MatKhauSuKien',
+                'sk.created_at',
+                'sk.updated_at',
+            )
+            ->orderBy('sk.ThoiGianBatDau', 'asc')
+            ->get();
+
+        return ['suKiens' => $suKiens];
+    }
+
+    public function renderTab(Request $request, $id, $tab = 'bai-giang')
+    {
+        $hocPhan = DB::table('hoc_phan')
+            ->where('MaHocPhan', $id)
+            ->select('MaHocPhan', 'TenHocPhan')
+            ->first();
+        switch ($tab) {
+            case 'bai-kiem-tra':
+                return view('giangvien.lopHocPhan.kiemTra', compact('id', 'tab'));
+            case 'su-kien-zoom':
+                return view('sinhvien.danhSachSuKienZoom', [
+                    'id' => $id,
+                    'tab' => $tab,
+                    'hocPhan' => $hocPhan,
+                    ...$this->danhSachSuKienZoom($id),
+                ]);
+            case 'moi-nguoi':
+                return view('giangvien.lopHocPhan.nguoi', compact('id', 'tab'));
+            default:
+                return view('sinhvien.danhSachBaiGiang', [
+                    'id' => $id,
+                    'tab' => $tab,
+                    'hocPhan' => $hocPhan,
+                    ...$this->danhSachBaiGiang($id),
+                ]);
+        }
+    }
+
+    public function chiTietBaiGiang($id, $maBaiGiang)
+    {
+        $baiGiang = DB::table('bai_giang as bg')
+            ->join('lop_hoc_phan as lhp', 'lhp.MaHocPhan', '=', 'bg.MaHocPhan')
+            ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+            ->where('lhp.MaLopHocPhan', $id)
+            ->where('bg.MaBaiGiang', $maBaiGiang)
+            ->where('dsl.MaSinhVien', Auth::id())
+            ->where('dsl.TrangThai', '=', 1)
+            ->select('bg.*')
+            ->first();
+
+        if (!$baiGiang) {
+            abort(404, 'Không tìm thấy bài giảng');
+        }
+
+        $files = DB::table('file_bai_giang')->where('MaBaiGiang', $maBaiGiang)
+            ->where('TrangThai', 1)
+            ->get();
+        $tab = 'bai-giang';
+        return view('sinhvien.chiTietBaiGiang', compact('baiGiang', 'files', 'tab', 'id'));
+    }
+
+    public function chiTietSuKienZoom($id, $maSuKien)
+    {
+        $suKien = DB::table('su_kien_zoom as sk')
+            ->join('nguoi_dung', 'nguoi_dung.MaNguoiDung', '=', 'sk.MaGiangVien')
+            ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'sk.MaLopHocPhan')
+            ->where('dsl.MaSinhVien', '=', Auth::id())
+            ->where('dsl.TrangThai', '=', 1)
+            ->where('sk.MaLopHocPhan', $id)
+            ->where('sk.MaSuKienZoom', $maSuKien)
+            ->select(
+                'sk.TenSuKien',
+                'sk.MoTa',
+                'sk.ThoiGianBatDau',
+                'sk.ThoiGianKetThuc',
+                'sk.LinkSuKien',
+                'sk.MatKhauSuKien',
+                'sk.created_at',
+                'sk.updated_at',
+                'nguoi_dung.HoTen as TenGiangVien'
+            )
+            ->first();
+
+        if (!$suKien) {
+            abort(404, 'Không tìm thấy sự kiện Zoom');
+        }
+
+        return view('sinhvien.chiTietSuKienZoom', [
+            'suKien' => $suKien,
+            'tenGiangVien' => $suKien->TenGiangVien ?? null,
+            'tab' => 'su-kien-zoom',
+            'id' => $id
+        ]);
     }
 }
