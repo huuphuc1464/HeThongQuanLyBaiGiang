@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <link rel="stylesheet" href="{{ asset('/css/teacher/main.css') }}">
-    @yield('style')
+    @yield('styles')
 </head>
 
 <body onload="time()">
@@ -23,7 +23,7 @@
         <a href="{{ route('giangvien.hocphan.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Học Phần</a>
         <a href="{{ route('giangvien.su-kien-zoom.danhsach') }}"><i class="fas fa-video me-2"></i> Quản lý Sự Kiện Zoom</a>
         <a href="/teacher/baiKiemTra"><i class="fas fa-clipboard-list me-2"></i> Quản lý Bài Kiểm Tra</a>
-        <a href="/teacher/lopHocPhan"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Lớp Học Phần</a>
+        <a href="{{ route('giangvien.lophocphan.danhsach') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Lớp Học Phần</a>
     </div>
 
     <!-- Content -->
