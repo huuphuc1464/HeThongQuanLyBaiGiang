@@ -6,7 +6,7 @@
 @include('components.thayDoiThongTinCaNhan')
 @endsection
 
-@section('style')
+@section('styles')
 <link rel="stylesheet" href="{{ asset('./css/doiThongTinCaNhan.css') }}">
 @endsection
 

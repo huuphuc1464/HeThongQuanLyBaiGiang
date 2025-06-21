@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\GiangVienController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
 use App\Http\Controllers\SinhVien\BaiGiangController as SinhVienBaiGiangController;
+use App\Http\Controllers\GiangVien\SinhVienController;
 use App\Models\BaiGiang;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MonHoc;
@@ -133,3 +134,8 @@ Route::get('/hoc-phan/{id}/{tab?}', [SinhVienHomeController::class, 'renderTab']
     ->name('hoc-phan.bai-giang.tab');
 Route::get('/hoc-phan/{id}/bai-giang/chi-tiet/{maBaiGiang}', [SinhVienHomeController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');
 Route::get('/hoc-phan/{id}/su-kien-zoom/chi-tiet/{maSuKien}', [SinhVienHomeController::class, 'chiTietSuKienZoom'])->name('su-kien-zoom.chi-tiet');
+
+
+// Quản lý sinh viên
+Route::get('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien', [SinhVienController::class, 'danhSachSinhVien'])->name('giangvien.lophocphan.sinhvien');
+Route::delete('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/xoa/{maDanhSachLop}', [SinhVienController::class, 'xoaSinhVien'])->name('giangvien.lophocphan.sinhvien.xoa');

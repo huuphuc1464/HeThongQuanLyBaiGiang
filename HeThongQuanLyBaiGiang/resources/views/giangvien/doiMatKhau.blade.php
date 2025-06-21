@@ -5,7 +5,7 @@
 @include('components.doiMatKhau')
 @endsection
 
-@section('style')
+@section('styles')
 <link rel="stylesheet" href="{{ asset('./css/doiMatKhau.css') }}">
 @endsection
 

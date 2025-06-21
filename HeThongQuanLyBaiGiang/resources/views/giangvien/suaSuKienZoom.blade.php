@@ -56,6 +56,6 @@
 </div>
 @endsection
 
-@section('style')
+@section('styles')
 <link rel="stylesheet" href="{{ asset('./css/teacher/form.css') }}">
 @endsection

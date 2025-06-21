@@ -104,7 +104,7 @@
 
 @endsection
 
-@section('style')
+@section('styles')
 <style>
     .tile {
         position: relative;
