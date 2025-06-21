@@ -1,6 +1,6 @@
 @extends('layouts.lopHocPhanLayout')
 
-@section('title','Danh sách sự kiện zoom')
+@section('title', $suKien->TenSuKien)
 
 @section('tab-content')
 <div class="container-fluid py-4">

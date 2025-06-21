@@ -201,12 +201,6 @@ a.text-decoration-none.text-dark:hover {
     padding: 0.75rem 1rem;
 }
 
-.card-class .card-title {
-    font-weight: 700;
-    font-size: 14px;
-    padding-bottom: 0.5rem;
-}
-
 .card-class .card-subtitle {
     font-size: 12px;
     padding-bottom: 0.5rem;
