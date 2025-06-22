@@ -19,9 +19,20 @@ class BaiKiemTraController extends Controller
 {
     public function danhSachBaiKiemTra()
     {
+        $baiKiemTras = DB::table('bai_kiem_tra as bkt')
+            ->join('lop_hoc_phan as lhp', function ($join) {
+                $join->on('lhp.MaLopHocPhan', '=', 'bkt.MaLopHocPhan')
+                    ->on('lhp.MaNguoiTao', '=', 'bkt.MaGiangVien');
+            })
+            ->where('bkt.MaGiangVien', Auth::id())
+            ->select('bkt.*', 'lhp.MaLopHocPhan', 'lhp.TenLopHocPhan')
+            ->get();
+
         $lopHocPhan = DB::table('lop_hoc_phan')->where('MaNguoiTao', Auth::id())->select('MaLopHocPhan', 'TenLopHocPhan')->get();
-        return view('giangvien.quanLyBaiKiemTra.danhSachBaiKiemTra', compact('lopHocPhan'));
+
+        return view('giangvien.quanLyBaiKiemTra.danhSachBaiKiemTra', compact('lopHocPhan', 'baiKiemTras'));
     }
+
     public function importBaiKiemTra(Request $request, EmailService $emailService)
     {
         $request->validate([
@@ -200,6 +211,63 @@ class BaiKiemTraController extends Controller
             $message = 'Đã xảy ra lỗi trong quá trình xử lý.';
             $message .= '<br><strong>Chi tiết:</strong><ul><li>' . e($e->getMessage()) . '</li></ul>';
             return redirect()->back()->with('warning', $message);
+        }
+    }
+
+    public function nhanBanBaiKiemTra(Request $request)
+    {
+        $request->validate([
+            'MaBaiKiemTra' => 'required|integer|exists:bai_kiem_tra,MaBaiKiemTra',
+            'MaLopHocPhan' => 'required|integer|exists:lop_hoc_phan,MaLopHocPhan',
+        ], [
+            'MaBaiKiemTra.required' => 'Vui lòng chọn bài kiểm tra cần nhân bản.',
+            'MaLopHocPhan.required' => 'Vui lòng chọn lớp học phần đích.',
+            'MaBaiKiemTra.exists' => 'Bài kiểm tra không tồn tại',
+            'MaLopHocPhan.exists' => 'Lớp học phần không tồn tại'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $baiGoc = BaiKiemTra::findOrFail($request->MaBaiKiemTra);
+
+            if ($baiGoc->MaGiangVien != Auth::id()) {
+                return redirect()->back()->with('errorSystem', 'Bạn không có quyền nhân bản bài kiểm tra này.');
+            }
+
+            $baiMoi = BaiKiemTra::create([
+                'MaLopHocPhan' => $request->MaLopHocPhan,
+                'MaGiangVien' => Auth::id(),
+                'TenBaiKiemTra' => 'Bản sao của' .  $baiGoc->TenBaiKiemTra,
+                'ThoiGianBatDau' => $baiGoc->ThoiGianBatDau,
+                'ThoiGianKetThuc' => $baiGoc->ThoiGianKetThuc,
+                'MoTa' => $baiGoc->MoTa,
+                'TrangThai' => 0,
+                'created_at' => now('Asia/Ho_Chi_Minh'),
+                'updated_at' => now('Asia/Ho_Chi_Minh')
+            ]);
+
+            $cauHoiGoc = CauHoiBaiKiemTra::where('MaBaiKiemTra', $baiGoc->MaBaiKiemTra)->get();
+
+            foreach ($cauHoiGoc as $cauHoi) {
+                CauHoiBaiKiemTra::create([
+                    'MaBaiKiemTra' => $baiMoi->MaBaiKiemTra,
+                    'CauHoi' => $cauHoi->CauHoi,
+                    'DapAnA' => $cauHoi->DapAnA,
+                    'DapAnB' => $cauHoi->DapAnB,
+                    'DapAnC' => $cauHoi->DapAnC,
+                    'DapAnD' => $cauHoi->DapAnD,
+                    'DapAnDung' => $cauHoi->DapAnDung,
+                    'created_at' => now('Asia/Ho_Chi_Minh'),
+                    'updated_at' => now('Asia/Ho_Chi_Minh')
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Nhân bản bài kiểm tra thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('errorSystem', 'Lỗi khi nhân bản: ' . $e->getMessage());
         }
     }
 }

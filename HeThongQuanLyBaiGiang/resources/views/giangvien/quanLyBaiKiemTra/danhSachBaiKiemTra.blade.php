@@ -118,15 +118,15 @@
                 <h5 class="modal-title fw-bold" id="nhanBanBaiKiemTraModalLabel">Nhân bản bài kiểm tra</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <form action="" method="POST">
+            <form action="{{ route('giangvien.bai-kiem-tra.nhan-ban') }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <label for="bai_kiem_tra" class="fw-semibold">Chọn bài kiểm tả muốn nhân bản:</label>
                     <select name="MaBaiKiemTra" class="form-select my-3" id="bai_kiem_tra" required>
                         <option value="" disabled selected>-- Chọn bài kiểm tra --</option>
-                        @foreach ($lopHocPhan as $lop)
-                        <option value="{{ $lop->MaLopHocPhan }}">
-                            {{ $lop->TenLopHocPhan }}
+                        @foreach ($baiKiemTras as $baiKiemTra)
+                        <option value="{{ $baiKiemTra->MaBaiKiemTra }}">
+                            {{ '['. $baiKiemTra->MaBaiKiemTra . ']' . $baiKiemTra->TenBaiKiemTra }}
                         </option>
                         @endforeach
                     </select>
