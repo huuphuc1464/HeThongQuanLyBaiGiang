@@ -135,3 +135,4 @@ Route::post('/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them-file', [SinhVienControl
 
 // Quản lý bài kiểm tra
 Route::get('giang-vien/bai-kiem-tra', [BaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('giangvien.bai-kiem-tra.danh-sach');
+Route::post('giang-vien/bai-kiem-tra/import', [BaiKiemTraController::class, 'importBaiKiemTra'])->name('giangvien.bai-kiem-tra.import');

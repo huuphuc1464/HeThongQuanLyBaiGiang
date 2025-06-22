@@ -11,17 +11,16 @@
                     <a class="btn btn-primary btn-sm" href="#" title="Thêm bài kiểm tra">
                         <i class="fas fa-plus"></i> Thêm
                     </a>
-                    <a class="btn btn-info btn-sm" href="#" title="Import bài kiểm tra">
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#importBaiKiemTra" title="Import bài kiểm tra bằng file Excel">
                         <i class="fas fa-file-import"></i> Import
-                    </a>
-                    <a class="btn btn-secondary btn-sm" href="#" title="Nhân bản bài kiểm tra">
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#nhanBanBaiKiemTra" title="Nhân bản bài kiểm tra">
                         <i class="fas fa-clone"></i> Nhân bản
-                    </a>
-                    <a class="btn btn-success btn-sm" href="#" download title="Tải mẫu Excel">
+                    </button>
+                    <a class="btn btn-success btn-sm" href="{{ asset('./BaiKiemTra/Template_Import_BaiKiemTra.xlsx') }}" download title="Tải mẫu Excel">
                         <i class="fas fa-file-excel"></i> Mẫu Excel
                     </a>
                 </div>
-
                 <div class="col-12 col-md d-flex justify-content-md-end">
                     <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 flex-nowrap" style="min-width: 250px;" title="Tìm kiếm bài kiểm tra">
                         <label for="search" class="fw-bold mb-0">Tìm kiếm:</label>
@@ -73,6 +72,81 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal import bài kiểm tra bằng file excel -->
+<div class="modal fade" id="importBaiKiemTra" tabindex="-1" aria-labelledby="importBaiKiemTraModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="importBaiKiemTraModalLabel">Thêm bài kiểm tra bằng file Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form action="{{ route('giangvien.bai-kiem-tra.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <label for="lop_hoc_phan" class="fw-semibold">Chọn lớp học phần:</label>
+                    <select name="MaLopHocPhan" class="form-select my-3" id="lop_hoc_phan" required>
+                        <option value="" disabled selected>-- Chọn lớp học phần --</option>
+                        @foreach ($lopHocPhan as $lop)
+                        <option value="{{ $lop->MaLopHocPhan }}">
+                            {{ $lop->TenLopHocPhan }}
+                        </option>
+                        @endforeach
+                    </select>
+                    <label for="excelFile" class="fw-semibold">Chọn file Excel chứa dữ liệu bài kiểm tra:</label>
+                    <small class="text-muted d-block pt-1 pb-2">Chỉ chấp nhận file Excel theo mẫu (.xlsx)</small>
+                    <input type="file" name="file" accept=".xlsx" class="form-control mb-3" required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Thêm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal nhân bản bài kiểm tra -->
+<div class="modal fade" id="nhanBanBaiKiemTra" tabindex="-1" aria-labelledby="nhanBanBaiKiemTraModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="nhanBanBaiKiemTraModalLabel">Nhân bản bài kiểm tra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form action="" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <label for="bai_kiem_tra" class="fw-semibold">Chọn bài kiểm tả muốn nhân bản:</label>
+                    <select name="MaBaiKiemTra" class="form-select my-3" id="bai_kiem_tra" required>
+                        <option value="" disabled selected>-- Chọn bài kiểm tra --</option>
+                        @foreach ($lopHocPhan as $lop)
+                        <option value="{{ $lop->MaLopHocPhan }}">
+                            {{ $lop->TenLopHocPhan }}
+                        </option>
+                        @endforeach
+                    </select>
+                    <label for="lop_hoc_phan" class="fw-semibold">Chọn lớp học phần:</label>
+                    <select name="MaLopHocPhan" class="form-select my-3" id="lop_hoc_phan" required>
+                        <option value="" disabled selected>-- Chọn lớp học phần --</option>
+                        @foreach ($lopHocPhan as $lop)
+                        <option value="{{ $lop->MaLopHocPhan }}">
+                            {{ $lop->TenLopHocPhan }}
+                        </option>
+                        @endforeach
+                    </select>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Thêm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
