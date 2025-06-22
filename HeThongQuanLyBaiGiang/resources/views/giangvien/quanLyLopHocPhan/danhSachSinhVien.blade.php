@@ -8,9 +8,9 @@
         <h3 class="tile-title">Danh sách sinh viên</h3>
         <div class="tile-body">
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <a class="btn btn-success btn-sm" href="" title="Thêm sự kiện Zoom">
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalThemSinhVien" title="Thêm sinh viên vào lớp">
                     <i class="fas fa-plus"></i> Thêm sinh viên vào lớp
-                </a>
+                </button>
                 <a class="btn btn-primary btn-sm" href="" title="Nhập Excel thêm sinh viên vào lớp học phần">
                     <i class="fas fa-file-excel"></i> Nhập excel
                 </a>
@@ -100,6 +100,34 @@
         </div>
     </div>
 </div>
+
+<!-- Modal thêm sinh viên bằng email-->
+<div class="modal fade" id="modalThemSinhVien" tabindex="-1" aria-labelledby="modalThemSinhVienEmail" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="modalThemSinhVienEmail">Thêm sinh viên vào lớp học phần</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form method="POST" action="{{ route('giangvien.sinhvien.them-bang-email', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <label for="emailSinhVien" class="fw-bold">Nhập Email Sinh Viên</label>
+                        <small class="text-muted d-block pt-1 pb-2">Nhập nhiều email cách nhau bằng dấu chấm phẩy (;)</small>
+                        <textarea name="emails" id="emailSinhVien" rows="3" class="form-control" placeholder="vd: sv1@gmail.com; sv2@gmail.com" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="submit" class="btn btn-success px-4">Mời</button>
+                    <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 @endsection
 

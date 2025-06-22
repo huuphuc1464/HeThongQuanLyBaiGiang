@@ -15,22 +15,22 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-white border-bottom px-3 fixed-top">
         <div class="container-fluid">
-            <!-- Nút toggle sidebar -->
+            {{-- Nút toggle sidebar --}}
             <button class="navbar-toggler me-2" type="button" id="anHienSidebarBtn" title="Thu gọn / Mở rộng thanh sidebar" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Logo -->
+            {{-- Logo --}}
             <a class="navbar-brand d-flex align-items-center gap-2" href="/">
                 <img alt="Website logo placeholder image" height="24" src="https://placehold.co/50" width="30" />
                 <span>Tên website</span>
             </a>
-            <!-- Nút toggle menu navbar -->
+            {{-- Nút toggle menu navbar --}}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#anHienNavbar" aria-controls="anHienNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fas fa-ellipsis-v"></i>
             </button>
-            <!-- Nội dung navbar -->
+            {{-- Nội dung navbar --}}
             <div class="collapse navbar-collapse justify-content-between" id="anHienNavbar">
-                <!-- Trái: Dropdown Khoa -->
+                {{-- Trái: Dropdown Khoa --}}
                 <div class="d-flex align-items-center">
                     <div class="dropdown">
                         <button class="btn dropdown-toggle text-dark fw-bold text-nowrap" style="border: none; box-shadow: none;" type="button" id="khoaDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
@@ -58,7 +58,7 @@
                     </div>
                 </div>
 
-                <!-- Giữa: Search -->
+                {{-- Giữa: Search --}}
                 <form class="d-flex me-auto mx-lg-auto my-2 my-lg-0 flex-grow-1 justify-content-end justify-content-lg-center px-3" role="search" style="max-width: 600px;">
                     <div class="position-relative w-100">
                         <input class="form-control rounded-pill" type="search" placeholder="Tìm kiếm lớp học phần, học phần, ..." aria-label="Search" />
@@ -66,28 +66,32 @@
                     </div>
                 </form>
 
-                <!-- Phải: Thông báo + Tên sinh viên -->
+                {{-- Phải: Thông báo + Tên sinh viên --}}
                 <div class="d-flex align-items-center">
-                    <!-- Chuông thông báo -->
+                    {{-- Chuông thông báo --}}
                     <div class="dropdown me-3">
                         <button class="btn btn-link text-dark position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Thông báo">
                             <i class="fas fa-bell fa-lg"></i>
                         </button>
-                        <div class="dropdown-menu shadow border-0 p-3 mt-2" aria-labelledby="notificationDropdown" style="width: 300px; border-radius: 12px;">
-                            <h6 class="fw-bold mb-2">Thông báo</h6>
-                            @if ($thongBao->isEmpty())
-                            <p class="text-muted mb-0">Chưa có thông báo nào</p>
-                            @else
-                            @foreach ($thongBao as $tb)
-                            <div class="dropdown-item-text mb-0 text-truncate" title="{{ $tb->NoiDung }}">
-                                {{ $tb->NoiDung }}
+                        <div class="dropdown-menu shadow border-0 mt-2 p-0" aria-labelledby="notificationDropdown" style="width: 300px; border-radius: 12px; overflow: hidden;">
+                            <div class="p-3 border-bottom">
+                                <h6 class="fw-bold mb-0">Thông báo</h6>
                             </div>
-                            @endforeach
-                            @endif
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                @if ($thongBao->isEmpty())
+                                <div class="p-3 text-muted">Chưa có thông báo nào</div>
+                                @else
+                                @foreach ($thongBao as $tb)
+                                <div class="dropdown-item text-truncate" title="{{ $tb->NoiDung }}">
+                                    {{ $tb->NoiDung }}
+                                </div>
+                                @endforeach
+                                @endif
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Tên người dùng -->
+                    {{-- Tên người dùng --}}
                     <div class="dropdown d-flex align-items-center text-nowrap">
                         <button class="btn btn-link dropdown-toggle d-flex align-items-center text-dark fw-bold text-decoration-none" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <input type="hidden" name="maNguoiDung" value="{{ $maNguoiDung }}">

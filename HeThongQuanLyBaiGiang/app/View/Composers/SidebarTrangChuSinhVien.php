@@ -26,6 +26,7 @@ class SidebarTrangChuSinhVien
                 ->where('lop_hoc_phan.TrangThai', 1)
                 ->where('hoc_phan.TrangThai', 1)
                 ->where('danh_sach_lop.MaSinhVien', $sinhVien->MaNguoiDung)
+                ->where('danh_sach_lop.TrangThai', 1)
                 ->get();
         }
         $view->with('danhSachLopHocPhanSidebar', $danhSachLopHocPhanSidebar);

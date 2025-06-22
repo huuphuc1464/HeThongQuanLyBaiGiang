@@ -22,22 +22,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\MonHoc;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/editor', function () {
-    return view('editor');
-});
-
 Route::get('/giang-vien', function () {
     return view('layouts.teacherLayout');
 })->middleware(['auth', RoleMiddleware::class . ':2']);
-
-Route::get('/', function () {
-    return view('layouts.studentLayout');
-});
 
 Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
 Route::post('/dang-nhap', [AuthController::class, 'dangNhap'])->name('login.submit');
@@ -50,7 +37,7 @@ Route::get('/dat-lai-mat-khau', [AuthController::class, 'hienThiFormDatLaiMatKha
 Route::post('/dat-lai-mat-khau', [AuthController::class, 'datLaiMatKhau'])->name('resetPass.submit');
 Route::get('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'hienThiFormDoiMatKhauLanDau'])->name('changePassFirst.form');
 Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKhauLanDau'])->name('changePassFirst.submit');
-Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->name('sinhvien.bai-giang')->middleware(['auth', RoleMiddleware::class . ':3']);
+Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->name('trang-chu')->middleware(['auth', RoleMiddleware::class . ':3']);
 Route::get('/doi-mat-khau', [SinhVienHomeController::class, 'hienFormDoiMatKhau'])->name('sinhvien.doi-mat-khau');
 Route::get('/giang-vien/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('giangvien.doi-mat-khau');
 Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');
@@ -140,3 +127,5 @@ Route::get('/hoc-phan/{id}/su-kien-zoom/chi-tiet/{maSuKien}', [SinhVienHomeContr
 // Quản lý sinh viên
 Route::get('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien', [SinhVienController::class, 'danhSachSinhVien'])->name('giangvien.lophocphan.sinhvien');
 Route::delete('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/xoa/{maDanhSachLop}', [SinhVienController::class, 'xoaSinhVien'])->name('giangvien.lophocphan.sinhvien.xoa');
+Route::post('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them', [SinhVienController::class, 'themSinhVien'])->name('giangvien.sinhvien.them-bang-email');
+Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');

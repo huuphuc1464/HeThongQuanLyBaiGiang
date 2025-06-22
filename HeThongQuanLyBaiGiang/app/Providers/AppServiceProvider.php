@@ -35,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        View::composer(['sinhvien.trangChu', 'layouts.sidebarTrangChu', 'sinhvien.doiMatKhau', 'sinhvien.thayDoiThongTinCaNhan'], SidebarTrangChuSinhVien::class);
+        View::composer(['sinhvien.trangChu', 'layouts.sidebarTrangChu', 'sinhvien.doiMatKhau', 'sinhvien.thayDoiThongTinCaNhan', 'sinhvien.trangThaiXacNhan'], SidebarTrangChuSinhVien::class);
         View::composer('layouts.studentLayout', ThongBaoSinhVien::class);
         View::composer('layouts.studentLayout', DanhSachKhoaSinhVien::class);
         View::composer('layouts.lopHocPhanLayout', SidebarBaiGiangSinhVien::class);
