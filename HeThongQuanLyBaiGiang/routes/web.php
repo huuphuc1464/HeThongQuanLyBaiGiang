@@ -135,6 +135,14 @@ Route::post('/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them-file', [SinhVienControl
 
 // Quản lý bài kiểm tra
 Route::get('giang-vien/bai-kiem-tra', [BaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('giangvien.bai-kiem-tra.danh-sach');
+Route::get('giang-vien/bai-kiem-tra/them', [BaiKiemTraController::class, 'hienFormThemBaiKiemTra'])->name('giangvien.bai-kiem-tra.form-them');
+Route::post('giang-vien/bai-kiem-tra/them', [BaiKiemTraController::class, 'themBaiKiemTra'])->name('giangvien.bai-kiem-tra.them');
 Route::post('giang-vien/bai-kiem-tra/import', [BaiKiemTraController::class, 'importBaiKiemTra'])->name('giangvien.bai-kiem-tra.import');
-Route::post('giang-vien/bai-kiem-tra/nhan-ban', [BaiKiemTraController::class, 'nhanBanBaiKiemTra'])
-    ->name('giangvien.bai-kiem-tra.nhan-ban');
+Route::post('giang-vien/bai-kiem-tra/nhan-ban', [BaiKiemTraController::class, 'nhanBanBaiKiemTra'])->name('giangvien.bai-kiem-tra.nhan-ban');
+Route::get('giang-vien/bai-kiem-tra/chi-tiet/{id}', [BaiKiemTraController::class, 'chiTietBaiKiemTra'])->name('giangvien.bai-kiem-tra.chi-tiet');
+Route::get('giang-vien/bai-kiem-tra/sua/{id}', [BaiKiemTraController::class, 'hienFormSuaBaiKiemTra'])->name('giangvien.bai-kiem-tra.form-sua');
+Route::put('giang-vien/bai-kiem-tra/sua/{id}', [BaiKiemTraController::class, 'capNhatBaiKiemTra'])->name('giangvien.bai-kiem-tra.sua');
+Route::delete('giang-vien/bai-kiem-tra/xoa/{id}', [BaiKiemTraController::class, 'xoaBaiKiemTra'])->name('giangvien.bai-kiem-tra.xoa');
+
+// Route::get('giang-vien/bai-kiem-tra/xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('giangvien.bai-kiem-tra.xuat-bai-kiem-tra');
+// Route::get('giang-vien/bai-kiem-tra/xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQua'])->name('giangvien.bai-kiem-tra.xuat-ket-qua');

@@ -14,23 +14,159 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class BaiKiemTraController extends Controller
 {
-    public function danhSachBaiKiemTra()
+    public function danhSachBaiKiemTra(Request $request)
     {
-        $baiKiemTras = DB::table('bai_kiem_tra as bkt')
+        $query = DB::table('bai_kiem_tra as bkt')
             ->join('lop_hoc_phan as lhp', function ($join) {
                 $join->on('lhp.MaLopHocPhan', '=', 'bkt.MaLopHocPhan')
                     ->on('lhp.MaNguoiTao', '=', 'bkt.MaGiangVien');
             })
             ->where('bkt.MaGiangVien', Auth::id())
-            ->select('bkt.*', 'lhp.MaLopHocPhan', 'lhp.TenLopHocPhan')
+            ->select('bkt.*', 'lhp.TenLopHocPhan');
+
+        // Tìm kiếm
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('bkt.TenBaiKiemTra', 'like', "%{$search}%")
+                    ->orWhere('bkt.MoTa', 'like', "%{$search}%")
+                    ->orWhere('lhp.TenLopHocPhan', 'like', "%{$search}%");
+            });
+        }
+
+        // Lọc theo lớp học phần
+        if ($maLopHocPhan = $request->input('filterClass')) {
+            $query->where('bkt.MaLopHocPhan', $maLopHocPhan);
+        }
+
+        // Phân trang
+        $perPage = $request->input('itemsPerPage', 10);
+        $baiKiemTras = $query->paginate($perPage);
+
+        $lopHocPhan = DB::table('lop_hoc_phan')
+            ->where('MaNguoiTao', Auth::id())
+            ->select('MaLopHocPhan', 'TenLopHocPhan')
             ->get();
 
-        $lopHocPhan = DB::table('lop_hoc_phan')->where('MaNguoiTao', Auth::id())->select('MaLopHocPhan', 'TenLopHocPhan')->get();
-
         return view('giangvien.quanLyBaiKiemTra.danhSachBaiKiemTra', compact('lopHocPhan', 'baiKiemTras'));
+    }
+
+    public function hienFormThemBaiKiemTra()
+    {
+        $lopHocPhan = DB::table('lop_hoc_phan')
+            ->where('MaNguoiTao', Auth::id())
+            ->select('MaLopHocPhan', 'TenLopHocPhan')
+            ->get();
+
+        return view('giangvien.quanLyBaiKiemTra.themBaiKiemTra', compact('lopHocPhan'));
+    }
+
+    public function themBaiKiemTra(Request $request, EmailService $emailService)
+    {
+        $request->validate([
+            'quizName' => 'required|string|max:255',
+            'classId' => 'required|integer|exists:lop_hoc_phan,MaLopHocPhan',
+            'startTime' => 'required|date|after:now',
+            'endTime' => 'required|date|after:startTime',
+            'description' => 'nullable|string|max:255',
+            'questions.*.cauHoi' => 'required|string',
+            'questions.*.dapAnA' => 'required|string',
+            'questions.*.dapAnB' => 'required|string',
+            'questions.*.dapAnC' => 'required|string',
+            'questions.*.dapAnD' => 'required|string',
+            'questions.*.dapAnDung' => 'required|in:A,B,C,D',
+        ], [
+            'quizName.required' => 'Tên bài kiểm tra không được để trống.',
+            'classId.required' => 'Vui lòng chọn lớp học phần.',
+            'classId.exists' => 'Lớp học phần không tồn tại.',
+            'startTime.required' => 'Thời gian bắt đầu không được để trống.',
+            'startTime.after' => 'Thời gian bắt đầu phải sau thời điểm hiện tại.',
+            'endTime.required' => 'Thời gian kết thúc không được để trống.',
+            'endTime.after' => 'Thời gian kết thúc phải sau thời gian bắt đầu.',
+            'questions.*.cauHoi.required' => 'Nội dung câu hỏi không được để trống.',
+            'questions.*.dapAnA.required' => 'Đáp án A không được để trống.',
+            'questions.*.dapAnB.required' => 'Đáp án B không được để trống.',
+            'questions.*.dapAnC.required' => 'Đáp án C không được để trống.',
+            'questions.*.dapAnD.required' => 'Đáp án D không được để trống.',
+            'questions.*.dapAnDung.required' => 'Vui lòng chọn đáp án đúng.',
+            'questions.*.dapAnDung.in' => 'Đáp án đúng phải là A, B, C hoặc D.',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $baiKiemTra = BaiKiemTra::create([
+                'MaLopHocPhan' => $request->classId,
+                'MaGiangVien' => Auth::id(),
+                'TenBaiKiemTra' => $request->quizName,
+                'ThoiGianBatDau' => Carbon::parse($request->startTime),
+                'ThoiGianKetThuc' => Carbon::parse($request->endTime),
+                'MoTa' => $request->description,
+                'TrangThai' => 1,
+                'created_at' => now('Asia/Ho_Chi_Minh'),
+                'updated_at' => now('Asia/Ho_Chi_Minh'),
+            ]);
+
+            foreach ($request->questions as $question) {
+                CauHoiBaiKiemTra::create([
+                    'MaBaiKiemTra' => $baiKiemTra->MaBaiKiemTra,
+                    'CauHoi' => $question['cauHoi'],
+                    'DapAnA' => $question['dapAnA'],
+                    'DapAnB' => $question['dapAnB'],
+                    'DapAnC' => $question['dapAnC'],
+                    'DapAnD' => $question['dapAnD'],
+                    'DapAnDung' => $question['dapAnDung'],
+                    'created_at' => now('Asia/Ho_Chi_Minh'),
+                    'updated_at' => now('Asia/Ho_Chi_Minh'),
+                ]);
+            }
+
+            $noiDungThongBao = 'Giảng viên đã tạo bài kiểm tra mới: "' . $request->quizName . '" vào lớp học phần. Vui lòng kiểm tra và chuẩn bị.';
+            ThongBao::create([
+                'MaLopHocPhan' => $request->classId,
+                'MaNguoiTao' => Auth::id(),
+                'NoiDung' => $noiDungThongBao,
+                'ThoiGianTao' => now('Asia/Ho_Chi_Minh'),
+                'TrangThai' => 1,
+                'created_at' => now('Asia/Ho_Chi_Minh'),
+                'updated_at' => now('Asia/Ho_Chi_Minh'),
+            ]);
+
+            $emails = DB::table('danh_sach_lop')
+                ->join('nguoi_dung', 'danh_sach_lop.MaSinhVien', '=', 'nguoi_dung.MaNguoiDung')
+                ->where('danh_sach_lop.MaLopHocPhan', $request->classId)
+                ->select('nguoi_dung.MaNguoiDung', 'nguoi_dung.HoTen', 'nguoi_dung.Email')
+                ->get();
+
+            $start = Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('H:i:s d/m/Y');
+            $end = Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('H:i:s d/m/Y');
+            foreach ($emails as $email) {
+                $studentName = $email->HoTen;
+                $emailAddress = $email->Email;
+                $body = "Chào {$studentName},<br><br>";
+                $body .= "{$noiDungThongBao}<br><br>";
+                $body .= "📄 Tên bài kiểm tra: {$baiKiemTra->TenBaiKiemTra}<br>";
+                $body .= "📄 Mô tả bài kiểm tra: {$baiKiemTra->MoTa}<br>";
+                $body .= "⌚ Thời gian bắt đầu: {$start}<br>";
+                $body .= "⏳ Thời gian kết thúc: {$end}<br>";
+                $body .= "<br>Trân trọng,<br>Hệ thống managing bài giảng trực tuyến.";
+                try {
+                    $emailService->sendEmail($emailAddress, 'Thêm bài kiểm tra mới', $body);
+                } catch (\Throwable $e) {
+                    Log::error("Không thể gửi email đến {$emailAddress}: " . $e->getMessage());
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('giangvien.bai-kiem-tra.danh-sach')->with('success', 'Thêm bài kiểm tra và các câu hỏi thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('errorSystem', 'Lỗi khi thêm bài kiểm tra: ' . $e->getMessage());
+        }
     }
 
     public function importBaiKiemTra(Request $request, EmailService $emailService)
@@ -64,7 +200,7 @@ class BaiKiemTraController extends Controller
 
                 $thoiGianKetThuc = is_numeric($thoiGianKetThucRaw)
                     ? Carbon::instance(Date::excelToDateTimeObject($thoiGianKetThucRaw))
-                    : Carbon::parse($thoiGianBatDauRaw);
+                    : Carbon::parse($thoiGianKetThucRaw);
             } catch (\Exception $e) {
                 return redirect()->back()->with('warning', 'Định dạng ngày giờ trong ô B2 hoặc B3 không hợp lệ.');
             }
@@ -187,19 +323,18 @@ class BaiKiemTraController extends Controller
                 $end = \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('H:i:s d/m/Y');
                 foreach ($emails as $email) {
                     $studentName = $email->HoTen;
-                    $email = $email->Email;
+                    $emailAddress = $email->Email;
                     $body = "Chào {$studentName},<br><br>";
                     $body .= "{$noiDungThongBao}<br><br>";
                     $body .= "📄 Tên bài kiểm tra: {$baiKiemTra->TenBaiKiemTra}<br>";
                     $body .= "📄 Mô tả bài kiểm tra: {$baiKiemTra->MoTa}<br>";
                     $body .= "⌚ Thời gian bắt đầu: {$start}<br>";
                     $body .= "⏳ Thời gian kết thúc: {$end}<br>";
-                    $body .= "<br>Trân trọng,<br>Hệ thống quản lý bài giảng trực tuyến.";
-
+                    $body .= "<br>Trân trọng,<br>Hệ thống managing bài giảng trực tuyến.";
                     try {
-                        $emailService->sendEmail($email, 'Thêm bài kiểm tra mới', $body);
+                        $emailService->sendEmail($emailAddress, 'Thêm bài kiểm tra mới', $body);
                     } catch (\Throwable $e) {
-                        Log::error("Không thể gửi email đến {$email}: " . $e->getMessage());
+                        Log::error("Không thể gửi email đến {$emailAddress}: " . $e->getMessage());
                     }
                 }
             }
@@ -238,7 +373,7 @@ class BaiKiemTraController extends Controller
             $baiMoi = BaiKiemTra::create([
                 'MaLopHocPhan' => $request->MaLopHocPhan,
                 'MaGiangVien' => Auth::id(),
-                'TenBaiKiemTra' => 'Bản sao của' .  $baiGoc->TenBaiKiemTra,
+                'TenBaiKiemTra' => 'Bản sao của ' .  $baiGoc->TenBaiKiemTra,
                 'ThoiGianBatDau' => $baiGoc->ThoiGianBatDau,
                 'ThoiGianKetThuc' => $baiGoc->ThoiGianKetThuc,
                 'MoTa' => $baiGoc->MoTa,
@@ -268,6 +403,154 @@ class BaiKiemTraController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('errorSystem', 'Lỗi khi nhân bản: ' . $e->getMessage());
+        }
+    }
+
+    public function chiTietBaiKiemTra($id)
+    {
+        $baiKiemTra = BaiKiemTra::where('MaBaiKiemTra', $id)
+            ->where('MaGiangVien', Auth::id())
+            ->firstOrFail();
+
+        $cauHois = CauHoiBaiKiemTra::where('MaBaiKiemTra', $id)->get();
+
+        $soLuongSinhVien = DB::table('ket_qua_bai_kiem_tra')
+            ->where('MaBaiKiemTra', $id)
+            ->distinct('MaSinhVien')
+            ->count('MaSinhVien');
+
+        return view('giangvien.quanLyBaiKiemTra.chiTietBaiKiemTra', compact('baiKiemTra', 'cauHois', 'soLuongSinhVien'));
+    }
+
+    public function hienFormSuaBaiKiemTra($id)
+    {
+        $baiKiemTra = BaiKiemTra::where('MaBaiKiemTra', $id)
+            ->where('MaGiangVien', Auth::id())
+            ->firstOrFail();
+
+        $lopHocPhan = DB::table('lop_hoc_phan')
+            ->where('MaNguoiTao', Auth::id())
+            ->select('MaLopHocPhan', 'TenLopHocPhan')
+            ->get();
+
+        $cauHois = CauHoiBaiKiemTra::where('MaBaiKiemTra', $id)->get();
+
+        $soLuongSinhVien = DB::table('ket_qua_bai_kiem_tra')
+            ->where('MaBaiKiemTra', $id)
+            ->distinct('MaSinhVien')
+            ->count('MaSinhVien');
+
+        return view('giangvien.quanLyBaiKiemTra.suaBaiKiemTra', compact('baiKiemTra', 'lopHocPhan', 'cauHois', 'soLuongSinhVien'));
+    }
+
+    public function capNhatBaiKiemTra(Request $request, $id)
+    {
+        $baiKiemTra = BaiKiemTra::where('MaBaiKiemTra', $id)
+            ->where('MaGiangVien', Auth::id())
+            ->firstOrFail();
+
+        $soLuongSinhVien = DB::table('ket_qua_bai_kiem_tra')
+            ->where('MaBaiKiemTra', $id)
+            ->distinct('MaSinhVien')
+            ->count('MaSinhVien');
+
+        if ($soLuongSinhVien > 0) {
+            return redirect()->back()->with('errorSystem', 'Không thể sửa bài kiểm tra vì đã có sinh viên làm bài.');
+        }
+
+        $request->validate([
+            'quizName' => 'required|string|max:255',
+            'classId' => 'required|integer|exists:lop_hoc_phan,MaLopHocPhan',
+            'startTime' => 'required|date|after:now',
+            'endTime' => 'required|date|after:startTime',
+            'description' => 'nullable|string|max:255',
+            'status' => 'required|in:0,1',
+            'questions.*.cauHoi' => 'required|string',
+            'questions.*.dapAnA' => 'required|string',
+            'questions.*.dapAnB' => 'required|string',
+            'questions.*.dapAnC' => 'required|string',
+            'questions.*.dapAnD' => 'required|string',
+            'questions.*.dapAnDung' => 'required|in:A,B,C,D',
+        ], [
+            'quizName.required' => 'Tên bài kiểm tra không được để trống.',
+            'classId.required' => 'Vui lòng chọn lớp học phần.',
+            'classId.exists' => 'Lớp học phần không tồn tại.',
+            'startTime.required' => 'Thời gian bắt đầu không được để trống.',
+            'startTime.after' => 'Thời gian bắt đầu phải sau thời điểm hiện tại.',
+            'endTime.required' => 'Thời gian kết thúc không được để trống.',
+            'endTime.after' => 'Thời gian kết thúc phải sau thời gian bắt đầu.',
+            'status.required' => 'Vui lòng chọn trạng thái.',
+            'status.in' => 'Trạng thái không hợp lệ.',
+            'questions.*.cauHoi.required' => 'Nội dung câu hỏi không được để trống.',
+            'questions.*.dapAnA.required' => 'Đáp án A không được để trống.',
+            'questions.*.dapAnB.required' => 'Đáp án B không được để trống.',
+            'questions.*.dapAnC.required' => 'Đáp án C không được để trống.',
+            'questions.*.dapAnD.required' => 'Đáp án D không được để trống.',
+            'questions.*.dapAnDung.required' => 'Vui lòng chọn đáp án đúng.',
+            'questions.*.dapAnDung.in' => 'Đáp án đúng phải là A, B, C hoặc D.',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $baiKiemTra->update([
+                'MaLopHocPhan' => $request->classId,
+                'TenBaiKiemTra' => $request->quizName,
+                'ThoiGianBatDau' => Carbon::parse($request->startTime),
+                'ThoiGianKetThuc' => Carbon::parse($request->endTime),
+                'MoTa' => $request->description,
+                'TrangThai' => $request->status,
+                'updated_at' => now('Asia/Ho_Chi_Minh'),
+            ]);
+
+            CauHoiBaiKiemTra::where('MaBaiKiemTra', $id)->delete();
+
+            foreach ($request->questions as $question) {
+                CauHoiBaiKiemTra::create([
+                    'MaBaiKiemTra' => $baiKiemTra->MaBaiKiemTra,
+                    'CauHoi' => $question['cauHoi'],
+                    'DapAnA' => $question['dapAnA'],
+                    'DapAnB' => $question['dapAnB'],
+                    'DapAnC' => $question['dapAnC'],
+                    'DapAnD' => $question['dapAnD'],
+                    'DapAnDung' => $question['dapAnDung'],
+                    'created_at' => now('Asia/Ho_Chi_Minh'),
+                    'updated_at' => now('Asia/Ho_Chi_Minh'),
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('giangvien.bai-kiem-tra.danh-sach')->with('success', 'Cập nhật bài kiểm tra thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('errorSystem', 'Lỗi khi cập nhật bài kiểm tra: ' . $e->getMessage());
+        }
+    }
+
+    public function xoaBaiKiemTra($id)
+    {
+        $baiKiemTra = BaiKiemTra::where('MaBaiKiemTra', $id)
+            ->where('MaGiangVien', Auth::id())
+            ->firstOrFail();
+
+        $soLuongSinhVien = DB::table('ket_qua_bai_kiem_tra')
+            ->where('MaBaiKiemTra', $id)
+            ->distinct('MaSinhVien')
+            ->count('MaSinhVien');
+
+        if ($soLuongSinhVien > 0) {
+            return redirect()->back()->with('errorSystem', 'Không thể xóa bài kiểm tra vì đã có sinh viên làm bài.');
+        }
+
+        try {
+            DB::beginTransaction();
+            CauHoiBaiKiemTra::where('MaBaiKiemTra', $id)->delete();
+            $baiKiemTra->delete();
+            DB::commit();
+            return redirect()->back()->with('success', 'Xóa bài kiểm tra thành công.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('errorSystem', 'Lỗi khi xóa bài kiểm tra: ' . $e->getMessage());
         }
     }
 }

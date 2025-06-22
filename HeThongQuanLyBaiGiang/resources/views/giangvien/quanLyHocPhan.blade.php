@@ -13,13 +13,15 @@
         <div class="card-body">
             <div class="row justify-content-between mb-3">
                 <div class="col-md-auto">
-                    <form method="GET" action="{{ route('giangvien.hocphan.danh-sach') }}" class="d-flex align-items-center">
+                    <form method="GET" action="{{ route('giangvien.hocphan.danh-sach') }}"
+                        class="d-flex align-items-center">
                         <input type="hidden" name="search" value="{{ request('search') }}">
                         <label for="per_page" class="me-2">Hiện</label>
-                        <select name="per_page" id="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
-                            <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
-                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        <select name="per_page" id="per_page" class="form-select form-select-sm"
+                            onchange="this.form.submit()">
+                            <option value="10" {{ request('per_page', 10)==10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ request('per_page')==25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page')==50 ? 'selected' : '' }}>50</option>
                         </select>
                         <span class="ms-2">mục</span>
                     </form>
@@ -28,7 +30,8 @@
                     <form method="GET" action="{{ route('giangvien.hocphan.danh-sach') }}">
                         <div class="input-group">
                             <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
-                            <input type="search" name="search" class="form-control" placeholder="Tìm kiếm..." value="{{ request('search') }}">
+                            <input type="search" name="search" class="form-control" placeholder="Tìm kiếm..."
+                                value="{{ request('search') }}">
                             <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                         </div>
                     </form>
@@ -54,7 +57,8 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <img src="{{ $hocPhan->AnhHocPhan ? asset('storage/' . $hocPhan->AnhHocPhan) : asset('img/login/default-avatar.png') }}"
-                                         alt="{{ $hocPhan->TenHocPhan }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                        alt="{{ $hocPhan->TenHocPhan }}" class="rounded me-3"
+                                        style="width: 60px; height: 60px; object-fit: cover;">
                                     <div>
                                         <h6 class="mb-0">{{ $hocPhan->TenHocPhan }}</h6>
                                         <small class="text-muted">{{ Str::limit($hocPhan->MoTa, 70) }}</small>
@@ -63,16 +67,21 @@
                             </td>
                             <td>{{ $hocPhan->monHoc->TenMonHoc ?? 'N/A' }}</td>
                             <td class="text-center">
-                                <a href="/giang-vien/hoc-phan/{{$hocPhan->MaHocPhan}}/bai-giang" class="btn btn-sm btn-outline-primary">
+                                <a href="/giang-vien/hoc-phan/{{$hocPhan->MaHocPhan}}/bai-giang"
+                                    class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-chalkboard-teacher me-1"></i> ({{ $hocPhan->bai_giang_count }})
                                 </a>
                             </td>
                             <td class="text-center">{{ $hocPhan->created_at->format('H:i:s d/m/Y') }}</td>
                             <td class="text-center">
                                 <div class="btn-group">
-                                    <button onclick="viewHocPhan({{ $hocPhan->MaHocPhan }})" class="btn btn-sm btn-info" title="Xem chi tiết"><i class="fas fa-eye"></i></button>
-                                    <button onclick="openHocPhanModal({{ $hocPhan->MaHocPhan }})" class="btn btn-sm btn-primary" title="Sửa"><i class="fas fa-edit"></i></button>
-                                    <button onclick="deleteHocPhan({{ $hocPhan->MaHocPhan }}, '{{ $hocPhan->TenHocPhan }}')" class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                    <button onclick="viewHocPhan({{ $hocPhan->MaHocPhan }})" class="btn btn-sm btn-info"
+                                        title="Xem chi tiết"><i class="fas fa-eye"></i></button>
+                                    <button onclick="openHocPhanModal({{ $hocPhan->MaHocPhan }})"
+                                        class="btn btn-sm btn-primary" title="Sửa"><i class="fas fa-edit"></i></button>
+                                    <button
+                                        onclick="deleteHocPhan({{ $hocPhan->MaHocPhan }}, '{{ $hocPhan->TenHocPhan }}')"
+                                        class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -106,15 +115,17 @@
                 <div class="modal-body">
                     <div id="modalErrors" class="alert alert-danger" style="display: none;"></div>
                     <div class="mb-3">
-                        <label for="TenHocPhan" class="form-label">Tên Học phần <span class="text-danger">*</span></label>
+                        <label for="TenHocPhan" class="form-label">Tên Học phần <span
+                                class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="TenHocPhan" name="TenHocPhan" required>
                     </div>
                     <div class="mb-3">
-                        <label for="MaMonHoc" class="form-label">Thuộc Môn học <span class="text-danger">*</span></label>
+                        <label for="MaMonHoc" class="form-label">Thuộc Môn học <span
+                                class="text-danger">*</span></label>
                         <select class="form-select" id="MaMonHoc" name="MaMonHoc" required>
                             <option value="">-- Chọn Môn học --</option>
                             @foreach($danhSachMonHoc as $monHoc)
-                                <option value="{{ $monHoc->MaMonHoc }}">{{ $monHoc->TenMonHoc }}</option>
+                            <option value="{{ $monHoc->MaMonHoc }}">{{ $monHoc->TenMonHoc }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -195,14 +206,14 @@
             modalLabel.textContent = 'Sửa Học phần';
             formMethod.innerHTML = `@method('PUT')`;
             formHocPhan.action = `{{ url('giang-vien/hoc-phan') }}/${id}`;
-            
+
             fetch(`{{ url('giang-vien/hoc-phan') }}/${id}/chinh-sua`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('TenHocPhan').value = data.TenHocPhan;
                     document.getElementById('MaMonHoc').value = data.MaMonHoc;
                     document.getElementById('MoTa').value = data.MoTa || '';
-                    
+
                     if (data.AnhHocPhan) {
                         document.getElementById('currentImage').innerHTML = `<img src="{{ asset('storage') }}/${data.AnhHocPhan}" class="img-thumbnail" style="max-width: 100px;">`;
                     }
@@ -262,29 +273,29 @@
         document.getElementById('formXoaHocPhan').action = `{{ url('giang-vien/hoc-phan') }}/${id}`;
         new bootstrap.Modal(document.getElementById('modalXacNhanXoa')).show();
     }
-    
+
     // Hiển thị lại modal với lỗi nếu có
-    @if($errors->any())
-        openHocPhanModal({{ old('MaHocPhan') ? old('MaHocPhan') : 'null' }});
+    @if ($errors -> any())
+        openHocPhanModal({{ old('MaHocPhan') ?old('MaHocPhan'): 'null' }});
 
-        let errors = {!! json_encode($errors->getMessages()) !!};
-        let errorHtml = '<ul>';
-        for (let field in errors) {
-            errors[field].forEach(error => {
-                errorHtml += `<li>${error}</li>`;
-            });
-        }
-        errorHtml += '</ul>';
-        document.getElementById('modalErrors').innerHTML = errorHtml;
-        document.getElementById('modalErrors').style.display = 'block';
-
-        // Đánh dấu các trường bị lỗi
-        Object.keys(errors).forEach(function(field) {
-            let input = document.getElementById(field.charAt(0).toUpperCase() + field.slice(1));
-            if (input) {
-                input.classList.add('is-invalid');
-            }
+    let errors = {!! json_encode($errors -> getMessages())!!};
+    let errorHtml = '<ul>';
+    for (let field in errors) {
+        errors[field].forEach(error => {
+            errorHtml += `<li>${error}</li>`;
         });
+    }
+    errorHtml += '</ul>';
+    document.getElementById('modalErrors').innerHTML = errorHtml;
+    document.getElementById('modalErrors').style.display = 'block';
+
+    // Đánh dấu các trường bị lỗi
+    Object.keys(errors).forEach(function (field) {
+        let input = document.getElementById(field.charAt(0).toUpperCase() + field.slice(1));
+        if (input) {
+            input.classList.add('is-invalid');
+        }
+    });
     @endif
 </script>
 @endsection
