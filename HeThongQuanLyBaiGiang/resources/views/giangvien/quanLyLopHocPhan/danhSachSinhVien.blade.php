@@ -8,12 +8,12 @@
         <h3 class="tile-title">Danh sách sinh viên</h3>
         <div class="tile-body">
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalThemSinhVien" title="Thêm sinh viên vào lớp">
+                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalThemSinhVien" title="Thêm sinh viên vào lớp bằng email">
                     <i class="fas fa-plus"></i> Thêm sinh viên vào lớp
                 </button>
-                <a class="btn btn-primary btn-sm" href="" title="Nhập Excel thêm sinh viên vào lớp học phần">
-                    <i class="fas fa-file-excel"></i> Nhập excel
-                </a>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#importStudentModal" title="Thêm sinh viên vào lớp bằng file Excel">
+                    <i class="fas fa-file-excel"></i> Import sinh viên
+                </button>
                 <a class="btn btn-warning btn-sm" href="{{ asset('./LopHocPhan/Template_Import_Student.xlsx') }}" download title="Tải mẫu Excel để thêm sinh viên vào lớp học phần">
                     <i class="fas fa-file-download"></i> Tải mẫu excel
                 </a>
@@ -101,12 +101,12 @@
     </div>
 </div>
 
-<!-- Modal thêm sinh viên bằng email-->
+<!-- Modal thêm sinh viên bằng email -->
 <div class="modal fade" id="modalThemSinhVien" tabindex="-1" aria-labelledby="modalThemSinhVienEmail" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title fw-bold" id="modalThemSinhVienEmail">Thêm sinh viên vào lớp học phần</h5>
+                <h5 class="modal-title fw-bold" id="modalThemSinhVienEmail">Thêm sinh viên vào lớp học phần bằng email</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <form method="POST" action="{{ route('giangvien.sinhvien.them-bang-email', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}">
@@ -121,6 +121,31 @@
                 <div class="modal-footer border-top-0 pt-0">
                     <button type="submit" class="btn btn-success px-4">Mời</button>
                     <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm sinh viên bằng file excel -->
+<div class="modal fade" id="importStudentModal" tabindex="-1" aria-labelledby="importStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="importStudentModalLabel">Thêm sinh viên bằng file Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form action="{{ route('giangvien.sinhvien.them-bang-file', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <label for="excelFile" class="fw-semibold">Chọn file Excel chứa thông tin sinh viên:</label>
+                    <small class="text-muted d-block pt-1 pb-2">Chỉ chấp nhận file Excel theo mẫu (.xlsx)</small>
+                    <input type="file" name="excel_file" accept=".xlsx" class="form-control mb-3" required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Thêm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
                 </div>
             </form>
         </div>
@@ -154,4 +179,5 @@
     });
 
 </script>
+
 @endsection

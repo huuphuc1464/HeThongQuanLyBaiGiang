@@ -129,3 +129,4 @@ Route::get('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien', [SinhVienControll
 Route::delete('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/xoa/{maDanhSachLop}', [SinhVienController::class, 'xoaSinhVien'])->name('giangvien.lophocphan.sinhvien.xoa');
 Route::post('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them', [SinhVienController::class, 'themSinhVien'])->name('giangvien.sinhvien.them-bang-email');
 Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
+Route::post('/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them-file', [SinhVienController::class, 'themSinhVienBangFile'])->name('giangvien.sinhvien.them-bang-file');
