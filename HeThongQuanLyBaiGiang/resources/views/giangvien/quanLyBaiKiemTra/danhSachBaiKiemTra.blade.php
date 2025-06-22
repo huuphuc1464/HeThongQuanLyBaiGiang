@@ -176,13 +176,15 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="duplicateModalLabel{{ $baiKiemTra->MaBaiKiemTra }}">
-                                            Nhân bản bài kiểm tra</h5>
+                                            Nhân bản bài kiểm tra: <strong>{{ $baiKiemTra->TenBaiKiemTra }}</strong>
+                                        </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <form action="{{ route('giangvien.bai-kiem-tra.nhan-ban') }}" method="POST">
                                             @csrf
+                                            @method('')
                                             <input type="hidden" name="MaBaiKiemTra"
                                                 value="{{ $baiKiemTra->MaBaiKiemTra }}">
                                             <div class="mb-3">
@@ -201,6 +203,15 @@
                                                 @error('MaLopHocPhan')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="status{{ $baiKiemTra->MaBaiKiemTra }}"
+                                                    class="form-label">Trạng thái</label>
+                                                <select class="form-select" name="TrangThai"
+                                                    id="status{{ $baiKiemTra->MaBaiKiemTra }}">
+                                                    <option value="1">Hiện</option>
+                                                    <option value="0" selected>Ẩn</option>
+                                                </select>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
@@ -232,8 +243,8 @@
 
 @section('scripts')
 <script>
-    // Xử lý tìm kiếm và lọc
-    document.querySelectorAll('form').forEach(form => {
+    // Xử lý tìm kiếm và lọc - chỉ áp dụng cho các form trong phần header của card-body
+    document.querySelectorAll('.card-body > .row.justify-content-between form').forEach(form => {
         form.addEventListener('submit', function (e) {
             const search = form.querySelector('input[name="search"]')?.value.trim();
             const filterClass = form.querySelector('select[name="filterClass"]')?.value;

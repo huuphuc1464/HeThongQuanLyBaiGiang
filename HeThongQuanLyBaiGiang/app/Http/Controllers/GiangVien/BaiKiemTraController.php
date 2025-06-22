@@ -358,11 +358,13 @@ class BaiKiemTraController extends Controller
         $request->validate([
             'MaBaiKiemTra' => 'required|integer|exists:bai_kiem_tra,MaBaiKiemTra',
             'MaLopHocPhan' => 'required|integer|exists:lop_hoc_phan,MaLopHocPhan',
+            'TrangThai' => 'required|in:0,1',
         ], [
             'MaBaiKiemTra.required' => 'Vui lòng chọn bài kiểm tra cần nhân bản.',
             'MaLopHocPhan.required' => 'Vui lòng chọn lớp học phần đích.',
             'MaBaiKiemTra.exists' => 'Bài kiểm tra không tồn tại',
-            'MaLopHocPhan.exists' => 'Lớp học phần không tồn tại'
+            'MaLopHocPhan.exists' => 'Lớp học phần không tồn tại',
+            'TrangThai.required' => 'Vui lòng chọn trạng thái.',
         ]);
 
         DB::beginTransaction();
@@ -381,7 +383,7 @@ class BaiKiemTraController extends Controller
                 'ThoiGianBatDau' => $baiGoc->ThoiGianBatDau,
                 'ThoiGianKetThuc' => $baiGoc->ThoiGianKetThuc,
                 'MoTa' => $baiGoc->MoTa,
-                'TrangThai' => 0,
+                'TrangThai' => $request->TrangThai,
                 'created_at' => now('Asia/Ho_Chi_Minh'),
                 'updated_at' => now('Asia/Ho_Chi_Minh')
             ]);
