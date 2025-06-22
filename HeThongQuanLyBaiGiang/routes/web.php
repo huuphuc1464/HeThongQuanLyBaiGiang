@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\MonHocController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GiangVienController;
+use App\Http\Controllers\GiangVien\BaiKiemTraController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
 use App\Http\Controllers\SinhVien\BaiGiangController as SinhVienBaiGiangController;
@@ -130,3 +131,7 @@ Route::delete('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/xoa/{maDanhSachL
 Route::post('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them', [SinhVienController::class, 'themSinhVien'])->name('giangvien.sinhvien.them-bang-email');
 Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
 Route::post('/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them-file', [SinhVienController::class, 'themSinhVienBangFile'])->name('giangvien.sinhvien.them-bang-file');
+
+
+// Quản lý bài kiểm tra
+Route::get('giang-vien/bai-kiem-tra', [BaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('giangvien.bai-kiem-tra.danh-sach');
