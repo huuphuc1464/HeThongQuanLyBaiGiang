@@ -34,16 +34,6 @@
             </a>
         </div>
         <div class="card-body">
-            @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            @if (session('errorSystem'))
-            <div class="alert alert-danger">{{ session('errorSystem') }}</div>
-            @endif
-            @if (session('warning'))
-            <div class="alert alert-warning">{!! session('warning') !!}</div>
-            @endif
-
             <!-- Form tìm kiếm và lọc -->
             <div class="row justify-content-between mb-3">
                 <div class="col-md-auto">

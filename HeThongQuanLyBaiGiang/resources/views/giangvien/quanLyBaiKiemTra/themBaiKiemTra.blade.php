@@ -97,6 +97,17 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select class="form-select @error('status') is-invalid @enderror" id="status" name="status"
+                            required>
+                            <option value="1" {{ old('status', '1' )=='1' ? 'selected' : '' }}>Hiện</option>
+                            <option value="0" {{ old('status')=='0' ? 'selected' : '' }}>Ẩn</option>
+                        </select>
+                        @error('status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <button type="button" class="btn btn-primary" id="nextStepBtn">Tiếp tục</button>
                 </div>
 
