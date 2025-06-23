@@ -144,5 +144,5 @@ Route::get('giang-vien/bai-kiem-tra/sua/{id}', [BaiKiemTraController::class, 'hi
 Route::put('giang-vien/bai-kiem-tra/sua/{id}', [BaiKiemTraController::class, 'capNhatBaiKiemTra'])->name('giangvien.bai-kiem-tra.sua');
 Route::delete('giang-vien/bai-kiem-tra/xoa/{id}', [BaiKiemTraController::class, 'xoaBaiKiemTra'])->name('giangvien.bai-kiem-tra.xoa');
 
-// Route::get('giang-vien/bai-kiem-tra/xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('giangvien.bai-kiem-tra.xuat-bai-kiem-tra');
-// Route::get('giang-vien/bai-kiem-tra/xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQua'])->name('giangvien.bai-kiem-tra.xuat-ket-qua');
+Route::get('giang-vien/bai-kiem-tra/xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('giangvien.bai-kiem-tra.xuat-bai-kiem-tra');
+Route::get('giang-vien/bai-kiem-tra/xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQuaBaiLam'])->name('giangvien.bai-kiem-tra.xuat-ket-qua');

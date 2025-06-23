@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class BaiKiemTraController extends Controller
@@ -559,5 +562,226 @@ class BaiKiemTraController extends Controller
             DB::rollBack();
             return redirect()->back()->with('errorSystem', 'Lỗi khi xóa bài kiểm tra: ' . $e->getMessage());
         }
+    }
+
+    public function xuatBaiKiemTra($id)
+    {
+        $giangVienId = Auth::id();
+
+        $laNguoiTao = DB::table('lop_hoc_phan as lhp')
+            ->join('bai_kiem_tra as bkt', 'lhp.MaLopHocPhan', '=', 'bkt.MaLopHocPhan')
+            ->where('bkt.MaBaiKiemTra', $id)
+            ->where('bkt.MaGiangVien', $giangVienId)
+            ->where('lhp.MaNguoiTao', $giangVienId)
+            ->exists();
+
+        if (!$laNguoiTao) {
+            return redirect()->back()->with('errorSystem', 'Bạn không có quyền truy cập vào bài kiểm tra này.');
+        }
+
+        $baiKiemTra = DB::table('bai_kiem_tra')->where('MaBaiKiemTra', $id)->first();
+        if (!$baiKiemTra) {
+            return redirect()->back()->with('errorSystem', 'Bài kiểm tra không tồn tại.');
+        }
+
+        $cauHois = DB::table('cau_hoi_bai_kiem_tra')
+            ->where('MaBaiKiemTra', $id)
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle($baiKiemTra->TenBaiKiemTra);
+
+        // Thông tin bài kiểm tra
+        $sheet->setCellValue('A1', 'Tên bài kiểm tra');
+        $sheet->setCellValue('B1', $baiKiemTra->TenBaiKiemTra);
+        $sheet->setCellValue('A2', 'Thời gian bắt đầu');
+        $sheet->setCellValue('B2', \Carbon\Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('d/m/Y H:i:s'));
+        $sheet->setCellValue('A3', 'Thời gian kết thúc');
+        $sheet->setCellValue('B3', \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('d/m/Y H:i:s'));
+        $sheet->setCellValue('A4', 'Mô tả');
+        $sheet->setCellValue('B4', $baiKiemTra->MoTa);
+        $sheet->setCellValue('A5', 'Trạng thái');
+        $sheet->setCellValue('B5', $baiKiemTra->TrangThai ? 'Hiện' : 'Ẩn');
+
+        for ($i = 1; $i <= 5; $i++) {
+            $sheet->getStyle("A$i")->getFont()->setBold(true);
+            $sheet->getStyle("A$i")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('ADD8E6');
+            $sheet->getStyle("A$i")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
+            $sheet->getStyle("B$i")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        }
+
+        // Câu hỏi 
+        $headers = ['Câu hỏi', 'Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D', 'Đáp án đúng'];
+        $sheet->fromArray($headers, null, 'A6');
+        $headerRange = 'A6:F6';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('90EE90');
+        $sheet->getStyle($headerRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
+
+        // Dữ liệu câu hỏi
+        $row = 7;
+        foreach ($cauHois as $q) {
+            $sheet->setCellValue("A$row", $q->CauHoi);
+            $sheet->setCellValue("B$row", $q->DapAnA);
+            $sheet->setCellValue("C$row", $q->DapAnB);
+            $sheet->setCellValue("D$row", $q->DapAnC);
+            $sheet->setCellValue("E$row", $q->DapAnD);
+            $sheet->setCellValue("F$row", $q->DapAnDung);
+            $row++;
+        }
+
+        if ($row > 7) {
+            $sheet->getStyle("A7:F" . ($row - 1))
+                ->getBorders()
+                ->getAllBorders()
+                ->setBorderStyle(Border::BORDER_THIN);
+        }
+
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'BaiKiemTra_' . str_replace(' ', '_', $baiKiemTra->TenBaiKiemTra) . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+    }
+
+    public function xuatKetQuaBaiLam($id)
+    {
+        $giangVienId = Auth::id();
+
+        $laNguoiTao = DB::table('lop_hoc_phan as lhp')
+            ->join('bai_kiem_tra as bkt', 'lhp.MaLopHocPhan', '=', 'bkt.MaLopHocPhan')
+            ->where('bkt.MaBaiKiemTra', $id)
+            ->where('bkt.MaGiangVien', $giangVienId)
+            ->where('lhp.MaNguoiTao', $giangVienId)
+            ->exists();
+
+        if (!$laNguoiTao) {
+            return redirect()->back()->with('errorSystem', 'Bạn không có quyền truy cập vào bài kiểm tra này.');
+        }
+
+        $baiKiemTra = DB::table('bai_kiem_tra')
+            ->join('lop_hoc_phan', 'bai_kiem_tra.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
+            ->where('bai_kiem_tra.MaBaiKiemTra', $id)
+            ->select('bai_kiem_tra.*', 'lop_hoc_phan.TenLopHocPhan')
+            ->first();
+
+        if (!$baiKiemTra) return redirect()->back()->with('errorSystem', 'Bài kiểm tra không tồn tại.');
+
+        $soCauHoi = DB::table('cau_hoi_bai_kiem_tra')->where('MaBaiKiemTra', '=', $id)->count();
+        if ($soCauHoi == 0) return redirect()->back()->with('errorSystem', 'Bài kiểm tra không có câu hỏi');
+
+        $ketQua = DB::table('ket_qua_bai_kiem_tra as kq')
+            ->join('sinh_vien as sv', 'sv.MaNguoiDung', '=', 'kq.MaSinhVien')
+            ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'sv.MaNguoiDung')
+            ->where('kq.MaBaiKiemTra', $id)
+            ->select('sv.*', 'nd.HoTen', 'nd.Email', 'kq.*')
+            ->orderBy('kq.NgayNop')
+            ->get();
+
+        if ($ketQua->isEmpty()) return redirect()->back()->with('errorSystem', 'Chưa có sinh viên làm bài kiểm tra');
+
+        $spreadsheet = new Spreadsheet();
+
+        // Sheet 1: Thông tin bài 
+        $sheet1 = $spreadsheet->getActiveSheet();
+        $sheet1->setTitle('Thông tin');
+        $sheet1->setCellValue('A1', 'THÔNG TIN BÀI KIỂM TRA');
+        $sheet1->mergeCells('A1:B1');
+        $sheet1->getStyle('A1')->getFont()->setBold(true)->setSize(18);
+        $sheet1->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet1->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet1->getStyle('A1:B1')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
+        $sheet1->getStyle('A1:B1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D0E3FA');
+
+        $sheet1->fromArray([
+            ['Tên bài kiểm tra:', $baiKiemTra->TenBaiKiemTra],
+            ['Lớp học phần:', $baiKiemTra->TenLopHocPhan],
+            ['Thời gian tạo:', \Carbon\Carbon::parse($baiKiemTra->created_at)->format('d/m/Y H:i:s')],
+            ['Thời gian cập nhật:', \Carbon\Carbon::parse($baiKiemTra->updated_at)->format('d/m/Y H:i:s')],
+            ['Thời gian bắt đầu:', \Carbon\Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('d/m/Y H:i:s')],
+            ['Thời gian kết thúc:', \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('d/m/Y H:i:s')],
+            ['Tổng số câu hỏi:', $soCauHoi ?? 'Không có câu hỏi'],
+            ['Số sinh viên nộp:', count($ketQua)],
+            ['Ngày xuất báo cáo:', now('Asia/Ho_Chi_Minh')->format('d/m/Y H:i:s')],
+        ], null, 'A3');
+
+        $sheet1->getStyle('A3:A11')->getFont()->setBold(true);
+        $sheet1->getStyle('A3:B11')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet1->getStyle('A3:B11')->getAlignment()->setWrapText(true);
+        $sheet1->getStyle('A3:B11')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet1->getStyle('A3:B11')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet1->getStyle('A3:B11')->getFont()->setSize(12);
+        $sheet1->getStyle('A3:B11')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet1->getColumnDimension('A')->setAutoSize(true);
+        $sheet1->getColumnDimension('B')->setAutoSize(true);
+
+        // Sheet 2: Kết quả bài làm
+        $sheet2 = $spreadsheet->createSheet();
+        $sheet2->setTitle('Kết quả');
+
+        $headers = ['STT', 'MSSV', 'Tên sinh viên', 'Email', 'Thời gian nộp', 'Tổng câu', 'Số đúng', 'Điểm', 'Câu hỏi', 'Đáp án sinh viên', 'Đáp án đúng', 'Kết quả'];
+        $sheet2->fromArray($headers, null, 'A1');
+        $sheet2->getStyle('A1:L1')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
+        $sheet2->getStyle('A1:L1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('4682B4');
+
+        $row = 2;
+        $index = 1;
+
+        foreach ($ketQua as $kq) {
+            $chiTiet = DB::table('chi_tiet_ket_qua')
+                ->join('cau_hoi_bai_kiem_tra as ch', 'chi_tiet_ket_qua.MaCauHoi', '=', 'ch.MaCauHoi')
+                ->where('MaKetQua', $kq->MaKetQua)
+                ->select('ch.CauHoi', 'ch.DapAnDung', 'chi_tiet_ket_qua.DapAnSinhVien', 'chi_tiet_ket_qua.KetQua')
+                ->get();
+
+            $startRow = $row;
+            foreach ($chiTiet as $ct) {
+                $sheet2->setCellValue("I$row", $ct->CauHoi);
+                $sheet2->setCellValue("J$row", $ct->DapAnSinhVien);
+                $sheet2->setCellValue("K$row", $ct->DapAnDung);
+                $sheet2->setCellValue("L$row", $ct->KetQua ? 'Đúng' : 'Sai');
+
+                $sheet2->getStyle("L$row")->getFill()->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB($ct->KetQua ? '90EE90' : 'FFA07A');
+
+                $row++;
+            }
+
+            $endRow = $row - 1;
+            if ($startRow <= $endRow) {
+                for ($col = 'A'; $col <= 'H'; $col++) {
+                    $sheet2->mergeCells("$col$startRow:$col$endRow");
+                    $sheet2->getStyle("$col$startRow:$col$endRow")->getAlignment()->setVertical('center')->setHorizontal('center');
+                }
+
+                $sheet2->setCellValue("A$startRow", $index++);
+                $sheet2->setCellValue("B$startRow", $kq->MSSV);
+                $sheet2->setCellValue("C$startRow", $kq->HoTen);
+                $sheet2->setCellValue("D$startRow", $kq->Email);
+                $sheet2->setCellValue("E$startRow", \Carbon\Carbon::parse($kq->NgayNop)->format('d/m/Y H:i:s'));
+                $sheet2->setCellValue("F$startRow", $kq->TongSoCauHoi);
+                $sheet2->setCellValue("G$startRow", $kq->TongCauDung);
+                $sheet2->setCellValue("H$startRow", round($kq->TongCauDung / $soCauHoi * 10, 2));
+            }
+        }
+
+        $sheet2->getStyle("A1:L" . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        foreach (range('A', 'L') as $col) {
+            $sheet2->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Xuất file
+        $filename = 'KetQuaBaiKiemTra_' . str_replace(' ', '_', $baiKiemTra->TenBaiKiemTra) . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel');
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 }
