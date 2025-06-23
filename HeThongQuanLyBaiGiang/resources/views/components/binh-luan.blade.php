@@ -23,7 +23,7 @@
             @forelse($binhLuans as $binhLuan)
             <div class="mb-3">
                 <div class="d-flex align-items-start">
-                    <img src="{{ asset('/AnhDaiDien/default-avatar.png') }}" class="rounded-circle me-2" width="40" height="40" />
+                    <img src="{{ asset($binhLuan->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="rounded-circle me-2" width="40" height="40" />
                     <div class="w-100">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
@@ -104,7 +104,7 @@
                         <div id="ds-tra-loi-{{ $binhLuan->MaBinhLuan }}" class="mt-2 d-none">
                             @foreach($binhLuan->traLoi as $traLoi)
                             <div class="d-flex ms-4 mt-2 border-start ps-3">
-                                <img src="{{ asset('/AnhDaiDien/default-avatar.png') }}" class="rounded-circle me-2" width="32" height="32" />
+                                <img src="{{ asset($binhLuan->AnhDaiDien ??'/AnhDaiDien/default-avatar.png') }}" class="rounded-circle me-2" width="32" height="32" />
                                 <div>
                                     <strong class="text-primary">{{ $traLoi->HoTen }}</strong>
                                     <small class="text-muted ms-2">{{ \Carbon\Carbon::parse($traLoi->created_at)->diffForHumans() }}</small>
