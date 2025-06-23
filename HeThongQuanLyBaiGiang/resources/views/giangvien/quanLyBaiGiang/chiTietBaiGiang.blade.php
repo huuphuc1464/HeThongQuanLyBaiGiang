@@ -3,8 +3,8 @@
 @section('tenTrang', $hocPhan->TenHocPhan . ' / Chi tiết bài giảng / ' . $baiGiang->TenBaiGiang)
 
 @section('content')
-<div class="row">
-    <div class="col-md-12">
+<div class="row pe-0">
+    <div class="col-md-12 pe-0">
         <div class="tile">
             <h3 class="tile-title text-primary mb-3">{{ $baiGiang->TenBaiGiang }}</h3>
             <div class="tile-body">
@@ -35,7 +35,7 @@
                 </div>
 
                 <!-- Nội dung -->
-                <div class="mb3">
+                <div class="mb-3">
                     <h5 class="text-primary">Nội dung bài giảng:</h5>
                     <div class="p-3 bg-light rounded" style="min-height: 150px;">
                         {!! $baiGiang->NoiDung !!}
@@ -72,5 +72,8 @@
             </div>
         </div>
     </div>
+    <x-binh-luan :bai-giang="$baiGiang" />
 </div>
+
+
 @endsection

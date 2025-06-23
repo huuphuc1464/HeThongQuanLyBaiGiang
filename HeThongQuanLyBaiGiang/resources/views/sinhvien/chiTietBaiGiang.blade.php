@@ -3,7 +3,7 @@
 @section('title', $baiGiang->TenBaiGiang)
 
 @section('tab-content')
-<div class="container-fluid card shadow-sm">
+<div class="container-fluid card shadow-sm mb-4">
     <div class="row">
         <div class="col-md-12">
             <div class="tile">
@@ -56,5 +56,6 @@
         </div>
     </div>
 </div>
+<x-binh-luan :bai-giang="$baiGiang" />
 
 @endsection

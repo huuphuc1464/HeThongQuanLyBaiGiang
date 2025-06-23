@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\MonHocController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GiangVienController;
+use App\Http\Controllers\Shared\BinhLuanBaiGiangController;
 use App\Http\Controllers\GiangVien\BaiKiemTraController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
@@ -146,3 +147,8 @@ Route::delete('giang-vien/bai-kiem-tra/xoa/{id}', [BaiKiemTraController::class, 
 
 Route::get('giang-vien/bai-kiem-tra/xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('giangvien.bai-kiem-tra.xuat-bai-kiem-tra');
 Route::get('giang-vien/bai-kiem-tra/xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQuaBaiLam'])->name('giangvien.bai-kiem-tra.xuat-ket-qua');
+
+Route::post('/binh-luan/gui-binh-luan', [BinhLuanBaiGiangController::class, 'guiBinhLuan'])->name('binhluan.guibinhluan');
+Route::post('/binh-luan/tra-loi-binh-luan', [BinhLuanBaiGiangController::class, 'traLoiBinhLuan'])->name('binhluan.traloi');
+Route::delete('/binh-luan/xoa/{id}', [BinhLuanBaiGiangController::class, 'xoa'])->name('binhluan.xoa');
+Route::put('/binh-luan/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat'])->name('binhluan.capnhat');
