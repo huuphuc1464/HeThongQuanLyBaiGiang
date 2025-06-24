@@ -28,6 +28,20 @@
     </div>
     @endif
 
+    <div class="mb-4">
+        <form method="GET" action="{{ route('sinh-vien.bai-kiem-tra.danh-sach') }}" class="form-inline">
+            <select name="trang_thai" class="form-control mr-2" onchange="this.form.submit()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="sap_dien_ra" {{ request('trang_thai')=='sap_dien_ra' ? 'selected' : '' }}>Sắp diễn ra
+                </option>
+                <option value="dang_dien_ra" {{ request('trang_thai')=='dang_dien_ra' ? 'selected' : '' }}>Đang diễn ra
+                </option>
+                <option value="da_ket_thuc" {{ request('trang_thai')=='da_ket_thuc' ? 'selected' : '' }}>Đã kết thúc
+                </option>
+            </select>
+        </form>
+    </div>
+
     @if($baiKiemTra->count() > 0)
     <div class="row">
         @foreach($baiKiemTra as $bai)
@@ -44,9 +58,22 @@
                     <p class="card-text"><strong>Thời gian kết thúc:</strong> {{
                         \Carbon\Carbon::parse($bai->ThoiGianKetThuc)->format('H:i d/m/Y') }}</p>
                     <p class="card-text"><strong>Thời gian làm bài:</strong> {{
-                        \Carbon\Carbon::parse($bai->ThoiGianBatDau)->diffInMinutes(\Carbon\Carbon::parse($bai->ThoiGianKetThuc))
-                        }} phút</p>
-
+                        ($diff =
+                        \Carbon\Carbon::parse($bai->ThoiGianBatDau)->diff(\Carbon\Carbon::parse($bai->ThoiGianKetThuc)))
+                        &&
+                        ($diff->h > 0 ? $diff->h . ' giờ ' : '') . $diff->i . ' phút'
+                        }}</p>
+                    <p class="card-text"><strong>Số câu hỏi:</strong> {{ $bai->cauHoiBaiKiemTra->count() }} câu</p>
+                    @if($bai->daLam)
+                    @php
+                    $ketQua = App\Models\KetQuaBaiKiemTra::where('MaBaiKiemTra', $bai->MaBaiKiemTra)
+                    ->where('MaSinhVien', Auth::id())
+                    ->first();
+                    @endphp
+                    <p class="card-text"><strong>Điểm số:</strong> {{ $ketQua->TongCauDung }}/{{ $ketQua->TongSoCauHoi
+                        }}
+                        ({{ number_format($ketQua->TongCauDung/$ketQua->TongSoCauHoi * 10, 1) }} điểm)</p>
+                    @endif
                     @if($bai->MoTa)
                     <p class="card-text"><strong>Mô tả:</strong> {{ Str::limit($bai->MoTa, 100) }}</p>
                     @endif

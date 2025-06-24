@@ -22,13 +22,23 @@ class KetQuaBaiKiemTraController extends Controller
         $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
             ->findOrFail($maBaiKiemTra);
 
+        // Kiểm tra sinh viên có thuộc lớp học phần không
+        $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
+        $thuocLop = $sinhVien->danhSachLop()
+            ->where('MaLopHocPhan', $baiKiemTra->MaLopHocPhan)
+            ->where('TrangThai', 1)
+            ->exists();
+
+        if (!$thuocLop) {
+            return redirect()->back()->with('error', 'Bạn không thuộc lớp học phần này!');
+        }
+
         // Kiểm tra thời gian làm bài
         $now = Carbon::now();
         $thoiGianBatDau = Carbon::parse($baiKiemTra->ThoiGianBatDau);
         $thoiGianKetThuc = Carbon::parse($baiKiemTra->ThoiGianKetThuc);
 
         // Kiểm tra sinh viên đã làm bài chưa
-        $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
         $daLamBai = KetQuaBaiKiemTra::where('MaBaiKiemTra', $maBaiKiemTra)
             ->where('MaSinhVien', $sinhVien->MaNguoiDung)
             ->exists();
@@ -59,6 +69,25 @@ class KetQuaBaiKiemTraController extends Controller
     {
         $baiKiemTra = BaiKiemTra::with('cauHoiBaiKiemTra')->findOrFail($maBaiKiemTra);
 
+        // Kiểm tra sinh viên có thuộc lớp học phần không
+        $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
+        $thuocLop = $sinhVien->danhSachLop()
+            ->where('MaLopHocPhan', $baiKiemTra->MaLopHocPhan)
+            ->where('TrangThai', 1)
+            ->exists();
+
+        if (!$thuocLop) {
+            return redirect()->back()->with('error', 'Bạn không thuộc lớp học phần này!');
+        }
+
+        // Validate đáp án
+        foreach ($baiKiemTra->cauHoiBaiKiemTra as $cauHoi) {
+            $dapAn = $request->input("cauhoi_{$cauHoi->MaCauHoi}");
+            if (!in_array($dapAn, ['A', 'B', 'C', 'D'])) {
+                return redirect()->back()->with('error', 'Đáp án không hợp lệ!');
+            }
+        }
+
         // Kiểm tra thời gian
         $now = Carbon::now();
         $thoiGianKetThuc = Carbon::parse($baiKiemTra->ThoiGianKetThuc);
@@ -68,7 +97,6 @@ class KetQuaBaiKiemTraController extends Controller
         }
 
         // Kiểm tra sinh viên đã làm bài chưa
-        $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
         $daLamBai = KetQuaBaiKiemTra::where('MaBaiKiemTra', $maBaiKiemTra)
             ->where('MaSinhVien', $sinhVien->MaNguoiDung)
             ->exists();
@@ -145,24 +173,47 @@ class KetQuaBaiKiemTraController extends Controller
     /**
      * Danh sách bài kiểm tra của sinh viên
      */
-    public function danhSachBaiKiemTra()
+    public function danhSachBaiKiemTra(Request $request)
     {
         $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
-
-        // Lấy các lớp học phần mà sinh viên tham gia
         $lopHocPhanIds = $sinhVien->danhSachLop()->pluck('MaLopHocPhan');
 
-        // Lấy bài kiểm tra từ các lớp học phần
-        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan'])
-            ->whereIn('MaLopHocPhan', $lopHocPhanIds)
-            ->orderBy('ThoiGianBatDau', 'desc')
-            ->get();
+        $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+            ->whereIn('MaLopHocPhan', $lopHocPhanIds);
+
+        // Lọc theo trạng thái
+        $trangThai = $request->input('trang_thai');
+        $now = Carbon::now();
+
+        switch ($trangThai) {
+            case 'sap_dien_ra':
+                $query->where('ThoiGianBatDau', '>', $now);
+                break;
+            case 'dang_dien_ra':
+                $query->where('ThoiGianBatDau', '<=', $now)
+                    ->where('ThoiGianKetThuc', '>=', $now);
+                break;
+            case 'da_ket_thuc':
+                $query->where('ThoiGianKetThuc', '<', $now);
+                break;
+        }
+
+        $baiKiemTra = $query->orderBy('ThoiGianBatDau', 'desc')->get();
 
         // Kiểm tra sinh viên đã làm bài nào
         foreach ($baiKiemTra as $bai) {
             $bai->daLam = KetQuaBaiKiemTra::where('MaBaiKiemTra', $bai->MaBaiKiemTra)
                 ->where('MaSinhVien', $sinhVien->MaNguoiDung)
                 ->exists();
+
+            // Thêm trạng thái cho từng bài kiểm tra
+            if (Carbon::parse($bai->ThoiGianBatDau) > $now) {
+                $bai->trangThai = 'Sắp diễn ra';
+            } elseif (Carbon::parse($bai->ThoiGianKetThuc) < $now) {
+                $bai->trangThai = 'Đã kết thúc';
+            } else {
+                $bai->trangThai = 'Đang diễn ra';
+            }
         }
 
         return view('sinhvien.danhsachbaikiemtra', compact('baiKiemTra'));
