@@ -29,7 +29,7 @@
     @endif
 
     <div class="mb-4">
-        <form method="GET" action="{{ route('sinh-vien.bai-kiem-tra.danh-sach') }}" class="form-inline">
+        <form method="GET" action="{{ route('danh-sach-bai-kiem-tra') }}" class="form-inline">
             <select name="trang_thai" class="form-control mr-2" onchange="this.form.submit()">
                 <option value="">Tất cả trạng thái</option>
                 <option value="sap_dien_ra" {{ request('trang_thai')=='sap_dien_ra' ? 'selected' : '' }}>Sắp diễn ra

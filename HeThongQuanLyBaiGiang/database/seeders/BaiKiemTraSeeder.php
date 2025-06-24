@@ -21,6 +21,8 @@ class BaiKiemTraSeeder extends Seeder
             'TenBaiKiemTra' => 'Kiểm tra giữa kỳ ASP.NET Core',
             'ThoiGianBatDau' => Carbon::now(),
             'ThoiGianKetThuc' => Carbon::now()->addDays(7),
+            'ThoiGianLamBai' => 45, // 45 phút
+            'ChoPhepXemKetQua' => true, // Cho phép xem kết quả
             'MoTa' => 'Bài kiểm tra về các kiến thức cơ bản của ASP.NET Core',
             'TrangThai' => 1,
             'created_at' => now(),
@@ -32,6 +34,8 @@ class BaiKiemTraSeeder extends Seeder
             'TenBaiKiemTra' => 'Kiểm tra giữa kỳ Laravel',
             'ThoiGianBatDau' => Carbon::now(),
             'ThoiGianKetThuc' => Carbon::now()->addDays(7),
+            'ThoiGianLamBai' => 60, // 60 phút
+            'ChoPhepXemKetQua' => false, // Không cho phép xem kết quả
             'MoTa' => 'Bài kiểm tra về các kiến thức cơ bản của Laravel',
             'TrangThai' => 1,
             'created_at' => now(),

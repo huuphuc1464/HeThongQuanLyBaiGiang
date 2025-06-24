@@ -14,9 +14,19 @@ class BaiKiemTra extends Model
         'TenBaiKiemTra',
         'ThoiGianBatDau',
         'ThoiGianKetThuc',
+        'ThoiGianLamBai',
+        'ChoPhepXemKetQua',
         'MoTa',
         'TrangThai'
     ];
+
+    protected $casts = [
+        'ThoiGianBatDau' => 'datetime',
+        'ThoiGianKetThuc' => 'datetime',
+        'ChoPhepXemKetQua' => 'boolean',
+        'ThoiGianLamBai' => 'integer'
+    ];
+
     public $timestamps = true;
 
     // Relationships

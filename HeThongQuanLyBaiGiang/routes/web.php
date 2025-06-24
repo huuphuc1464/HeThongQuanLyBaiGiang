@@ -23,6 +23,7 @@ use App\Models\BaiGiang;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MonHoc;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
+use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
 
 Route::get('/giang-vien', function () {
     return view('layouts.teacherLayout');
@@ -155,8 +156,8 @@ Route::put('/binh-luan/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat']
 
 // Routes cho sinh viên làm bài kiểm tra
 Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
-    Route::get('/bai-kiem-tra', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
-    Route::get('/bai-kiem-tra/{maBaiKiemTra}/lam-bai', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'lamBaiKiemTra'])->name('lam-bai-kiem-tra');
-    Route::post('/bai-kiem-tra/{maBaiKiemTra}/nop-bai', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'nopBaiKiemTra'])->name('nop-bai-kiem-tra');
-    Route::get('/bai-kiem-tra/{maBaiKiemTra}/ket-qua', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');
+    Route::get('/bai-kiem-tra', [KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
+    Route::get('/bai-kiem-tra/{maBaiKiemTra}/lam-bai', [KetQuaBaiKiemTraController::class, 'lamBaiKiemTra'])->name('lam-bai-kiem-tra');
+    Route::post('/bai-kiem-tra/{maBaiKiemTra}/nop-bai', [KetQuaBaiKiemTraController::class, 'nopBaiKiemTra'])->name('nop-bai-kiem-tra');
+    Route::get('/bai-kiem-tra/{maBaiKiemTra}/ket-qua', [KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');
 });

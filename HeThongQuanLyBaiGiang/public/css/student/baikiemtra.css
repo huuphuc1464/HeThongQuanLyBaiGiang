@@ -1,1 +1,57 @@
- 
+/* Đảm bảo nội dung không bị che bởi sidebar */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Style cho form làm bài */
+.card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style cho timer */
+#timer {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Style cho câu hỏi */
+.form-check {
+    margin: 10px 0;
+    padding: 10px;
+}
+
+.form-check-input {
+    margin-right: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .container {
+        padding: 10px;
+    }
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 8px;
+}
+
+.modal-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+/* Đảm bảo form không bị overflow */
+#examForm {
+    overflow-x: hidden;
+}
+
+/* Style cho nút submit */
+.btn-success {
+    padding: 10px 30px;
+    font-size: 1.1em;
+}
