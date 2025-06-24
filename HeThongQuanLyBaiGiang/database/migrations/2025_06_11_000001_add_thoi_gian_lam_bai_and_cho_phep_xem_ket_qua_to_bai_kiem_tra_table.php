@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bai_kiem_tra', function (Blueprint $table) {
-            // Thêm trường thời gian làm bài (tính bằng phút)
             $table->integer('ThoiGianLamBai')->after('ThoiGianKetThuc')->default(60);
-
-            // Thêm trường cho phép xem kết quả
             $table->boolean('ChoPhepXemKetQua')->after('ThoiGianLamBai')->default(false);
         });
     }

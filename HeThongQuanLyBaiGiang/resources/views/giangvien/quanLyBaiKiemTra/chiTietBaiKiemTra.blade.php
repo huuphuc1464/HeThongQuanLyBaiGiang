@@ -47,6 +47,15 @@
                 \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('H:i:s d/m/Y') }}
             </div>
             <div class="mb-3">
+                <strong>Thời gian làm bài:</strong> {{ $baiKiemTra->ThoiGianLamBai }} phút
+            </div>
+            <div class="mb-3">
+                <strong>Cho phép xem kết quả:</strong>
+                <span class="badge {{ $baiKiemTra->ChoPhepXemKetQua ? 'bg-success' : 'bg-danger' }}">
+                    {{ $baiKiemTra->ChoPhepXemKetQua ? 'Có' : 'Không' }}
+                </span>
+            </div>
+            <div class="mb-3">
                 <strong>Mô tả:</strong> {{ $baiKiemTra->MoTa ?? 'Không có mô tả' }}
             </div>
             <div class="mb-3">

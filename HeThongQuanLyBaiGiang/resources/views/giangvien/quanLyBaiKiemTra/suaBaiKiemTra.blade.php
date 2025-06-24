@@ -132,6 +132,30 @@
                         @enderror
                     </div>
                     <div class="mb-3">
+                        <label for="thoiGianLamBai" class="form-label">Thời gian làm bài (phút) <span
+                                class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('thoiGianLamBai') is-invalid @enderror"
+                            id="thoiGianLamBai" name="thoiGianLamBai"
+                            value="{{ old('thoiGianLamBai', $baiKiemTra->ThoiGianLamBai) }}" min="1" max="180" required>
+                        @error('thoiGianLamBai')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="choPhepXemKetQua" class="form-label">Cho phép xem kết quả <span
+                                class="text-danger">*</span></label>
+                        <select class="form-select @error('choPhepXemKetQua') is-invalid @enderror"
+                            id="choPhepXemKetQua" name="choPhepXemKetQua" required>
+                            <option value="1" {{ old('choPhepXemKetQua', $baiKiemTra->ChoPhepXemKetQua) ? 'selected' :
+                                '' }}>Có</option>
+                            <option value="0" {{ old('choPhepXemKetQua', $baiKiemTra->ChoPhepXemKetQua) ? '' :
+                                'selected' }}>Không</option>
+                        </select>
+                        @error('choPhepXemKetQua')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
                         <select class="form-select @error('status') is-invalid @enderror" id="status" name="status"
                             required>
