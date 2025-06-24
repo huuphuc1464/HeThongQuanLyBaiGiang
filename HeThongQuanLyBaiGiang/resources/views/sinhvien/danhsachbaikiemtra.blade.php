@@ -43,6 +43,9 @@
                         \Carbon\Carbon::parse($bai->ThoiGianBatDau)->format('H:i d/m/Y') }}</p>
                     <p class="card-text"><strong>Thời gian kết thúc:</strong> {{
                         \Carbon\Carbon::parse($bai->ThoiGianKetThuc)->format('H:i d/m/Y') }}</p>
+                    <p class="card-text"><strong>Thời gian làm bài:</strong> {{
+                        \Carbon\Carbon::parse($bai->ThoiGianBatDau)->diffInMinutes(\Carbon\Carbon::parse($bai->ThoiGianKetThuc))
+                        }} phút</p>
 
                     @if($bai->MoTa)
                     <p class="card-text"><strong>Mô tả:</strong> {{ Str::limit($bai->MoTa, 100) }}</p>

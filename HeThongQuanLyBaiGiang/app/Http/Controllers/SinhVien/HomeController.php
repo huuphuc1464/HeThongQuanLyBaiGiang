@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\BaiGiang;
 use App\Models\LopHocPhan;
 use App\Models\NguoiDung;
+use App\Models\BaiKiemTra;
+use App\Models\SinhVien;
+use App\Models\KetQuaBaiKiemTra;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -186,7 +189,18 @@ class HomeController extends Controller
             ->first();
         switch ($tab) {
             case 'bai-kiem-tra':
-                return view('giangvien.lopHocPhan.kiemTra', compact('id', 'tab'));
+                $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
+                $lopHocPhanIds = $sinhVien->danhSachLop()->where('TrangThai', 1)->pluck('MaLopHocPhan');
+                $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan'])
+                    ->whereIn('MaLopHocPhan', $lopHocPhanIds)
+                    ->orderBy('ThoiGianBatDau', 'desc')
+                    ->get();
+                foreach ($baiKiemTra as $bai) {
+                    $bai->daLam = KetQuaBaiKiemTra::where('MaBaiKiemTra', $bai->MaBaiKiemTra)
+                        ->where('MaSinhVien', $sinhVien->MaNguoiDung)
+                        ->exists();
+                }
+                return view('sinhvien.danhsachbaikiemtra', compact('baiKiemTra'));
             case 'su-kien-zoom':
                 return view('sinhvien.danhSachSuKienZoom', [
                     'id' => $id,
