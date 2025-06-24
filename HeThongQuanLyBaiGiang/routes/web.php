@@ -152,3 +152,11 @@ Route::post('/binh-luan/gui-binh-luan', [BinhLuanBaiGiangController::class, 'gui
 Route::post('/binh-luan/tra-loi-binh-luan', [BinhLuanBaiGiangController::class, 'traLoiBinhLuan'])->name('binhluan.traloi');
 Route::delete('/binh-luan/xoa/{id}', [BinhLuanBaiGiangController::class, 'xoa'])->name('binhluan.xoa');
 Route::put('/binh-luan/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat'])->name('binhluan.capnhat');
+
+// Routes cho sinh viên làm bài kiểm tra
+Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
+    Route::get('/bai-kiem-tra', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
+    Route::get('/bai-kiem-tra/{maBaiKiemTra}/lam-bai', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'lamBaiKiemTra'])->name('lam-bai-kiem-tra');
+    Route::post('/bai-kiem-tra/{maBaiKiemTra}/nop-bai', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'nopBaiKiemTra'])->name('nop-bai-kiem-tra');
+    Route::get('/bai-kiem-tra/{maBaiKiemTra}/ket-qua', [App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');
+});
