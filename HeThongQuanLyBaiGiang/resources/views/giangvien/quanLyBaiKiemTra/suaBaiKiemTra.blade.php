@@ -136,7 +136,9 @@
                                 class="text-danger">*</span></label>
                         <input type="number" class="form-control @error('thoiGianLamBai') is-invalid @enderror"
                             id="thoiGianLamBai" name="thoiGianLamBai"
-                            value="{{ old('thoiGianLamBai', $baiKiemTra->ThoiGianLamBai) }}" min="1" max="180" required>
+                            value="{{ old('thoiGianLamBai', $baiKiemTra->ThoiGianLamBai) }}" min="15" max="180"
+                            required>
+                        <div class="form-text">Thời gian làm bài từ 15 đến 180 phút</div>
                         @error('thoiGianLamBai')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

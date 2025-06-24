@@ -101,8 +101,9 @@
                         <label for="thoiGianLamBai" class="form-label">Thời gian làm bài (phút) <span
                                 class="text-danger">*</span></label>
                         <input type="number" class="form-control @error('thoiGianLamBai') is-invalid @enderror"
-                            id="thoiGianLamBai" name="thoiGianLamBai" value="{{ old('thoiGianLamBai', 60) }}" min="1"
+                            id="thoiGianLamBai" name="thoiGianLamBai" value="{{ old('thoiGianLamBai', 60) }}" min="15"
                             max="180" required>
+                        <div class="form-text">Thời gian làm bài từ 15 đến 180 phút</div>
                         @error('thoiGianLamBai')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

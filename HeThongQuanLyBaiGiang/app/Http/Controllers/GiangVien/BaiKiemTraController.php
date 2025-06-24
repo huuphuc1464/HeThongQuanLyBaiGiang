@@ -77,7 +77,7 @@ class BaiKiemTraController extends Controller
             'endTime' => 'required|date|after:startTime',
             'description' => 'nullable|string|max:255',
             'status' => 'required|in:0,1',
-            'thoiGianLamBai' => 'required|integer|min:1|max:180',
+            'thoiGianLamBai' => 'required|integer|min:15|max:180',
             'choPhepXemKetQua' => 'required|boolean',
             'questions.*.cauHoi' => 'required|string',
             'questions.*.dapAnA' => 'required|string',
@@ -96,9 +96,9 @@ class BaiKiemTraController extends Controller
             'description.max' => 'Mô tả không được vượt quá 255 ký tự.',
             'status.required' => 'Vui lòng chọn trạng thái.',
             'status.in' => 'Trạng thái không hợp lệ.',
-            'thoiGianLamBai.required' => 'Vui lòng nhập thời gian làm bài.',
+            'thoiGianLamBai.required' => 'Thời gian làm bài không được để trống.',
             'thoiGianLamBai.integer' => 'Thời gian làm bài phải là số nguyên.',
-            'thoiGianLamBai.min' => 'Thời gian làm bài tối thiểu là 1 phút.',
+            'thoiGianLamBai.min' => 'Thời gian làm bài tối thiểu là 15 phút.',
             'thoiGianLamBai.max' => 'Thời gian làm bài tối đa là 180 phút.',
             'choPhepXemKetQua.required' => 'Vui lòng chọn trạng thái cho phép xem kết quả.',
             'choPhepXemKetQua.boolean' => 'Trạng thái cho phép xem kết quả không hợp lệ.',
@@ -209,6 +209,8 @@ class BaiKiemTraController extends Controller
             $trangThaiRaw = strtolower(trim($sheet->getCell('B5')->getValue()));
             $thoiGianBatDauRaw = $sheet->getCell('B2')->getValue();
             $thoiGianKetThucRaw = $sheet->getCell('B3')->getValue();
+            $thoiGianLamBaiRaw = trim($sheet->getCell('B6')->getValue());
+            $choPhepXemKetQuaRaw = strtolower(trim($sheet->getCell('B7')->getValue()));
 
             try {
                 $thoiGianBatDau = is_numeric($thoiGianBatDauRaw)
@@ -226,7 +228,18 @@ class BaiKiemTraController extends Controller
                 return redirect()->back()->with('warning', 'Trạng thái phải là "hiện" hoặc "ẩn".');
             }
 
+            if (!is_numeric($thoiGianLamBaiRaw) || $thoiGianLamBaiRaw < 15 || $thoiGianLamBaiRaw > 180) {
+                return redirect()->back()->with('warning', 'Thời gian làm bài phải là số từ 15 đến 180 phút.');
+            }
+
+            if (!in_array($choPhepXemKetQuaRaw, ['có', 'không'])) {
+                return redirect()->back()->with('warning', 'Cho phép xem kết quả phải là "có" hoặc "không".');
+            }
+
             $trangThai = $trangThaiRaw === 'hiện' ? 1 : 0;
+            $choPhepXemKetQua = $choPhepXemKetQuaRaw === 'có' ? 1 : 0;
+            $thoiGianLamBai = (int)$thoiGianLamBaiRaw;
+
             if (
                 empty($tenBaiKiemTra) ||
                 empty($thoiGianBatDau) ||
@@ -256,6 +269,8 @@ class BaiKiemTraController extends Controller
                 'ThoiGianKetThuc' => $thoiGianKetThuc,
                 'MoTa' => $moTa,
                 'TrangThai' => $trangThai,
+                'ThoiGianLamBai' => $thoiGianLamBai,
+                'ChoPhepXemKetQua' => $choPhepXemKetQua,
                 'created_at' => now('Asia/Ho_Chi_Minh'),
                 'updated_at' => now('Asia/Ho_Chi_Minh')
             ]);
@@ -484,7 +499,7 @@ class BaiKiemTraController extends Controller
             'endTime' => 'required|date|after:startTime',
             'description' => 'nullable|string|max:255',
             'status' => 'required|in:0,1',
-            'thoiGianLamBai' => 'required|integer|min:1|max:180',
+            'thoiGianLamBai' => 'required|integer|min:15|max:180',
             'choPhepXemKetQua' => 'required|boolean',
             'questions.*.cauHoi' => 'required|string',
             'questions.*.dapAnA' => 'required|string',
@@ -503,9 +518,9 @@ class BaiKiemTraController extends Controller
             'description.max' => 'Mô tả không được vượt quá 255 ký tự.',
             'status.required' => 'Vui lòng chọn trạng thái.',
             'status.in' => 'Trạng thái không hợp lệ.',
-            'thoiGianLamBai.required' => 'Vui lòng nhập thời gian làm bài.',
+            'thoiGianLamBai.required' => 'Thời gian làm bài không được để trống.',
             'thoiGianLamBai.integer' => 'Thời gian làm bài phải là số nguyên.',
-            'thoiGianLamBai.min' => 'Thời gian làm bài tối thiểu là 1 phút.',
+            'thoiGianLamBai.min' => 'Thời gian làm bài tối thiểu là 15 phút.',
             'thoiGianLamBai.max' => 'Thời gian làm bài tối đa là 180 phút.',
             'choPhepXemKetQua.required' => 'Vui lòng chọn trạng thái cho phép xem kết quả.',
             'choPhepXemKetQua.boolean' => 'Trạng thái cho phép xem kết quả không hợp lệ.',
@@ -623,8 +638,12 @@ class BaiKiemTraController extends Controller
         $sheet->setCellValue('B4', $baiKiemTra->MoTa);
         $sheet->setCellValue('A5', 'Trạng thái');
         $sheet->setCellValue('B5', $baiKiemTra->TrangThai ? 'Hiện' : 'Ẩn');
+        $sheet->setCellValue('A6', 'Thời gian làm bài (phút)');
+        $sheet->setCellValue('B6', $baiKiemTra->ThoiGianLamBai);
+        $sheet->setCellValue('A7', 'Cho phép xem kết quả');
+        $sheet->setCellValue('B7', $baiKiemTra->ChoPhepXemKetQua ? 'Có' : 'Không');
 
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 7; $i++) {
             $sheet->getStyle("A$i")->getFont()->setBold(true);
             $sheet->getStyle("A$i")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('ADD8E6');
             $sheet->getStyle("A$i")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
@@ -633,14 +652,14 @@ class BaiKiemTraController extends Controller
 
         // Câu hỏi 
         $headers = ['Câu hỏi', 'Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D', 'Đáp án đúng'];
-        $sheet->fromArray($headers, null, 'A6');
-        $headerRange = 'A6:F6';
+        $sheet->fromArray($headers, null, 'A8');
+        $headerRange = 'A8:F8';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
         $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('90EE90');
         $sheet->getStyle($headerRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
 
         // Dữ liệu câu hỏi
-        $row = 7;
+        $row = 9;
         foreach ($cauHois as $q) {
             $sheet->setCellValue("A$row", $q->CauHoi);
             $sheet->setCellValue("B$row", $q->DapAnA);
@@ -651,8 +670,8 @@ class BaiKiemTraController extends Controller
             $row++;
         }
 
-        if ($row > 7) {
-            $sheet->getStyle("A7:F" . ($row - 1))
+        if ($row > 9) {
+            $sheet->getStyle("A9:F" . ($row - 1))
                 ->getBorders()
                 ->getAllBorders()
                 ->setBorderStyle(Border::BORDER_THIN);
