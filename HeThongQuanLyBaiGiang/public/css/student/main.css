@@ -193,7 +193,8 @@ a.text-decoration-none.text-dark:hover {
     border-top-left-radius: 0.375rem;
     border-top-right-radius: 0.375rem;
     height: 200px;
-    object-fit: contain;
+    object-fit: cover;
+    width: 100%;
 }
 
 .card-class .card-body {

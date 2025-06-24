@@ -13,8 +13,8 @@
         <!-- Tên lớp học phần -->
         <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-2">
-                <img src="{{ $lopHocPhan->AnhHocPhan }}" width="30" height="32" alt="Class icon"
-                    style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
+                <img src=" {{ $lopHocPhan->AnhHocPhan ? asset('img/' . $lopHocPhan->AnhHocPhan) : asset('img/hocphan/default.png') }}"
+                    width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
                 <span class="text-truncate d-inline-block"
                     style="max-width: 220px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                     title="{{ $lopHocPhan->TenLopHocPhan }}">

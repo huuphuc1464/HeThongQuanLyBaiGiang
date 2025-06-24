@@ -56,7 +56,7 @@
                             <td class="text-center">{{ $hocPhan->MaHocPhan }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $hocPhan->AnhHocPhan ? asset('storage/' . $hocPhan->AnhHocPhan) : asset('img/login/default-avatar.png') }}"
+                                    <img src="{{ $hocPhan->AnhHocPhan ? asset('img/' . $hocPhan->AnhHocPhan) : asset('img/hocphan/default.png') }}"
                                         alt="{{ $hocPhan->TenHocPhan }}" class="rounded me-3"
                                         style="width: 60px; height: 60px; object-fit: cover;">
                                     <div>

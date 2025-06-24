@@ -7,7 +7,7 @@ use App\Models\HocPhan;
 use App\Models\MonHoc;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class HocPhanController extends Controller
@@ -21,12 +21,12 @@ class HocPhanController extends Controller
 
         // Tìm kiếm
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('TenHocPhan', 'like', '%' . $request->search . '%')
-                  ->orWhere('MoTa', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('monHoc', function($q) use ($request) {
-                      $q->where('TenMonHoc', 'like', '%' . $request->search . '%');
-                  });
+                    ->orWhere('MoTa', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('monHoc', function ($q) use ($request) {
+                        $q->where('TenMonHoc', 'like', '%' . $request->search . '%');
+                    });
             });
         }
 
@@ -39,8 +39,6 @@ class HocPhanController extends Controller
     public function themMoi(Request $request)
     {
         try {
-            \Log::info('Bắt đầu thêm học phần', $request->all());
-            
             $request->validate([
                 'TenHocPhan' => [
                     'required',
@@ -48,7 +46,7 @@ class HocPhanController extends Controller
                     'max:100',
                     Rule::unique('hoc_phan')->where(function ($query) use ($request) {
                         return $query->where('MaMonHoc', $request->MaMonHoc)
-                                     ->where('TrangThai', 1);
+                            ->where('TrangThai', 1);
                     })
                 ],
                 'MaMonHoc' => 'required|exists:mon_hoc,MaMonHoc',
@@ -66,25 +64,21 @@ class HocPhanController extends Controller
                 'TrangThai' => 1
             ];
 
-            \Log::info('Dữ liệu học phần', $data);
-
             // Xử lý upload hình ảnh
             if ($request->hasFile('AnhHocPhan')) {
-                $path = $request->file('AnhHocPhan')->store('hocphan', 'public');
-                $data['AnhHocPhan'] = $path;
-                \Log::info('Đã upload hình ảnh', ['path' => $path]);
+                $image = $request->file('AnhHocPhan');
+                $imageName = time() . '-' . uniqid() . '.' . $image->extension();
+                $image->move(public_path('img/hocphan'), $imageName);
+                $data['AnhHocPhan'] = 'hocphan/' . $imageName;
             }
 
             $hocPhan = HocPhan::create($data);
-            \Log::info('Đã tạo học phần thành công', ['MaHocPhan' => $hocPhan->MaHocPhan]);
 
             return redirect()->back()->with('success', 'Thêm học phần thành công!');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Lỗi validation khi thêm học phần', ['errors' => $e->errors()]);
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            \Log::error('Lỗi khi thêm học phần', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Có lỗi xảy ra khi thêm học phần: ' . $e->getMessage())->withInput();
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi thêm học phần.')->withInput();
         }
     }
 
@@ -121,7 +115,7 @@ class HocPhanController extends Controller
                 'max:100',
                 Rule::unique('hoc_phan')->where(function ($query) use ($request) {
                     return $query->where('MaMonHoc', $request->MaMonHoc)
-                                 ->where('TrangThai', 1);
+                        ->where('TrangThai', 1);
                 })->ignore($hocPhan->MaHocPhan, 'MaHocPhan')
             ],
             'MaMonHoc' => 'required|exists:mon_hoc,MaMonHoc',
@@ -141,11 +135,16 @@ class HocPhanController extends Controller
         if ($request->hasFile('AnhHocPhan')) {
             // Xóa hình ảnh cũ nếu có
             if ($hocPhan->AnhHocPhan) {
-                Storage::disk('public')->delete($hocPhan->AnhHocPhan);
+                $oldImagePath = public_path('img/' . $hocPhan->AnhHocPhan);
+                if (File::exists($oldImagePath)) {
+                    File::delete($oldImagePath);
+                }
             }
 
-            $path = $request->file('AnhHocPhan')->store('hocphan', 'public');
-            $data['AnhHocPhan'] = $path;
+            $image = $request->file('AnhHocPhan');
+            $imageName = time() . '-' . uniqid() . '.' . $image->extension();
+            $image->move(public_path('img/hocphan'), $imageName);
+            $data['AnhHocPhan'] = 'hocphan/' . $imageName;
         }
 
         $hocPhan->update($data);
@@ -167,7 +166,10 @@ class HocPhanController extends Controller
 
         // Xóa hình ảnh nếu có
         if ($hocPhan->AnhHocPhan) {
-            Storage::disk('public')->delete($hocPhan->AnhHocPhan);
+            $imagePath = public_path('img/' . $hocPhan->AnhHocPhan);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
         }
 
         $hocPhan->delete();
