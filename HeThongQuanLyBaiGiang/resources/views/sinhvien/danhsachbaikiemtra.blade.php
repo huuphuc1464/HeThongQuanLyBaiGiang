@@ -57,12 +57,7 @@
                         \Carbon\Carbon::parse($bai->ThoiGianBatDau)->format('H:i d/m/Y') }}</p>
                     <p class="card-text"><strong>Thời gian kết thúc:</strong> {{
                         \Carbon\Carbon::parse($bai->ThoiGianKetThuc)->format('H:i d/m/Y') }}</p>
-                    <p class="card-text"><strong>Thời gian làm bài:</strong> {{
-                        ($diff =
-                        \Carbon\Carbon::parse($bai->ThoiGianBatDau)->diff(\Carbon\Carbon::parse($bai->ThoiGianKetThuc)))
-                        &&
-                        ($diff->h > 0 ? $diff->h . ' giờ ' : '') . $diff->i . ' phút'
-                        }}</p>
+                    <p class="card-text"><strong>Thời gian làm bài:</strong> {{ $bai->ThoiGianLamBai }} phút</p>
                     <p class="card-text"><strong>Số câu hỏi:</strong> {{ $bai->cauHoiBaiKiemTra->count() }} câu</p>
                     @if($bai->daLam)
                     @php
@@ -70,9 +65,13 @@
                     ->where('MaSinhVien', Auth::id())
                     ->first();
                     @endphp
+                    @if($bai->ChoPhepXemKetQua)
                     <p class="card-text"><strong>Điểm số:</strong> {{ $ketQua->TongCauDung }}/{{ $ketQua->TongSoCauHoi
                         }}
                         ({{ number_format($ketQua->TongCauDung/$ketQua->TongSoCauHoi * 10, 1) }} điểm)</p>
+                    @else
+                    <p class="card-text text-muted"><em>Giảng viên không cho phép xem kết quả</em></p>
+                    @endif
                     @endif
                     @if($bai->MoTa)
                     <p class="card-text"><strong>Mô tả:</strong> {{ Str::limit($bai->MoTa, 100) }}</p>

@@ -115,166 +115,93 @@
     })();
 
     // Timer
-    let time = parseInt('{{ $thoiGianConLai }}'); // Thời gian còn lại từ server (tính bằng giây)
+    let time = parseInt('{{ $thoiGianConLai }}');
     const timerElement = document.getElementById('timer');
     const submitBtn = document.getElementById('submitBtn');
     const confirmSubmitBtn = document.getElementById('confirmSubmit');
     let isTimeUp = false;
+    let isSubmitting = false;
+
+    function disableAllInputs() {
+        document.querySelectorAll('#examForm input, #examForm button').forEach(el => el.disabled = true);
+    }
+    function showLoading() {
+        let loading = document.createElement('div');
+        loading.id = 'loadingOverlay';
+        loading.style.position = 'fixed';
+        loading.style.top = 0;
+        loading.style.left = 0;
+        loading.style.width = '100vw';
+        loading.style.height = '100vh';
+        loading.style.background = 'rgba(255,255,255,0.7)';
+        loading.style.display = 'flex';
+        loading.style.alignItems = 'center';
+        loading.style.justifyContent = 'center';
+        loading.innerHTML = '<div class="spinner-border text-primary" style="width: 4rem; height: 4rem;"></div><span class="ms-3">Đang nộp bài...</span>';
+        document.body.appendChild(loading);
+    }
 
     const countdown = setInterval(() => {
-        if (time <= 0) {
+        if (time <= 0 && !isSubmitting) {
             clearInterval(countdown);
             isTimeUp = true;
             timerElement.textContent = "00:00:00";
             timerElement.style.color = "#e74c3c";
             submitBtn.disabled = true;
-
-            // Hiển thị thông báo thời gian hết
             showTimeUpNotification();
             return;
         }
-
+        if (time === 60) {
+            alert('Chỉ còn 1 phút làm bài!');
+        }
         let hours = Math.floor(time / 3600);
         let minutes = Math.floor((time % 3600) / 60);
         let seconds = time % 60;
-
         timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-        // Đổi màu khi còn ít thời gian (dưới 5 phút)
         if (time <= 300) {
             timerElement.style.color = "#e74c3c";
+            if (time % 2 === 0) {
+                timerElement.style.opacity = "0.5";
+            } else {
+                timerElement.style.opacity = "1";
+            }
         }
-
         time--;
     }, 1000);
 
-    // Hàm hiển thị thông báo thời gian hết
     function showTimeUpNotification() {
-        // Tạo modal thông báo
-        const modalHtml = `
-            <div class="modal fade" id="timeUpModal" tabindex="-1" aria-labelledby="timeUpModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title" id="timeUpModalLabel">
-                                <i class="fas fa-clock"></i> Hết thời gian làm bài
-                            </h5>
-                        </div>
-                        <div class="modal-body text-center">
-                            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                            <h6>Thời gian làm bài kiểm tra đã hết!</h6>
-                            <p class="text-muted">Bài kiểm tra sẽ được nộp tự động. Bạn sẽ được chuyển về trang danh sách bài kiểm tra.</p>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-primary" id="confirmTimeUp">
-                                <i class="fas fa-check"></i> Xác nhận
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Thêm modal vào body
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        // Hiển thị modal
-        const timeUpModal = new bootstrap.Modal(document.getElementById('timeUpModal'));
-        timeUpModal.show();
-
-        // Xử lý khi người dùng xác nhận
-        document.getElementById('confirmTimeUp').addEventListener('click', function () {
-            timeUpModal.hide();
-            // Nộp bài và chuyển hướng
+        if (isSubmitting) return;
+        isSubmitting = true;
+        disableAllInputs();
+        showLoading();
+        setTimeout(() => {
             submitExamAndRedirect();
-        });
+        }, 1500);
     }
-
-    // Hàm nộp bài và chuyển hướng
     function submitExamAndRedirect() {
-        const form = document.getElementById('examForm');
-
-        // Thêm input ẩn để đánh dấu là nộp tự động
-        const autoSubmitInput = document.createElement('input');
-        autoSubmitInput.type = 'hidden';
-        autoSubmitInput.name = 'auto_submit';
-        autoSubmitInput.value = '1';
-        form.appendChild(autoSubmitInput);
-
-        // Submit form và chuyển hướng
-        form.submit();
+        if (isSubmitting) {
+            const form = document.getElementById('examForm');
+            form.submit();
+        }
     }
-
-    // Xác nhận nộp bài
     confirmSubmitBtn.addEventListener('click', function () {
         const form = document.getElementById('examForm');
-        if (form.checkValidity()) {
-            // Đóng modal xác nhận
-            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-            confirmModal.hide();
-
-            // Submit form
-            form.submit();
-        } else {
-            showValidationError();
-        }
-    });
-
-    // Hàm hiển thị lỗi validation
-    function showValidationError() {
-        // Tạo modal thông báo lỗi
-        const modalHtml = `
-            <div class="modal fade" id="validationErrorModal" tabindex="-1" aria-labelledby="validationErrorModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header bg-warning">
-                            <h5 class="modal-title" id="validationErrorModalLabel">
-                                <i class="fas fa-exclamation-triangle"></i> Lỗi
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                            <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
-                            <h6>Vui lòng hoàn thành bài kiểm tra!</h6>
-                            <p class="text-muted">Bạn cần chọn đáp án cho tất cả các câu hỏi trước khi nộp bài.</p>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class="fas fa-times"></i> Đóng
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Xóa modal cũ nếu có
-        const oldModal = document.getElementById('validationErrorModal');
-        if (oldModal) {
-            oldModal.remove();
-        }
-
-        // Thêm modal mới vào body
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        // Hiển thị modal
-        const validationModal = new bootstrap.Modal(document.getElementById('validationErrorModal'));
-        validationModal.show();
-    }
-
-    // Ngăn chặn submit khi chưa xác nhận
-    document.getElementById('examForm').addEventListener('submit', function (event) {
-        if (!isTimeUp && !document.getElementById('examForm').checkValidity()) {
-            event.preventDefault();
-            showValidationError();
-        }
-    });
-
-    // Ngăn chặn người dùng rời khỏi trang khi đang làm bài
-    window.addEventListener('beforeunload', function (e) {
         if (!isTimeUp) {
+            disableAllInputs();
+            showLoading();
+            form.submit();
+        }
+    });
+    window.addEventListener('beforeunload', function (e) {
+        if (!isTimeUp && !isSubmitting) {
             e.preventDefault();
-            e.returnValue = 'Bạn có chắc chắn muốn rời khỏi trang? Bài kiểm tra sẽ bị mất.';
+            e.returnValue = '';
+        }
+    });
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden && !isTimeUp && !isSubmitting) {
+            // Có thể thêm code xử lý khi sinh viên chuyển tab
+            console.log('Sinh viên đã chuyển tab!');
         }
     });
 </script>
