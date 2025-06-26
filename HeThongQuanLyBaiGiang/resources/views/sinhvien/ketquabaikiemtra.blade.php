@@ -73,7 +73,7 @@
             @endif
 
             <div class="text-center mt-4">
-                <a href="{{ route('sinh-vien.danh-sach-bai-kiem-tra') }}" class="btn btn-primary">
+                <a href="{{ route('danh-sach-bai-kiem-tra') }}" class="btn btn-primary">
                     <i class="fas fa-arrow-left"></i> Quay lại danh sách
                 </a>
             </div>

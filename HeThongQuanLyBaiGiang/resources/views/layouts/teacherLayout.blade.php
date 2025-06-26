@@ -19,10 +19,16 @@
         <div class="p-3 text-center border-bottom border-secondary">
             <h5 class="text-white">Quản trị hệ thống</h5>
         </div>
-        <a href="{{ route('giangvien.hocphan.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Học Phần</a>
-        <a href="{{ route('giangvien.su-kien-zoom.danhsach') }}"><i class="fas fa-video me-2"></i> Quản lý Sự Kiện Zoom</a>
-        <a href="{{ route('giangvien.bai-kiem-tra.danh-sach') }}"><i class="fas fa-clipboard-list me-2"></i> Quản lý Bài Kiểm Tra</a>
-        <a href="{{ route('giangvien.lophocphan.danhsach') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Lớp Học Phần</a>
+        <a href="{{ route('giangvien.hocphan.danh-sach') }}" class="sidebar-item {{ request()->is('giang-vien/hoc-phan*') ? 'active' : '' }}">
+            <i class="fas fa-book-open me-2"></i> Quản lý Học Phần</a>
+        <a href="{{ route('giangvien.su-kien-zoom.danhsach') }}" class="sidebar-item {{ request()->is('giang-vien/su-kien-zoom*') ? 'active' : '' }}">
+            <i class="fas fa-video me-2"></i> Quản lý Sự Kiện Zoom
+        </a>
+        <a href="{{ route('giangvien.bai-kiem-tra.danh-sach') }}" class="sidebar-item {{ request()->is('giang-vien/bai-kiem-tra*') ? 'active' : '' }}">
+            <i class="fas fa-clipboard-list me-2"></i> Quản lý Bài Kiểm Tra
+        </a>
+        <a href="{{ route('giangvien.lophocphan.danhsach') }}" class="sidebar-item {{ request()->is('giang-vien/lop-hoc-phan*') ? 'active' : '' }}">
+            <i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Lớp Học Phần</a>
     </div>
 
     <!-- Content -->

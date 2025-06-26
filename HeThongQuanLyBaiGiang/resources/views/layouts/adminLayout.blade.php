@@ -37,6 +37,10 @@
             margin-left: 250px;
         }
 
+        .sidebar-item.active {
+            background-color: #495057 !important;
+            font-weight: 600;
+        }
     </style>
     @yield('styles')
 </head>
@@ -47,11 +51,14 @@
         <div class="p-3 text-center border-bottom border-secondary">
             <h5 class="text-white">Quản trị hệ thống</h5>
         </div>
-        <a href="{{ route('admin.dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
-        <a href="{{ route('admin.khoa.danh-sach') }}"><i class="fas fa-building me-2"></i> Quản lý Khoa</a>
-        <a href="{{ route('admin.mon-hoc.danh-sach') }}"><i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-        <a href="{{route('admin.giang-vien.danh-sach') }}"><i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
-        <a href="#"><i class="fas fa-cogs me-2"></i> Cài đặt hệ thống</a>
+        <a href="{{ route('admin.dashboard') }}" class="sidebar-item {{ request()->is('admin') ? 'active' : '' }}">
+            <i class="fas fa-home me-2"></i> Dashboard</a>
+        <a href="{{ route('admin.khoa.danh-sach') }}" class="sidebar-item {{ request()->is('admin/khoa*') ? 'active' : '' }}">
+            <i class="fas fa-building me-2"></i> Quản lý Khoa</a>
+        <a href="{{ route('admin.mon-hoc.danh-sach') }}" class="sidebar-item {{ request()->is('admin/mon-hoc*') ? 'active' : '' }}">
+            <i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
+        <a href="{{route('admin.giang-vien.danh-sach') }}" class="sidebar-item {{ request()->is('admin/giang-vien*') ? 'active' : '' }}">
+            <i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
     </div>
 
     <!-- Content -->
@@ -60,7 +67,7 @@
             <div class="container-fluid justify-content-end">
                 <div class="dropdown">
                     <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> Admin
+                        <i class="fas fa-user-circle"></i> {{ $tenNguoiDung }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item" href="{{ route('admin.doi-thong-tin') }}">Thông tin tài khoản</a></li>

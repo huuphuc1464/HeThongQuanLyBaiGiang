@@ -32,9 +32,9 @@
                 </a>
             </li>
             <li class="nav-item gachDuoi">
-                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="#">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="{{ route('hoc-phan.bai-giang.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
                     <i class="fas fa-video"></i>
-                    <span>Sự kiện học trực tuyến qua Zoom</span>
+                    <span>Sự kiện học trực tuyến</span>
                 </a>
             </li>
         </ul>

@@ -166,7 +166,7 @@
 
     document.getElementById('btn-cancel')?.addEventListener('click', () => {
         handleCancelBaiGiang({
-            routeUrl: @json(route('giang-vien.bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan])),
+            routeUrl: @json(route('giangvien.bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan])),
             maHocPhan: window.maHocPhan,
             maBaiGiang: window.maBaiGiang
         });
