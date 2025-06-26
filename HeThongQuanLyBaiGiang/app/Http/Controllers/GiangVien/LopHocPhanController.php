@@ -25,7 +25,7 @@ class LopHocPhanController extends Controller
         }
         $lopHocPhans = $query->orderBy('created_at', 'desc')->paginate($perPage);
         $hocPhans = HocPhan::where('MaNguoiTao', Auth::id())->get();
-        return view('giangvien.quanLyLopHocPhan', compact('lopHocPhans', 'hocPhans'));
+        return view('giangvien.quanLyLopHocPhan.quanLyLopHocPhan', compact('lopHocPhans', 'hocPhans'));
     }
 
     public function themMoi(Request $request)

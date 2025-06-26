@@ -49,9 +49,8 @@ class SuKienZoomController extends Controller
 
         $danhSachSuKien = $query->paginate(10)->withQueryString();
 
-        return view('giangvien.danhSachSuKienZoom', compact('danhSachSuKien'));
+        return view('giangvien.quanLySuKienZoom.danhSachSuKienZoom', compact('danhSachSuKien'));
     }
-
 
     public function hienFormThemZoom()
     {
@@ -60,7 +59,7 @@ class SuKienZoomController extends Controller
             ->where('MaNguoiTao', Auth::id())
             ->where('TrangThai', 1)
             ->get();
-        return view('giangvien.themSuKienZoom', compact('lopHocPhan'));
+        return view('giangvien.quanLySuKienZoom.themSuKienZoom', compact('lopHocPhan'));
     }
 
     public function hienFormCapNhatZoom($id)
@@ -71,7 +70,7 @@ class SuKienZoomController extends Controller
             ->where('su_kien_zoom.MaSuKienZoom', $id)
             ->where('su_kien_zoom.MaGiangVien', Auth::id())
             ->first();
-        return view('giangvien.suaSuKienZoom', compact('suKienZoom'));
+        return view('giangvien.quanLySuKienZoom.suaSuKienZoom', compact('suKienZoom'));
     }
 
     public function chiTietSuKien($id)
@@ -82,7 +81,7 @@ class SuKienZoomController extends Controller
             ->where('su_kien_zoom.MaSuKienZoom', $id)
             ->where('su_kien_zoom.MaGiangVien', Auth::id())
             ->first();
-        return view('giangvien.chiTietSuKienZoom', compact('suKienZoom'));
+        return view('giangvien.quanLySuKienZoom.chiTietSuKienZoom', compact('suKienZoom'));
     }
 
     public function themSuKienZoom(Request $request)

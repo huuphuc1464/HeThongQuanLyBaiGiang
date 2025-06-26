@@ -33,7 +33,7 @@ class HocPhanController extends Controller
         $danhSachHocPhan = $query->orderBy('created_at', 'desc')->paginate($perPage);
         $danhSachMonHoc = MonHoc::where('TrangThai', 1)->get();
 
-        return view('giangvien.quanLyHocPhan', compact('danhSachHocPhan', 'danhSachMonHoc'));
+        return view('giangvien.quanLyHocPhan.quanLyHocPhan', compact('danhSachHocPhan', 'danhSachMonHoc'));
     }
 
     public function themMoi(Request $request)
