@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    public function hienThiDanhSachBaiGiang()
+    public function hienThiDanhSachBaiGiang(Request $request)
     {
         $maSinhVien = Auth::user()->MaNguoiDung;
-        $danhSachBaiGiang = DB::table('lop_hoc_phan as lhp')
+        $query = DB::table('lop_hoc_phan as lhp')
             ->join('hoc_phan as hp', 'lhp.MaHocPhan', '=', 'hp.MaHocPhan')
             ->join('nguoi_dung as nd', 'lhp.MaNguoiTao', '=', 'nd.MaNguoiDung')
             ->join('danh_sach_lop as dsl', function ($join) {
@@ -31,17 +31,36 @@ class HomeController extends Controller
                     ->whereColumn('MaLopHocPhan', 'lhp.MaLopHocPhan')
                     ->where('MaSinhVien', $maSinhVien)
                     ->where('TrangThai', 1);
-            })
-            ->select(
-                'lhp.MaLopHocPhan',
-                'lhp.TenLopHocPhan',
-                'hp.TenHocPhan',
-                'lhp.MoTa',
-                'nd.HoTen as TenGiangVien',
-                'nd.AnhDaiDien as AnhGiangVien',
-                'hp.AnhHocPhan',
-                DB::raw('COUNT(DISTINCT dsl.MaSinhVien) as SoLuongSinhVien')
-            )
+            });
+
+        if ($request->filled('search')) {
+            $keywords = preg_split('/\s+/', trim($request->search));
+
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $kw = strtolower($kw);
+                    $q->orWhereRaw('LOWER(lhp.TenLopHocPhan) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(hp.TenHocPhan) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(nd.HoTen) LIKE ?', ["%$kw%"]);
+                }
+            });
+        }
+
+        if ($request->filled('giang_vien') && $request->filled('mon_hoc')) {
+            $query->where('nd.MaNguoiDung', '=', $request->giang_vien)
+                ->where('hp.MaMonHoc', '=', $request->mon_hoc);
+        }
+
+        $danhSachBaiGiang = $query->select(
+            'lhp.MaLopHocPhan',
+            'lhp.TenLopHocPhan',
+            'hp.TenHocPhan',
+            'lhp.MoTa',
+            'nd.HoTen as TenGiangVien',
+            'nd.AnhDaiDien as AnhGiangVien',
+            'hp.AnhHocPhan',
+            DB::raw('COUNT(DISTINCT dsl.MaSinhVien) as SoLuongSinhVien')
+        )
             ->groupBy(
                 'lhp.MaLopHocPhan',
                 'lhp.TenLopHocPhan',
