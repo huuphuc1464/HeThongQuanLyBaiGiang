@@ -161,7 +161,7 @@
         const nam = this.value;
         if (!nam) return;
 
-        fetch(`{{ route('giang-vien.bai-giang.bieu-do-thong-ke', ['id' => $hocPhan->MaHocPhan]) }}?nam=${nam}`)
+        fetch(`{{ route('giangvien.bai-giang.bieu-do-thong-ke', ['maHocPhan' => $hocPhan->MaHocPhan]) }}?nam=${nam}`)
             .then(res => res.json())
             .then(data => {
                 const newData = Array(12).fill(0);

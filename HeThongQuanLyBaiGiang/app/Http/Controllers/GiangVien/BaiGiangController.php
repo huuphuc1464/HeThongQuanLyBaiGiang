@@ -18,11 +18,11 @@ use Illuminate\Support\Str;
 class BaiGiangController extends Controller
 {
 
-    public function danhSachBaiGiang(Request $request, $id)
+    public function danhSachBaiGiang(Request $request, $maHocPhan)
     {
         $query = DB::table('bai_giang')
             ->where('MaGiangVien', Auth::id())
-            ->where('MaHocPhan', $id);
+            ->where('MaHocPhan', $maHocPhan);
 
         if ($request->filled('search')) {
             $keywords = preg_split('/\s+/', trim($request->search));
@@ -47,7 +47,7 @@ class BaiGiangController extends Controller
             ->groupBy('TenChuong')
             ->map(fn($chuong) => $chuong->groupBy('TenBai'));
 
-        $hocPhan = DB::table('hoc_phan')->where('MaHocPhan', $id)->select('MaHocPhan', 'TenHocPhan')->first();
+        $hocPhan = DB::table('hoc_phan')->where('MaHocPhan', $maHocPhan)->select('MaHocPhan', 'TenHocPhan')->first();
 
         return view('giangvien.quanLyBaiGiang.danhSachBaiGiang', compact('baiGiangs', 'hocPhan'));
     }
@@ -104,15 +104,15 @@ class BaiGiangController extends Controller
         return redirect()->back()->with('success', 'Trạng thái bài giảng đã được cập nhật.');
     }
 
-    public function hienFormThem($id)
+    public function hienFormThem($maHocPhan)
     {
         $hocPhan = DB::table('hoc_phan')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->select('MaHocPhan', 'TenHocPhan')
             ->first();
 
         // Lấy dữ liệu chương và bài từ các bài giảng
-        $baiGiangs = BaiGiang::where('MaHocPhan', $id)
+        $baiGiangs = BaiGiang::where('MaHocPhan', $maHocPhan)
             ->select('TenChuong', 'TenBai')
             ->whereNotNull('TenChuong')
             ->whereNotNull('TenBai')
@@ -232,7 +232,6 @@ class BaiGiangController extends Controller
             return redirect()->back()->with('error', 'Lỗi khi lưu bài giảng: ' . $e->getMessage());
         }
     }
-
 
     public function capNhatBaiGiang(Request $request, $maHocPhan, $maBaiGiang)
     {
@@ -368,43 +367,43 @@ class BaiGiangController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function thongKeBaiGiang($id)
+    public function thongKeBaiGiang($maHocPhan)
     {
         $tongBaiGiang = DB::table('bai_giang')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->count();
 
         $tongChuong = DB::table('bai_giang')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->distinct()
             ->count('TenChuong');
 
         $tongBai = DB::table('bai_giang')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->distinct()
             ->count('TenBai');
 
         $tongFile = DB::table('file_bai_giang')
             ->join('bai_giang', 'file_bai_giang.MaBaiGiang', '=', 'bai_giang.MaBaiGiang')
-            ->where('bai_giang.MaHocPhan', $id)
+            ->where('bai_giang.MaHocPhan', $maHocPhan)
             ->count();
 
         $tongSinhVien = DB::table('danh_sach_lop')
             ->join('lop_hoc_phan', 'danh_sach_lop.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
-            ->where('lop_hoc_phan.MaHocPhan', $id)
+            ->where('lop_hoc_phan.MaHocPhan', $maHocPhan)
             ->distinct()
             ->count('danh_sach_lop.MaSinhVien');
 
         $thongKeTheoThang = DB::table('bai_giang')
             ->selectRaw('MONTH(created_at) as thang, COUNT(*) as so_luong')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->whereYear('created_at', now()->year)
             ->groupByRaw('MONTH(created_at)')
             ->pluck('so_luong', 'thang');
 
         $filePaths = DB::table('file_bai_giang')
             ->join('bai_giang', 'bai_giang.MaBaiGiang', '=', 'file_bai_giang.MaBaiGiang')
-            ->where('bai_giang.MaHocPhan', $id)
+            ->where('bai_giang.MaHocPhan', $maHocPhan)
             ->pluck('file_bai_giang.DuongDan');
 
         // Tính tổng dung lượng file trên đĩa
@@ -418,16 +417,16 @@ class BaiGiangController extends Controller
         $tongDungLuong = round($tongDungLuong / 1024 / 1024, 2);
 
         $hocPhan = DB::table('hoc_phan')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->select('MaHocPhan', 'TenHocPhan')
             ->first();
 
         $namThongKe = DB::table('bai_giang')
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->selectRaw('YEAR(created_at) as nam')
             ->union(
                 DB::table('bai_giang')
-                    ->where('MaHocPhan', $id)
+                    ->where('MaHocPhan', $maHocPhan)
                     ->selectRaw('YEAR(updated_at) as nam')
             )
             ->distinct()
@@ -435,7 +434,7 @@ class BaiGiangController extends Controller
             ->pluck('nam');
 
         return view('giangvien.quanLyBaiGiang.thongKeBaiGiang', [
-            'hocPhanId' => $id,
+            'hocPhanId' => $maHocPhan,
             'tongBaiGiang' => $tongBaiGiang,
             'tongChuong' => $tongChuong,
             'tongBai' => $tongBai,
@@ -448,13 +447,13 @@ class BaiGiangController extends Controller
         ]);
     }
 
-    public function layDuLieuBieuDoThongKe(Request $request, $id)
+    public function layDuLieuBieuDoThongKe(Request $request, $maHocPhan)
     {
         $nam = $request->query('nam');
         $data = DB::table('bai_giang')
             ->select(DB::raw('MONTH(created_at) as thang'), DB::raw('count(*) as tong'))
             ->whereYear('created_at', $nam)
-            ->where('MaHocPhan', $id)
+            ->where('MaHocPhan', $maHocPhan)
             ->groupBy(DB::raw('MONTH(created_at)'))
             ->pluck('tong', 'thang');
 

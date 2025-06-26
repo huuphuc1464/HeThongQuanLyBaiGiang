@@ -2,13 +2,11 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\GiangVien\HomeController as GiangVienHomeController;
-use App\Http\Controllers\Login;
 use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
 use App\Http\Controllers\GiangVien\SuKienZoomController;
 use App\Http\Controllers\GiangVien\HocPhanController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Admin\KhoaController;
 use App\Http\Controllers\Admin\MonHocController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -17,147 +15,166 @@ use App\Http\Controllers\Shared\BinhLuanBaiGiangController;
 use App\Http\Controllers\GiangVien\BaiKiemTraController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
-use App\Http\Controllers\SinhVien\BaiGiangController as SinhVienBaiGiangController;
 use App\Http\Controllers\GiangVien\SinhVienController;
-use App\Models\BaiGiang;
-use Illuminate\Support\Facades\Auth;
-use App\Models\MonHoc;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
 
-Route::get('/giang-vien', function () {
-    return view('layouts.teacherLayout');
-})->middleware(['auth', RoleMiddleware::class . ':2']);
-
-Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
-Route::post('/dang-nhap', [AuthController::class, 'dangNhap'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/xac-nhan-otp', [AuthController::class, 'hienThiFormXacNhanOTP'])->name('otp.form');
-Route::post('/xac-nhan-otp', [AuthController::class, 'xacNhanOTP'])->name('otp.xacNhan');
-Route::get('/khoi-phuc-mat-khau', [AuthController::class, 'hienThiFormKhoiPhuc'])->name('forgot');
-Route::post('/khoi-phuc-mat-khau/gui-otp', [AuthController::class, 'guiOtpKhoiPhuc'])->name('forgot.sendOtp');
-Route::get('/dat-lai-mat-khau', [AuthController::class, 'hienThiFormDatLaiMatKhau'])->name('resetPass.form');
-Route::post('/dat-lai-mat-khau', [AuthController::class, 'datLaiMatKhau'])->name('resetPass.submit');
-Route::get('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'hienThiFormDoiMatKhauLanDau'])->name('changePassFirst.form');
-Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKhauLanDau'])->name('changePassFirst.submit');
-Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->name('trang-chu')->middleware(['auth', RoleMiddleware::class . ':3']);
-Route::get('/doi-mat-khau', [SinhVienHomeController::class, 'hienFormDoiMatKhau'])->name('sinhvien.doi-mat-khau');
-Route::get('/giang-vien/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('giangvien.doi-mat-khau');
-Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');
-Route::get('/giang-vien/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('giangvien.doi-thong-tin');
-Route::post('/doi-thong-tin', [AuthController::class, 'doiThongTin'])->name('doi-thong-tin.submit');
-Route::get('/thay-doi-thong-tin-ca-nhan', [SinhVienHomeController::class, 'hienFormThayDoiThongTin'])->name('sinhvien.doi-thong-tin');
-Route::get('/admin/doi-mat-khau', [DashboardController::class, 'hienFormDoiMatKhau'])->name('admin.doi-mat-khau');
-Route::get('/admin/thay-doi-thong-tin-ca-nhan', [DashboardController::class, 'hienFormThayDoiThongTin'])->name('admin.doi-thong-tin');
-
-Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::class . ':1'])->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    // Routes cho quản lý khoa
-    Route::get('/khoa', [KhoaController::class, 'danhSach'])->name('khoa.danh-sach');
-    Route::post('/khoa', [KhoaController::class, 'themMoi'])->name('khoa.them-moi');
-    Route::put('/khoa/{khoa}', [KhoaController::class, 'capNhat'])->name('khoa.cap-nhat');
-    Route::delete('/khoa/{khoa}', [KhoaController::class, 'xoa'])->name('khoa.xoa');
-    // Routes cho quản lý môn học
-    Route::get('/mon-hoc', [MonHocController::class, 'danhSach'])->name('mon-hoc.danh-sach');
-    Route::post('/mon-hoc', [MonHocController::class, 'themMoi'])->name('mon-hoc.them-moi');
-    Route::put('/mon-hoc/{monHoc}', [MonHocController::class, 'capNhat'])->name('mon-hoc.cap-nhat');
-    Route::delete('/mon-hoc/{monHoc}', [MonHocController::class, 'xoa'])->name('mon-hoc.xoa');
-    // Routes cho quản lý giảng viên
-    Route::get('/giang-vien', [GiangVienController::class, 'danhSachGiangVien'])->name('giang-vien.danh-sach');
-    Route::get('/giang-vien/them', [GiangVienController::class, 'hienFormThemGiangVien'])->name('giang-vien.form-them');
-    Route::post('/giang-vien/them', [GiangVienController::class, 'themGiangVien'])->name('giang-vien.them');
-    Route::delete('/giang-vien/xoa/{id}', [GiangVienController::class, 'xoaGiangVien'])->name('giang-vien.xoa');
-    Route::post('/giang-vien/khoi-phuc/{id}', [GiangVienController::class, 'khoiPhucGiangVien'])->name('giang-vien.khoi-phuc');
-    Route::get('/giang-vien/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('giang-vien.form-sua');
-    Route::put('/giang-vien/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('giang-vien.sua');
+Route::prefix('auth')->group(function () {
+    Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
+    Route::post('/dang-nhap', [AuthController::class, 'dangNhap'])->name('login.submit');
+    Route::post('/dang-xuat', [AuthController::class, 'dangXuat'])->name('logout');
+    Route::post('/xac-nhan-otp', [AuthController::class, 'xacNhanOTP'])->name('otp.xacNhan');
+    Route::get('/xac-nhan-otp', [AuthController::class, 'hienThiFormXacNhanOTP'])->name('otp.form');
+    Route::get('/khoi-phuc-mat-khau', [AuthController::class, 'hienThiFormKhoiPhuc'])->name('forgot');
+    Route::post('/khoi-phuc-mat-khau/gui-otp', [AuthController::class, 'guiOtpKhoiPhuc'])->name('forgot.sendOtp');
+    Route::post('/dat-lai-mat-khau', [AuthController::class, 'datLaiMatKhau'])->name('resetPass.submit');
+    Route::get('/dat-lai-mat-khau', [AuthController::class, 'hienThiFormDatLaiMatKhau'])->name('resetPass.form');
+    Route::post('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'doiMatKhauLanDau'])->name('changePassFirst.submit');
+    Route::get('/doi-mat-khau-lan-dau-dang-nhap', [AuthController::class, 'hienThiFormDoiMatKhauLanDau'])->name('changePassFirst.form');
 });
-
-Route::get('/giang-vien/su-kien-zoom', [SuKienZoomController::class, 'danhSachSuKien'])->name('giangvien.su-kien-zoom.danhsach');
-Route::get('/giang-vien/su-kien-zoom/chi-tiet/{id}', [SuKienZoomController::class, 'chiTietSuKien'])->name('giangvien.su-kien-zoom.chi-tiet');
-Route::get('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'hienFormThemZoom'])->name('giangvien.su-kien-zoom.form-them');
-Route::post('/giang-vien/su-kien-zoom/them', [SuKienZoomController::class, 'themSuKienZoom'])->name('giangvien.su-kien-zoom.them');
-Route::delete('/giangvien/su-kien-zoom/xoa/{id}', [SuKienZoomController::class, 'xoaSuKienZoom'])->name('giangvien.su-kien-zoom.xoa');
-Route::get('/giang-vien/su-kien-zoom/sua/{id}', [SuKienZoomController::class, 'hienFormCapNhatZoom'])->name('giangvien.su-kien-zoom.form-sua');
-Route::put('/giang-vien/su-kien-zoom/sua/{id}', [SuKienZoomController::class, 'capNhatSuKienZoom'])->name('giangvien.su-kien-zoom.sua');
-
-
-Route::get('/giang-vien/hoc-phan/{id}/bai-giang', [BaiGiangController::class, 'danhSachBaiGiang'])->name('giang-vien.bai-giang');
-Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/{maBaiGiang}/thay-doi-trang-thai', [BaiGiangController::class, 'thayDoiTrangThai'])->name('baiGiang.thayDoiTrangThai');
-Route::get('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'hienFormThem'])->name('giang-vien.bai-giang.form-them');
-Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/sua/{maBaiGiang}', [BaiGiangController::class, 'hienFormSua'])->name('giang-vien.bai-giang.form-sua');
-Route::post('/giang-vien/hoc-phan/{id}/bai-giang/them', [BaiGiangController::class, 'themBaiGiang'])
-    ->name('giang-vien.bai-giang.them');
-Route::put('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/cap-nhat/{maBaiGiang}', [BaiGiangController::class, 'capNhatBaiGiang'])
-    ->name('giang-vien.bai-giang.cap-nhat');
-Route::get('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/chi-tiet/{maBaiGiang}', [BaiGiangController::class, 'chiTietBaiGiang'])->name('giang-vien.bai-giang.chi-tiet');
-Route::post('/giang-vien/hoc-phan/{maHocPhan}/bai-giang/huy', [BaiGiangController::class, 'huyBoBaiGiang'])->name('bai-giang.huy');
-Route::get('/giang-vien/hoc-phan/{id}/bai-giang/thong-ke', [BaiGiangController::class, 'thongKeBaiGiang'])->name('giang-vien.bai-giang.thong-ke');
-Route::get('/giang-vien/hoc-phan/{id}/bai-giang/bieu-do-thong-ke', [BaiGiangController::class, 'layDuLieuBieuDoThongKe'])->name('giang-vien.bai-giang.bieu-do-thong-ke');
-
 
 Route::any('/elfinder/connector', [ElfinderController::class, 'connector'])->name('elfinder.connector');
 
-// Giảng viên - học phần
-Route::get('/giang-vien/hoc-phan', [HocPhanController::class, 'danhSach'])->name('giangvien.hocphan.danh-sach');
-Route::post('/giang-vien/hoc-phan', [HocPhanController::class, 'themMoi'])->name('giangvien.hocphan.them-moi');
-Route::get('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'chiTiet'])->name('giangvien.hocphan.chi-tiet');
-Route::get('/giang-vien/hoc-phan/{id}/chinh-sua', [HocPhanController::class, 'chinhSua'])->name('giangvien.hocphan.chinh-sua');
-Route::put('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'capNhat'])->name('giangvien.hocphan.cap-nhat');
-Route::delete('/giang-vien/hoc-phan/{id}', [HocPhanController::class, 'xoa'])->name('giangvien.hocphan.xoa');
-Route::get('/giang-vien/hoc-phan/mon-hoc/danh-sach', [HocPhanController::class, 'layDanhSachMonHoc'])->name('giangvien.hocphan.mon-hoc.danh-sach');
+Route::middleware(['auth', RoleMiddleware::class . ':1,2,3'])->group(function () {
+    Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');
+    Route::post('/doi-thong-tin', [AuthController::class, 'doiThongTin'])->name('doi-thong-tin.submit');
+});
 
-// Giảng viên  - lớp học phần
-Route::get('/giang-vien/lop-hoc-phan', [LopHocPhanController::class, 'danhSach'])->name('giangvien.lophocphan.danhsach');
-Route::post('/giang-vien/lop-hoc-phan', [LopHocPhanController::class, 'themMoi'])->name('giangvien.lophocphan.them-moi');
-Route::get('/giang-vien/lop-hoc-phan/{id}', [LopHocPhanController::class, 'chiTiet'])->name('giangvien.lophocphan.chi-tiet');
-Route::get('/giang-vien/lop-hoc-phan/{id}/chinh-sua', [LopHocPhanController::class, 'chinhSua'])->name('giangvien.lophocphan.chinh-sua');
-Route::put('/giang-vien/lop-hoc-phan/{id}', [LopHocPhanController::class, 'capNhat'])->name('giangvien.lophocphan.cap-nhat');
-Route::delete('/giang-vien/lop-hoc-phan/{id}', [LopHocPhanController::class, 'xoa'])->name('giangvien.lophocphan.xoa');
+Route::prefix('binh-luan')->name('binhluan.')->middleware(['auth', RoleMiddleware::class . ':2,3'])->group(function () {
+    // Bình luận
+    Route::post('/gui-binh-luan', [BinhLuanBaiGiangController::class, 'guiBinhLuan'])->name('guibinhluan');
+    Route::post('/tra-loi-binh-luan', [BinhLuanBaiGiangController::class, 'traLoiBinhLuan'])->name('traloi');
+    Route::delete('/xoa/{id}', [BinhLuanBaiGiangController::class, 'xoa'])->name('xoa');
+    Route::put('/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat'])->name('capnhat');
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::class . ':1'])->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/doi-mat-khau', [DashboardController::class, 'hienFormDoiMatKhau'])->name('doi-mat-khau');
+    Route::get('/thay-doi-thong-tin-ca-nhan', [DashboardController::class, 'hienFormThayDoiThongTin'])->name('doi-thong-tin');
+
+    // Routes cho quản lý khoa
+    Route::prefix('khoa')->name('khoa.')->group(function () {
+        Route::get('/', [KhoaController::class, 'danhSach'])->name('danh-sach');
+        Route::post('/', [KhoaController::class, 'themMoi'])->name('them-moi');
+        Route::put('/{khoa}', [KhoaController::class, 'capNhat'])->name('cap-nhat');
+        Route::delete('/{khoa}', [KhoaController::class, 'xoa'])->name('xoa');
+    });
+
+    // Routes cho quản lý môn học
+    Route::prefix('mon-hoc')->name('mon-hoc.')->group(function () {
+        Route::get('/', [MonHocController::class, 'danhSach'])->name('danh-sach');
+        Route::post('/', [MonHocController::class, 'themMoi'])->name('them-moi');
+        Route::put('/{monHoc}', [MonHocController::class, 'capNhat'])->name('cap-nhat');
+        Route::delete('/{monHoc}', [MonHocController::class, 'xoa'])->name('xoa');
+    });
+
+    // Routes cho quản lý giảng viên
+    Route::prefix('giang-vien')->name('giang-vien.')->group(function () {
+        Route::get('/', [GiangVienController::class, 'danhSachGiangVien'])->name('danh-sach');
+        Route::get('/them', [GiangVienController::class, 'hienFormThemGiangVien'])->name('form-them');
+        Route::post('/them', [GiangVienController::class, 'themGiangVien'])->name('them');
+        Route::delete('/xoa/{id}', [GiangVienController::class, 'xoaGiangVien'])->name('xoa');
+        Route::post('/khoi-phuc/{id}', [GiangVienController::class, 'khoiPhucGiangVien'])->name('khoi-phuc');
+        Route::get('/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('form-sua');
+        Route::put('/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('sua');
+    });
+});
+
+Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddleware::class . ':2'])->group(function () {
+    Route::get('/', [HocPhanController::class, 'danhSach'])->name('hocphan.danh-sach');
+    Route::get('/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('doi-mat-khau');
+    Route::get('/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('doi-thong-tin');
+
+    // Quản lý sự kiện Zoom
+    Route::prefix('su-kien-zoom')->name('su-kien-zoom.')->group(function () {
+        Route::get('/', [SuKienZoomController::class, 'danhSachSuKien'])->name('danhsach');
+        Route::get('/chi-tiet/{id}', [SuKienZoomController::class, 'chiTietSuKien'])->name('chi-tiet');
+        Route::get('/them', [SuKienZoomController::class, 'hienFormThemZoom'])->name('form-them');
+        Route::post('/them', [SuKienZoomController::class, 'themSuKienZoom'])->name('them');
+        Route::delete('/xoa/{id}', [SuKienZoomController::class, 'xoaSuKienZoom'])->name('xoa');
+        Route::get('/sua/{id}', [SuKienZoomController::class, 'hienFormCapNhatZoom'])->name('form-sua');
+        Route::put('/sua/{id}', [SuKienZoomController::class, 'capNhatSuKienZoom'])->name('sua');
+    });
 
 
+    // Quản lý bài giảng
+    Route::prefix('hoc-phan/{maHocPhan}/bai-giang')->name('bai-giang.')->group(function () {
+        Route::get('/', [BaiGiangController::class, 'danhSachBaiGiang'])->name('danh-sach');
+        Route::post('/{maBaiGiang}/thay-doi-trang-thai', [BaiGiangController::class, 'thayDoiTrangThai'])->name('thay-doi-trang-thai');
+        Route::get('/them', [BaiGiangController::class, 'hienFormThem'])->name('form-them');
+        Route::get('/sua/{maBaiGiang}', [BaiGiangController::class, 'hienFormSua'])->name('form-sua');
+        Route::post('/them', [BaiGiangController::class, 'themBaiGiang'])->name('them');
+        Route::put('/cap-nhat/{maBaiGiang}', [BaiGiangController::class, 'capNhatBaiGiang'])->name('cap-nhat');
+        Route::get('/chi-tiet/{maBaiGiang}', [BaiGiangController::class, 'chiTietBaiGiang'])->name('chi-tiet');
+        Route::post('/huy', [BaiGiangController::class, 'huyBoBaiGiang'])->name('huy');
+        Route::get('/thong-ke', [BaiGiangController::class, 'thongKeBaiGiang'])->name('thong-ke');
+        Route::get('/bieu-do-thong-ke', [BaiGiangController::class, 'layDuLieuBieuDoThongKe'])->name('bieu-do-thong-ke');
+    });
 
+    // Quản lý học phần
+    Route::prefix('hoc-phan')->name('hocphan.')->group(function () {
+        Route::get('/', [HocPhanController::class, 'danhSach'])->name('danh-sach');
+        Route::post('/', [HocPhanController::class, 'themMoi'])->name('them-moi');
+        Route::get('/{id}', [HocPhanController::class, 'chiTiet'])->name('chi-tiet');
+        Route::get('/{id}/chinh-sua', [HocPhanController::class, 'chinhSua'])->name('chinh-sua');
+        Route::put('/{id}', [HocPhanController::class, 'capNhat'])->name('cap-nhat');
+        Route::delete('/{id}', [HocPhanController::class, 'xoa'])->name('xoa');
+        Route::get('/mon-hoc/danh-sach', [HocPhanController::class, 'layDanhSachMonHoc'])->name('mon-hoc.danh-sach');
+    });
 
+    // Quản lý lớp học phần
+    Route::prefix('lop-hoc-phan')->name('lophocphan.')->group(function () {
+        Route::get('/', [LopHocPhanController::class, 'danhSach'])->name('danhsach');
+        Route::post('/', [LopHocPhanController::class, 'themMoi'])->name('them-moi');
+        Route::get('/{id}', [LopHocPhanController::class, 'chiTiet'])->name('chi-tiet');
+        Route::get('/{id}/chinh-sua', [LopHocPhanController::class, 'chinhSua'])->name('chinh-sua');
+        Route::put('/{id}', [LopHocPhanController::class, 'capNhat'])->name('cap-nhat');
+        Route::delete('/{id}', [LopHocPhanController::class, 'xoa'])->name('xoa');
 
+        // Quản lý sinh viên
+        Route::prefix('{maLopHocPhan}/sinh-vien')->name('sinhvien.')->group(function () {
+            Route::get('/', [SinhVienController::class, 'danhSachSinhVien'])->name('danhsach');
+            Route::delete('/xoa/{maDanhSachLop}', [SinhVienController::class, 'xoaSinhVien'])->name('xoa');
+            Route::post('/them', [SinhVienController::class, 'themSinhVien'])->name('them-bang-email');
+            Route::post('/them-file', [SinhVienController::class, 'themSinhVienBangFile'])->name('them-bang-file');
+        });
+    });
 
+    // Quản lý bài kiểm tra
+    Route::prefix('bai-kiem-tra')->name('bai-kiem-tra.')->group(function () {
+        Route::get('/', [BaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach');
+        Route::get('them', [BaiKiemTraController::class, 'hienFormThemBaiKiemTra'])->name('form-them');
+        Route::post('them', [BaiKiemTraController::class, 'themBaiKiemTra'])->name('them');
+        Route::post('import', [BaiKiemTraController::class, 'importBaiKiemTra'])->name('import');
+        Route::post('nhan-ban', [BaiKiemTraController::class, 'nhanBanBaiKiemTra'])->name('nhan-ban');
+        Route::get('chi-tiet/{id}', [BaiKiemTraController::class, 'chiTietBaiKiemTra'])->name('chi-tiet');
+        Route::get('sua/{id}', [BaiKiemTraController::class, 'hienFormSuaBaiKiemTra'])->name('form-sua');
+        Route::put('sua/{id}', [BaiKiemTraController::class, 'capNhatBaiKiemTra'])->name('sua');
+        Route::delete('xoa/{id}', [BaiKiemTraController::class, 'xoaBaiKiemTra'])->name('xoa');
+        Route::get('xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('xuat-bai-kiem-tra');
+        Route::get('xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQuaBaiLam'])->name('xuat-ket-qua');
+    });
+});
 
-// Sinh viên
-Route::get('/hoc-phan/{id}/{tab?}', [SinhVienHomeController::class, 'renderTab'])
-    ->name('hoc-phan.bai-giang.tab');
-Route::get('/hoc-phan/{id}/bai-giang/chi-tiet/{maBaiGiang}', [SinhVienHomeController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');
-Route::get('/hoc-phan/{id}/su-kien-zoom/chi-tiet/{maSuKien}', [SinhVienHomeController::class, 'chiTietSuKienZoom'])->name('su-kien-zoom.chi-tiet');
-
-
-// Quản lý sinh viên
-Route::get('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien', [SinhVienController::class, 'danhSachSinhVien'])->name('giangvien.lophocphan.sinhvien');
-Route::delete('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/xoa/{maDanhSachLop}', [SinhVienController::class, 'xoaSinhVien'])->name('giangvien.lophocphan.sinhvien.xoa');
-Route::post('giang-vien/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them', [SinhVienController::class, 'themSinhVien'])->name('giangvien.sinhvien.them-bang-email');
-Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
-Route::post('/lop-hoc-phan/{maLopHocPhan}/sinh-vien/them-file', [SinhVienController::class, 'themSinhVienBangFile'])->name('giangvien.sinhvien.them-bang-file');
-
-
-// Quản lý bài kiểm tra
-Route::get('giang-vien/bai-kiem-tra', [BaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('giangvien.bai-kiem-tra.danh-sach');
-Route::get('giang-vien/bai-kiem-tra/them', [BaiKiemTraController::class, 'hienFormThemBaiKiemTra'])->name('giangvien.bai-kiem-tra.form-them');
-Route::post('giang-vien/bai-kiem-tra/them', [BaiKiemTraController::class, 'themBaiKiemTra'])->name('giangvien.bai-kiem-tra.them');
-Route::post('giang-vien/bai-kiem-tra/import', [BaiKiemTraController::class, 'importBaiKiemTra'])->name('giangvien.bai-kiem-tra.import');
-Route::post('giang-vien/bai-kiem-tra/nhan-ban', [BaiKiemTraController::class, 'nhanBanBaiKiemTra'])->name('giangvien.bai-kiem-tra.nhan-ban');
-Route::get('giang-vien/bai-kiem-tra/chi-tiet/{id}', [BaiKiemTraController::class, 'chiTietBaiKiemTra'])->name('giangvien.bai-kiem-tra.chi-tiet');
-Route::get('giang-vien/bai-kiem-tra/sua/{id}', [BaiKiemTraController::class, 'hienFormSuaBaiKiemTra'])->name('giangvien.bai-kiem-tra.form-sua');
-Route::put('giang-vien/bai-kiem-tra/sua/{id}', [BaiKiemTraController::class, 'capNhatBaiKiemTra'])->name('giangvien.bai-kiem-tra.sua');
-Route::delete('giang-vien/bai-kiem-tra/xoa/{id}', [BaiKiemTraController::class, 'xoaBaiKiemTra'])->name('giangvien.bai-kiem-tra.xoa');
-
-Route::get('giang-vien/bai-kiem-tra/xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('giangvien.bai-kiem-tra.xuat-bai-kiem-tra');
-Route::get('giang-vien/bai-kiem-tra/xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQuaBaiLam'])->name('giangvien.bai-kiem-tra.xuat-ket-qua');
-
-Route::post('/binh-luan/gui-binh-luan', [BinhLuanBaiGiangController::class, 'guiBinhLuan'])->name('binhluan.guibinhluan');
-Route::post('/binh-luan/tra-loi-binh-luan', [BinhLuanBaiGiangController::class, 'traLoiBinhLuan'])->name('binhluan.traloi');
-Route::delete('/binh-luan/xoa/{id}', [BinhLuanBaiGiangController::class, 'xoa'])->name('binhluan.xoa');
-Route::put('/binh-luan/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat'])->name('binhluan.capnhat');
-
-// Routes cho sinh viên làm bài kiểm tra
 Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
-    Route::get('/bai-kiem-tra', [KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
-    Route::get('/bai-kiem-tra/{maBaiKiemTra}/lam-bai', [KetQuaBaiKiemTraController::class, 'lamBaiKiemTra'])->name('lam-bai-kiem-tra');
-    Route::post('/bai-kiem-tra/{maBaiKiemTra}/nop-bai', [KetQuaBaiKiemTraController::class, 'nopBaiKiemTra'])->name('nop-bai-kiem-tra');
-    Route::get('/bai-kiem-tra/{maBaiKiemTra}/ket-qua', [KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');
+    Route::get('/', [SinhVienHomeController::class, 'hienThiDanhSachBaiGiang'])->name('trang-chu');
+    Route::get('/doi-mat-khau', [SinhVienHomeController::class, 'hienFormDoiMatKhau'])->name('sinhvien.doi-mat-khau');
+    Route::get('/thay-doi-thong-tin-ca-nhan', [SinhVienHomeController::class, 'hienFormThayDoiThongTin'])->name('sinhvien.doi-thong-tin');
+
+    // Routes cho sinh viên làm bài kiểm tra
+    Route::prefix('bai-kiem-tra')->group(function () {
+        Route::get('/', [KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
+        Route::get('/{maBaiKiemTra}/lam-bai', [KetQuaBaiKiemTraController::class, 'lamBaiKiemTra'])->name('lam-bai-kiem-tra');
+        Route::post('/{maBaiKiemTra}/nop-bai', [KetQuaBaiKiemTraController::class, 'nopBaiKiemTra'])->name('nop-bai-kiem-tra');
+        Route::get('/{maBaiKiemTra}/ket-qua', [KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');
+    });
+
+    Route::prefix('hoc-phan/{id}')->group(function () {
+        Route::get('/{tab?}', [SinhVienHomeController::class, 'renderTab'])->name('hoc-phan.bai-giang.tab');
+        Route::get('/bai-giang/chi-tiet/{maBaiGiang}', [SinhVienHomeController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');
+        Route::get('/su-kien-zoom/chi-tiet/{maSuKien}', [SinhVienHomeController::class, 'chiTietSuKienZoom'])->name('su-kien-zoom.chi-tiet');
+    });
+
+    Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
 });

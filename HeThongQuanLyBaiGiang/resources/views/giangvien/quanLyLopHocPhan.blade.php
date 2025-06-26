@@ -159,7 +159,7 @@
                             <td>{{ $lop->MoTa }}</td>
                             <td class="text-center">{{ $lop->created_at ? $lop->created_at->format('H:i:s d/m/Y') : '' }}</td>
                             <td class="text-center">
-                                <a href="{{ route('giangvien.lophocphan.sinhvien', ['maLopHocPhan' => $lop->MaLopHocPhan]) }}" class="btn btn-info btn-sm">
+                                <a href="{{ route('giangvien.lophocphan.sinhvien.danhsach', ['maLopHocPhan' => $lop->MaLopHocPhan]) }}" class="btn btn-info btn-sm">
                                     <i class="fas fa-users"></i> Sinh viên
                                 </a>
                             </td>                            

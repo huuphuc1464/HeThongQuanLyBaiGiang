@@ -7,7 +7,7 @@
         <div class="tile">
             <h3 class="tile-title">Chỉnh sửa bài giảng</h3>
             <div class="tile-body">
-                <form action="{{ route('giang-vien.bai-giang.cap-nhat', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" method="POST" class="row">
+                <form action="{{ route('giangvien.bai-giang.cap-nhat', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" method="POST" class="row">
                     @csrf
                     @method('PUT')
                     <div class="form-group col-md-4">
@@ -166,7 +166,7 @@
 
     document.getElementById('btn-cancel')?.addEventListener('click', () => {
         handleCancelBaiGiang({
-            routeUrl: @json(route('bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan])),
+            routeUrl: @json(route('giang-vien.bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan])),
             maHocPhan: window.maHocPhan,
             maBaiGiang: window.maBaiGiang
         });

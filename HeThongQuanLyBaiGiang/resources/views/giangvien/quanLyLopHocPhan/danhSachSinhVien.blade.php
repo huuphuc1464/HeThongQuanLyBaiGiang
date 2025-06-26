@@ -109,7 +109,7 @@
                 <h5 class="modal-title fw-bold" id="modalThemSinhVienEmail">Thêm sinh viên vào lớp học phần bằng email</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <form method="POST" action="{{ route('giangvien.sinhvien.them-bang-email', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}">
+            <form method="POST" action="{{ route('giangvien.lophocphan.sinhvien.them-bang-email', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-1">
@@ -135,7 +135,7 @@
                 <h5 class="modal-title fw-bold" id="importStudentModalLabel">Thêm sinh viên bằng file Excel</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <form action="{{ route('giangvien.sinhvien.them-bang-file', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('giangvien.lophocphan.sinhvien.them-bang-file', ['maLopHocPhan' => $lopHocPhan->MaLopHocPhan]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <label for="excelFile" class="fw-semibold">Chọn file Excel chứa thông tin sinh viên:</label>

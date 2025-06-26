@@ -61,10 +61,10 @@
 
                 <!-- Hành động -->
                 <div class="mt-4">
-                    <a href="{{ route('giang-vien.bai-giang', ['id' => $hocPhan->MaHocPhan]) }}" class="btn btn-secondary me-2">
+                    <a href="{{ route('giangvien.bai-giang.danh-sach', ['maHocPhan' => $hocPhan->MaHocPhan]) }}" class="btn btn-secondary me-2">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
-                    <a href="{{ route('giang-vien.bai-giang.form-sua', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-primary">
+                    <a href="{{ route('giangvien.bai-giang.form-sua', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Chỉnh sửa
                     </a>
                 </div>

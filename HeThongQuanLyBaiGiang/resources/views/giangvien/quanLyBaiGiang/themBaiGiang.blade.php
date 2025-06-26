@@ -7,7 +7,7 @@
         <div class="tile">
             <h3 class="tile-title">Thêm bài giảng</h3>
             <div class="tile-body">
-                <form action="{{ route('giang-vien.bai-giang.them', ['id' => $hocPhan->MaHocPhan]) }}" method="POST" class="row" enctype="multipart/form-data">
+                <form action="{{ route('giangvien.bai-giang.them', ['maHocPhan' => $hocPhan->MaHocPhan]) }}" method="POST" class="row" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group col-md-4">
                         <label class="control-label">Tên học phần <span class="text-danger">*</span></label>
@@ -142,7 +142,7 @@
 
     document.getElementById('btn-cancel')?.addEventListener('click', () => {
         handleCancelBaiGiang({
-            routeUrl: '{{ route('bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan]) }}'
+            routeUrl: '{{ route('giangvien.bai-giang.huy', ['maHocPhan' => $hocPhan->MaHocPhan]) }}'
             , maHocPhan: window.maHocPhan
             , maBaiGiang: window.maBaiGiang
         });

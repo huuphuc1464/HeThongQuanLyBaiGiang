@@ -17,7 +17,7 @@ class RoleMiddleware
     public function handle($request, Closure $next, ...$roles)
     {
         if (!Auth::check()) {
-            return redirect('/login');
+            return redirect('/auth/dang-nhap');
         }
 
         if (!in_array(Auth::user()->MaVaiTro, $roles)) {

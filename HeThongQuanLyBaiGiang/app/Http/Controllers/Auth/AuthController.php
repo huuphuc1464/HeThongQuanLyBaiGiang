@@ -75,12 +75,12 @@ class AuthController extends Controller
         }
         return redirect('/')->with('swal_success', 'Đăng nhập thành công');
     }
-    public function logout(Request $request)
+    public function dangXuat(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/dang-nhap');
+        return redirect()->route('login');
     }
 
     public function hienThiFormKhoiPhuc()

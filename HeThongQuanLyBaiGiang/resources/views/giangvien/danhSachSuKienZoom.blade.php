@@ -146,7 +146,7 @@
         modalXoa.querySelector('#tenSuKienZoom').textContent = `"${tenSuKien}"`;
 
         const form = modalXoa.querySelector('#formXoaSuKien');
-        form.action = `/giangvien/su-kien-zoom/xoa/${suKienId}`;
+        form.action = `/giang-vien/su-kien-zoom/xoa/${suKienId}`;
     });
 
 </script>

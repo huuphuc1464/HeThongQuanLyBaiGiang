@@ -7,10 +7,10 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('giang-vien.bai-giang.form-them', ['id' => $hocPhan->MaHocPhan]) }}" class="btn btn-success">
+                    <a href="{{ route('giangvien.bai-giang.form-them', ['maHocPhan' => $hocPhan->MaHocPhan]) }}" class="btn btn-success">
                         <i class="fas fa-plus"></i> Thêm bài giảng
                     </a>
-                    <a href="{{ route('giang-vien.bai-giang.thong-ke', ['id' => $hocPhan->MaHocPhan]) }}" class="btn btn-warning">
+                    <a href="{{ route('giangvien.bai-giang.thong-ke', ['maHocPhan' => $hocPhan->MaHocPhan]) }}" class="btn btn-warning">
                         <i class="fas fa-signal"></i> Thống kê
                     </a>
                 </div>
@@ -65,25 +65,25 @@
 
                                                         @if ($baiGiang->TrangThai == 1)
                                                         <button type="button" class="btn btn-danger btn-sm me-1" aria-label="Ẩn bài giảng {{ $baiGiang->TenBaiGiang }}" onclick="moModalTrangThai(
-                                                                                '{{ route('baiGiang.thayDoiTrangThai', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}',
+                                                                                '{{ route('giangvien.bai-giang.thay-doi-trang-thai', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}',
                                                                                 '{{ $baiGiang->TenBaiGiang }}',
                                                                                 1)">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                         @else
                                                         <button type="button" class="btn btn-success btn-sm me-1" aria-label="Khôi phục bài giảng {{ $baiGiang->TenBaiGiang }}" onclick="moModalTrangThai(
-                                                                                '{{ route('baiGiang.thayDoiTrangThai', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}',
+                                                                                '{{ route('giangvien.bai-giang.thay-doi-trang-thai', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}',
                                                                                 '{{ $baiGiang->TenBaiGiang }}',
                                                                                 0)">
                                                             <i class="fas fa-undo"></i>
                                                         </button>
                                                         @endif
 
-                                                        <a href="{{ route('giang-vien.bai-giang.form-sua', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-warning btn-sm me-1">
+                                                        <a href="{{ route('giangvien.bai-giang.form-sua', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-warning btn-sm me-1">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
 
-                                                        <a href="{{ route('giang-vien.bai-giang.chi-tiet', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-primary btn-sm">
+                                                        <a href="{{ route('giangvien.bai-giang.chi-tiet', ['maHocPhan' => $baiGiang->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-primary btn-sm">
                                                             <i class="fas fa-info-circle"></i>
                                                         </a>
                                                     </div>
