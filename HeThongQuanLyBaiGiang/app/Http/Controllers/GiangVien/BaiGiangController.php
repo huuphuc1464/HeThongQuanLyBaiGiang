@@ -214,7 +214,7 @@ class BaiGiangController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('giang-vien.bai-giang', ['id' => $maHocPhan])->with('success', 'Thêm bài giảng thành công!');
+            return redirect()->route('giangvien.bai-giang.danh-sach', ['maHocPhan' => $maHocPhan])->with('success', 'Thêm bài giảng thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -313,7 +313,7 @@ class BaiGiangController extends Controller
                 }
             }
             DB::commit();
-            return redirect()->route('giang-vien.bai-giang', ['id' => $maHocPhan])->with('success', 'Cập nhật bài giảng thành công!');
+            return redirect()->route('giangvien.bai-giang', ['maHocPhan' => $maHocPhan])->with('success', 'Cập nhật bài giảng thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Lỗi khi cập nhật: ' . $e->getMessage());
