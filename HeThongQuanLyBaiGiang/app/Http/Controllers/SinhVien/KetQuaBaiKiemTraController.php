@@ -270,7 +270,6 @@ class KetQuaBaiKiemTraController extends Controller
                 $bai->trangThai = 'Đã kết thúc';
             }
         }
-        dd($baiKiemTra);
 
         return view('sinhvien.danhsachbaikiemtra', compact('baiKiemTra'));
     }
