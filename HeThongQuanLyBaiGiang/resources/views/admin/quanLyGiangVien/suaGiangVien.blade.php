@@ -18,19 +18,19 @@
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Địa chỉ thường trú</label>
+                            <label class="control-label">Địa chỉ thường trú <span class="text-danger">*</span></label>
                             <input class="form-control" type="text" name="DiaChi" maxlength="255" value="{{ old('DiaChi', $giangVien->DiaChi) }}">
                             @error('DiaChi') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Ngày sinh</label>
+                            <label class="control-label">Ngày sinh <span class="text-danger">*</span></label>
                             <input class="form-control" type="date" name="NgaySinh" value="{{ old('NgaySinh', $giangVien->NgaySinh) }}" min="1950-01-01" max="{{ now()->subYears(17)->format('Y-m-d') }}" required>
                             @error('NgaySinh') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Giới tính</label>
+                            <label class="control-label">Giới tính <span class="text-danger">*</span></label>
                             <select class="form-control" name="GioiTinh" required>
                                 <option value="Nam" {{ old('GioiTinh', $giangVien->GioiTinh) == 'Nam' ? 'selected' : '' }}>Nam</option>
                                 <option value="Nữ" {{ old('GioiTinh', $giangVien->GioiTinh) == 'Nữ' ? 'selected' : '' }}>Nữ</option>

@@ -16,31 +16,31 @@
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Địa chỉ email</label>
+                            <label class="control-label">Địa chỉ email <span class="text-danger">*</span></label>
                             <input class="form-control" type="text" name="Email" maxlength="100" placeholder="Nhập địa chỉ email" required value="{{ old('Email') }}">
                             @error('Email') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Địa chỉ thường trú</label>
-                            <input class="form-control" type="text" name="DiaChi" maxlength="255" placeholder="Nhập địa chỉ thường trú" value="{{ old('DiaChi') }}">
+                            <label class="control-label">Địa chỉ thường trú <span class="text-danger">*</span></label>
+                            <input class="form-control" type="text" name="DiaChi" maxlength="255" required placeholder="Nhập địa chỉ thường trú" value="{{ old('DiaChi') }}">
                             @error('DiaChi') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Số điện thoại</label>
+                            <label class="control-label">Số điện thoại <span class="text-danger">*</span></label>
                             <input class="form-control" type="text" name="SoDienThoai" maxlength="10" minlength="10" placeholder="Nhập số điện thoại" required value="{{ old('SoDienThoai') }}">
                             @error('SoDienThoai') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Ngày sinh</label>
+                            <label class="control-label">Ngày sinh <span class="text-danger">*</span></label>
                             <input class="form-control" type="date" name="NgaySinh" min="1950-01-01" max="{{ now()->subYears(17)->format('Y-m-d') }}" required value="{{ old('NgaySinh') }}">
                             @error('NgaySinh') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="form-group col-md-4">
-                            <label class="control-label">Giới tính</label>
+                            <label class="control-label">Giới tính <span class="text-danger">*</span></label>
                             <select class="form-control" name="GioiTinh" required>
                                 <option value="" disabled {{ old('GioiTinh') == null ? 'selected' : '' }}>-- Chọn giới tính --</option>
                                 <option value="Nam" {{ old('GioiTinh') == 'Nam' ? 'selected' : '' }}>Nam</option>

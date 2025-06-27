@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -45,7 +46,7 @@ class AuthController extends Controller
         }
 
         if (empty($MatKhau)) {
-            return back()->with('swal_warning', 'Mật khẩu đang để trống...');
+            return back()->with('swal_warning', 'Mật khẩu đang để trống...')->withInput();
         }
 
         $user = NguoiDung::where('TenTaiKhoan', $TenTaiKhoan)->where('TrangThai', 1)->first();
@@ -55,7 +56,7 @@ class AuthController extends Controller
         }
 
         if (!Hash::check($MatKhau, $user->MatKhau)) {
-            return back()->with('swal_error', 'Sai mật khẩu');
+            return back()->with('swal_error', 'Sai mật khẩu')->withInput();
         }
 
         Auth::login($user);
@@ -75,6 +76,7 @@ class AuthController extends Controller
         }
         return redirect('/')->with('swal_success', 'Đăng nhập thành công');
     }
+
     public function dangXuat(Request $request)
     {
         Auth::logout();
@@ -90,12 +92,23 @@ class AuthController extends Controller
 
     public function guiOtpKhoiPhuc(Request $request, EmailService $emailService)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'email' => 'required|email',
+            ],
+            [
+                'email.required' => 'Email không được để trống',
+                'email.email' => 'Email không đúng định dạng'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return back()->with('swal_error', $validator->errors()->first())->withInput();
+        }
 
         $email = $request->email;
-        $exists = NguoiDung::where('Email', $email)->exists();
+        $exists = NguoiDung::where('Email', $email)->where('TrangThai', 1)->exists();
 
         if (!$exists) {
             return back()->with('swal_error', 'Email không tồn tại trong hệ thống.');
@@ -132,13 +145,26 @@ class AuthController extends Controller
 
     public function xacNhanOTP(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required'
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'email' => 'required|email',
+                'otp' => 'required|digits:6'
+            ],
+            [
+                'email.required' => 'Email không được để trống',
+                'email.email' => 'Email không đúng định dạng',
+                'otp.required' => 'OTP không được để trống',
+                'otp.digits' => 'OTP phải gồm đúng 6 chữ số'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return back()->with('swal_error', $validator->errors()->first())->withInput();
+        }
 
         $email = $request->email;
-        $exists = NguoiDung::where('Email', $email)->exists();
+        $exists = NguoiDung::where('Email', $email)->where('TrangThai', 1)->exists();
 
         if (!$exists) {
             return back()->with('swal_error', 'Email không tồn tại trong hệ thống.');
@@ -177,6 +203,7 @@ class AuthController extends Controller
                 'confirmed'
             ],
         ], [
+            'password.required' => 'Mật khẩu không được để trống',
             'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.'
         ]);
@@ -185,10 +212,10 @@ class AuthController extends Controller
             return back()->with('swal_error', $validator->errors()->first());
         }
 
-        $user = NguoiDung::where('Email', $request->email)->first();
+        $user = NguoiDung::where('Email', $request->email)->where('TrangThai', 1)->first();
 
         if (!$user) {
-            return back()->with('swal_error', 'Email không tồn tại.');
+            return back()->with('swal_error', 'Tài khoản không tồn tại.');
         }
 
         $user->MatKhau = Hash::make($request->password);
@@ -211,6 +238,7 @@ class AuthController extends Controller
                 'confirmed'
             ],
         ], [
+            'password.required' => 'Mật khẩu không được để trống',
             'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.'
         ]);
@@ -219,7 +247,7 @@ class AuthController extends Controller
             return back()->with('swal_error', $validator->errors()->first());
         }
 
-        $user = NguoiDung::where('TenTaiKhoan', $request->username)->first();
+        $user = NguoiDung::where('TenTaiKhoan', $request->username)->where('TrangThai', 1)->first();
 
         if (!$user) {
             return back()->with('swal_error', 'Tài khoản không tồn tại.');
@@ -272,7 +300,11 @@ class AuthController extends Controller
         $request->validate([
             'HoTen' => 'required|string|max:100',
             'DiaChi' => 'required|string|max:255',
-            'SoDienThoai' => 'required|regex:/^0\d{9}$/|unique:nguoi_dung,SoDienThoai',
+            'SoDienThoai' => [
+                'required',
+                'regex:/^0\d{9}$/',
+                Rule::unique('nguoi_dung', 'SoDienThoai')->ignore(Auth::id(), 'MaNguoiDung')
+            ],
             'NgaySinh' => [
                 'required',
                 'date',
@@ -296,7 +328,7 @@ class AuthController extends Controller
             'GioiTinh.required' => 'Vui lòng chọn giới tính.',
             'GioiTinh.in' => 'Giới tính không hợp lệ.',
             'AnhDaiDien.image' => 'Tệp tải lên phải là hình ảnh.',
-            'AnhDaiDien.mimes' => 'Chỉ chấp nhận tệp JPG, JPEG hoặc PNG.',
+            'AnhDaiDien.mimes' => 'Ảnh chỉ chấp nhận tệp JPG, JPEG hoặc PNG.',
             'AnhDaiDien.max' => 'Ảnh không được lớn hơn 2MB.'
         ]);
 
@@ -322,11 +354,11 @@ class AuthController extends Controller
             $user->AnhDaiDien = 'AnhDaiDien/' . $fileName;
         }
 
-        $user->HoTen = $request->HoTen;
-        $user->DiaChi = $request->DiaChi;
+        $user->HoTen = preg_replace('/\s+/', ' ', trim($request->HoTen));
+        $user->DiaChi = preg_replace('/\s+/', ' ', trim($request->DiaChi));
         $user->SoDienThoai = $request->SoDienThoai;
         $user->NgaySinh = $request->NgaySinh;
-        $user->GioiTinh = $request->GioiTinh;
+        $user->GioiTinh = preg_replace('/\s+/', ' ', trim($request->GioiTinh));
         $user->save();
 
         return back()->with('success', 'Cập nhật thông tin thành công.');

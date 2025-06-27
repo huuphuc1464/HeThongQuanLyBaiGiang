@@ -13,7 +13,7 @@
     <form action="{{ route('login.submit') }}" method="POST">
         @csrf
         <div class="wrap-input100 validate-input">
-            <input class="input100" type="text" placeholder="Tên tài khoản" name="TenTaiKhoan" id="username" required>
+            <input class="input100" type="text" placeholder="Tên tài khoản" name="TenTaiKhoan" id="username" value="{{ old('TenTaiKhoan') }}" required>
             <span class="symbol-input100">
                 <i class='bx bx-user'></i>
             </span>

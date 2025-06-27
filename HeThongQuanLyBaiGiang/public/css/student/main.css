@@ -192,7 +192,8 @@ a.text-decoration-none.text-dark:hover {
     border-bottom: 1px solid #dee2e6;
     border-top-left-radius: 0.375rem;
     border-top-right-radius: 0.375rem;
-    height: 200px;
+    /* height: 200px; */
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     width: 100%;
 }

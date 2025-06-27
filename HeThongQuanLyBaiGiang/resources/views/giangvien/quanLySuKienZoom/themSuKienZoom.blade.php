@@ -48,7 +48,7 @@
 
                     <div class="form-group col-md-4">
                         <label class="control-label">Mật khẩu sự kiện<span class="text-danger">*</span></label>
-                        <input class="form-control" type="text" name="MatKhauSuKien" maxlength="100" minlength="6 " placeholder="Nhập mật khẩu sự kiện" value="{{ old('MatKhauSuKien') }}">
+                        <input class="form-control" type="text" name="MatKhauSuKien" maxlength="10" minlength="6" required placeholder="Nhập mật khẩu sự kiện" value="{{ old('MatKhauSuKien') }}">
                         @error('MatKhauSuKien') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
 

@@ -29,31 +29,31 @@
                     </div>
 
                     <div class="form-group col-md-4">
-                        <label class="control-label">Họ và tên</label>
+                        <label class="control-label">Họ và tên <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="HoTen" maxlength="100" required value="{{ old('HoTen', $user->HoTen) }}">
                         @error('HoTen') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="form-group col-md-4">
-                        <label class="control-label">Địa chỉ thường trú</label>
+                        <label class="control-label">Địa chỉ thường trú <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="DiaChi" maxlength="255" required value="{{ old('DiaChi', $user->DiaChi) }}">
                         @error('DiaChi') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="form-group col-md-4">
-                        <label class="control-label">Số điện thoại</label>
+                        <label class="control-label">Số điện thoại <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="SoDienThoai" maxlength="10" minlength="10" required value="{{ old('SoDienThoai', $user->SoDienThoai) }}">
                         @error('SoDienThoai') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="form-group col-md-4">
-                        <label class="control-label">Ngày sinh</label>
+                        <label class="control-label">Ngày sinh <span class="text-danger">*</span></label>
                         <input class="form-control" type="date" name="NgaySinh" min="1950-01-01" max="{{ now()->subYears(17)->format('Y-m-d') }}" required value="{{ old('NgaySinh', $user->NgaySinh) }}">
                         @error('NgaySinh') <div class="text-danger mt-1">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="form-group col-md-4">
-                        <label class="control-label">Giới tính</label>
+                        <label class="control-label">Giới tính <span class="text-danger">*</span></label>
                         <select class="form-control" name="GioiTinh" required>
                             <option value="" disabled {{ old('GioiTinh', $user->GioiTinh) == null ? 'selected' : '' }}>-- Chọn giới tính --</option>
                             <option value="Nam" {{ old('GioiTinh', $user->GioiTinh) == 'Nam' ? 'selected' : '' }}>Nam</option>
@@ -64,10 +64,10 @@
 
 
                     <div class="form-group col-md-12">
-                        <label class="control-label">Ảnh đại diện</label>
+                        <label class="control-label">Ảnh đại diện <span class="text-danger">*</span></label>
                         <label class="col-12"><small>Chỉ chấp nhận hình ảnh có định dạng JPG, JPEG, PNG. Kích thước tối đa 2MB.</small></label>
                         <div id="myfileupload">
-                            <input type="file" id="uploadfile" name="AnhDaiDien" accept="image/*" onchange="readURL(this);" />
+                            <input type="file" id="uploadfile" name="AnhDaiDien" accept=".jpg, .jpeg, .png" onchange="readURL(this);" />
                         </div>
                         @error('AnhDaiDien')
                         <div class="text-danger mt-1">{{ $message }}</div>

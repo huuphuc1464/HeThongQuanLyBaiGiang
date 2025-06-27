@@ -21,7 +21,7 @@
 
                     {{-- Tên chương --}}
                     <div class="form-group col-md-4">
-                        <label for="TenChuong">Tên chương</label>
+                        <label for="TenChuong">Tên chương <span class="text-danger">*</span></label>
                         <select class="form-control" id="selectChuong" onchange="onChangeChuong()" {{ $baiGiang->TenChuong == 'other' ? '' : 'name=TenChuong required' }}>
                             <option value="">-- Chọn chương --</option>
                             @foreach ($chuongBai as $chuong => $bais)
@@ -41,7 +41,7 @@
 
                     {{-- Tên bài --}}
                     <div class="form-group col-md-4">
-                        <label for="TenBai">Tên bài</label>
+                        <label for="TenBai">Tên bài <span class="text-danger">*</span></label>
                         <select class="form-control" id="selectBai" onchange="onChangeBai()" {{ $baiGiang->TenBai == 'other' ? '' : 'name=TenBai required' }} data-selected="{{ $baiGiang->TenBai }}">
                             <option value="">-- Chọn bài --</option>
                         </select>
@@ -55,7 +55,7 @@
 
                     {{-- Tên bài giảng --}}
                     <div class="form-group col-md-4">
-                        <label for="TenBaiGiang">Tên bài giảng</label>
+                        <label for="TenBaiGiang">Tên bài giảng <span class="text-danger">*</span></label>
                         <input type="text" name="TenBaiGiang" class="form-control" value="{{ $baiGiang->TenBaiGiang }}" required>
                         @error('TenBaiGiang')
                         <div class="text-danger mt-1">{{ $message }}</div>
@@ -64,7 +64,7 @@
 
                     {{-- Mô tả --}}
                     <div class="form-group col-md-4">
-                        <label for="MoTa">Mô tả</label>
+                        <label for="MoTa">Mô tả <span class="text-danger">*</span></label>
                         <input type="text" name="MoTa" class="form-control" value="{{ $baiGiang->MoTa }}">
                         @error('MoTa')
                         <div class="text-danger mt-1">{{ $message }}</div>
@@ -73,7 +73,7 @@
 
                     {{-- Trạng thái --}}
                     <div class="form-group col-md-4">
-                        <label for="TrangThai">Trạng thái</label>
+                        <label for="TrangThai">Trạng thái <span class="text-danger">*</span></label>
                         <select name="TrangThai" class="form-control" required>
                             <option value="1" {{ $baiGiang->TrangThai == 1 ? 'selected' : '' }}>Hiển thị</option>
                             <option value="0" {{ $baiGiang->TrangThai == 0 ? 'selected' : '' }}>Ẩn</option>
@@ -86,7 +86,7 @@
 
                     {{-- Nội dung bài giảng --}}
                     <div class="form-group col-md-12">
-                        <label for="NoiDung">Nội dung bài giảng</label>
+                        <label for="NoiDung">Nội dung bài giảng <span class="text-danger">*</span></label>
                         <textarea name="NoiDung" id="editor" class="form-control">{{ $baiGiang->NoiDung }}</textarea>
                         @error('NoiDung')
                         <div class="text-danger mt-1">{{ $message }}</div>
