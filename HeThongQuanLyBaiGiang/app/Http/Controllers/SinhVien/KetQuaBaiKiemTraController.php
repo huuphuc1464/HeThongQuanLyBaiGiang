@@ -187,7 +187,6 @@ class KetQuaBaiKiemTraController extends Controller
                 'redirect' => route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
             ]);
         } catch (\Exception $e) {
-            \Log::error('Lỗi khi lưu kết quả bài kiểm tra: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Lỗi khi lưu kết quả bài kiểm tra!',
                 'redirect' => route('danh-sach-bai-kiem-tra')

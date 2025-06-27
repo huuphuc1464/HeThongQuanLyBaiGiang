@@ -221,6 +221,11 @@
                     const successModalElement = document.getElementById('successModal');
                     if (successModalElement) {
                         var successModal = new bootstrap.Modal(successModalElement);
+                        // Ẩn confirmModal trước khi hiển thị successModal
+                        var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                        if (confirmModal) {
+                            confirmModal.hide();
+                        }
                         document.querySelector('#successModal .modal-body').innerText = data.message || 'Nộp bài thành công!';
                         successModal.show();
                         setTimeout(function () {
@@ -279,42 +284,7 @@
             disableAllInputs();
             showLoading();
             window.removeEventListener('beforeunload', beforeUnloadHandler);
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                },
-                body: formData
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Phản hồi server không thành công: ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const loading = document.getElementById('loadingOverlay');
-                    if (loading) loading.remove();
-                    const successModalElement = document.getElementById('successModal');
-                    if (successModalElement) {
-                        var successModal = new bootstrap.Modal(successModalElement);
-                        document.querySelector('#successModal .modal-body').innerText = data.message || 'Nộp bài thành công!';
-                        successModal.show();
-                        setTimeout(function () {
-                            window.location.href = data.redirect || "{{ route('danh-sach-bai-kiem-tra') }}";
-                        }, 2000);
-                    } else {
-                        alert(data.message || 'Nộp bài thành công!');
-                        window.location.href = data.redirect || "{{ route('danh-sach-bai-kiem-tra') }}";
-                    }
-                })
-                .catch(error => {
-                    console.error('Lỗi:', error);
-                    alert('Có lỗi xảy ra khi nộp bài: ' + error.message);
-                    const loading = document.getElementById('loadingOverlay');
-                    if (loading) loading.remove();
-                    window.location.reload();
-                });
+            submitExamAndRedirect();
         }
     });
 
