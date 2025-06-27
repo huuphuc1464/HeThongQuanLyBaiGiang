@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('MaChiTietKetQua');
             $table->foreignId('MaKetQua')->constrained('ket_qua_bai_kiem_tra', 'MaKetQua');
             $table->foreignId('MaCauHoi')->constrained('cau_hoi_bai_kiem_tra', 'MaCauHoi');
-            $table->text('DapAnSinhVien');
+            $table->string('DapAnSinhVien', 1)->nullable();
             $table->boolean('KetQua');
             $table->timestamps();
         });

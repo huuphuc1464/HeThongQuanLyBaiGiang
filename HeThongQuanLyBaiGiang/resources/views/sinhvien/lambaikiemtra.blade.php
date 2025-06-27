@@ -32,7 +32,7 @@
 
     <!-- Form làm bài -->
     <form action="{{ route('nop-bai-kiem-tra', $baiKiemTra->MaBaiKiemTra) }}" method="POST" id="examForm"
-        class="needs-validation" novalidate>
+        class="needs-validation" novalidate onsubmit="return false;">
         @csrf
         <input type="hidden" name="redirect_url" value="{{ route('danh-sach-bai-kiem-tra') }}">
         <div class="card shadow-sm mb-4">
@@ -41,7 +41,8 @@
             </div>
             <div class="card-body">
                 @foreach($baiKiemTra->cauHoiBaiKiemTra as $index => $cauHoi)
-                <div class="mb-4 p-3 border rounded" style="background-color: #f8f9fa;">
+                <div class="mb-4 p-3 border rounded" style="background-color: #f8f9fa;"
+                    id="question_{{ $cauHoi->MaCauHoi }}">
                     <h6>Câu {{ $index + 1 }}: {{ $cauHoi->CauHoi }}</h6>
                     <div class="form-check mb-2">
                         <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" value="A"
@@ -70,8 +71,7 @@
 
         <!-- Nút nộp bài -->
         <div class="text-center">
-            <button type="button" class="btn btn-success btn-lg" id="submitBtn" data-bs-toggle="modal"
-                data-bs-target="#confirmModal">
+            <button type="button" class="btn btn-success btn-lg" id="submitBtn">
                 <i class="bi bi-check-circle"></i> Nộp bài
             </button>
         </div>
@@ -95,6 +95,21 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal thành công -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="successModalLabel">Nộp bài thành công</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Nộp bài kiểm tra thành công!
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section('scripts')
@@ -108,6 +123,11 @@
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();
+                    // Highlight câu hỏi chưa chọn
+                    const invalidQuestions = form.querySelectorAll('.invalid-feedback');
+                    invalidQuestions.forEach(feedback => {
+                        feedback.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
                 }
                 form.classList.add('was-validated');
             }, false);
@@ -174,33 +194,132 @@
         isSubmitting = true;
         disableAllInputs();
         showLoading();
-        setTimeout(() => {
-            submitExamAndRedirect();
-        }, 1500);
+        alert('Thời gian làm bài đã hết! Bài làm của bạn sẽ được nộp với các đáp án hiện tại.');
+        submitExamAndRedirect();
     }
+
     function submitExamAndRedirect() {
         if (isSubmitting) {
             const form = document.getElementById('examForm');
-            form.submit();
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Phản hồi server không thành công: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const loading = document.getElementById('loadingOverlay');
+                    if (loading) loading.remove();
+                    const successModalElement = document.getElementById('successModal');
+                    if (successModalElement) {
+                        var successModal = new bootstrap.Modal(successModalElement);
+                        document.querySelector('#successModal .modal-body').innerText = data.message || 'Nộp bài thành công!';
+                        successModal.show();
+                        setTimeout(function () {
+                            window.location.href = data.redirect || "{{ route('danh-sach-bai-kiem-tra') }}";
+                        }, 2000);
+                    } else {
+                        alert(data.message || 'Nộp bài thành công!');
+                        window.location.href = data.redirect || "{{ route('danh-sach-bai-kiem-tra') }}";
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    alert('Có lỗi xảy ra khi nộp bài: ' + error.message);
+                    const loading = document.getElementById('loadingOverlay');
+                    if (loading) loading.remove();
+                    window.location.reload();
+                });
         }
     }
-    confirmSubmitBtn.addEventListener('click', function () {
-        const form = document.getElementById('examForm');
-        if (!isTimeUp) {
-            disableAllInputs();
-            showLoading();
-            form.submit();
-        }
-    });
-    window.addEventListener('beforeunload', function (e) {
+
+    function beforeUnloadHandler(e) {
         if (!isTimeUp && !isSubmitting) {
             e.preventDefault();
             e.returnValue = '';
         }
+    }
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+
+    submitBtn.addEventListener('click', function () {
+        const form = document.getElementById('examForm');
+        if (form.checkValidity()) {
+            // Hiển thị modal xác nhận nếu tất cả câu hỏi đã được chọn
+            var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            confirmModal.show();
+        } else {
+            form.classList.add('was-validated');
+            // Tìm câu hỏi đầu tiên chưa chọn và cuộn đến đó
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) {
+                firstInvalid.closest('.border').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                alert('Vui lòng chọn đáp án cho tất cả câu hỏi trước khi nộp bài!');
+            }
+        }
     });
+
+    confirmSubmitBtn.addEventListener('click', function () {
+        const form = document.getElementById('examForm');
+        if (!isTimeUp && form.checkValidity()) {
+            const formData = new FormData(form);
+            if (!formData.has('_token')) {
+                alert('Lỗi: Không tìm thấy CSRF token!');
+                const loading = document.getElementById('loadingOverlay');
+                if (loading) loading.remove();
+                return;
+            }
+            disableAllInputs();
+            showLoading();
+            window.removeEventListener('beforeunload', beforeUnloadHandler);
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Phản hồi server không thành công: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const loading = document.getElementById('loadingOverlay');
+                    if (loading) loading.remove();
+                    const successModalElement = document.getElementById('successModal');
+                    if (successModalElement) {
+                        var successModal = new bootstrap.Modal(successModalElement);
+                        document.querySelector('#successModal .modal-body').innerText = data.message || 'Nộp bài thành công!';
+                        successModal.show();
+                        setTimeout(function () {
+                            window.location.href = data.redirect || "{{ route('danh-sach-bai-kiem-tra') }}";
+                        }, 2000);
+                    } else {
+                        alert(data.message || 'Nộp bài thành công!');
+                        window.location.href = data.redirect || "{{ route('danh-sach-bai-kiem-tra') }}";
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    alert('Có lỗi xảy ra khi nộp bài: ' + error.message);
+                    const loading = document.getElementById('loadingOverlay');
+                    if (loading) loading.remove();
+                    window.location.reload();
+                });
+        }
+    });
+
     document.addEventListener('visibilitychange', function () {
         if (document.hidden && !isTimeUp && !isSubmitting) {
-            // Có thể thêm code xử lý khi sinh viên chuyển tab
             console.log('Sinh viên đã chuyển tab!');
         }
     });

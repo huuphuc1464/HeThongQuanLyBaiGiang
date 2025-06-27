@@ -57,60 +57,47 @@
                         \Carbon\Carbon::parse($bai->ThoiGianBatDau)->format('H:i d/m/Y') }}</p>
                     <p class="card-text"><strong>Thời gian kết thúc:</strong> {{
                         \Carbon\Carbon::parse($bai->ThoiGianKetThuc)->format('H:i d/m/Y') }}</p>
-                    <p class="card-text"><strong>Thời gian làm bài:</strong> {{ $bai->ThoiGianLamBai }} phút</p>
+                    <p class="cardਸ
+    
+                <p class=" card-text"><strong>Thời gian làm bài:</strong> {{ $bai->ThoiGianLamBai }} phút</p>
                     <p class="card-text"><strong>Số câu hỏi:</strong> {{ $bai->cauHoiBaiKiemTra->count() }} câu</p>
-                    @if($bai->daLam)
-                    @php
-                    $ketQua = App\Models\KetQuaBaiKiemTra::where('MaBaiKiemTra', $bai->MaBaiKiemTra)
-                    ->where('MaSinhVien', Auth::id())
-                    ->first();
-                    @endphp
-                    @if($bai->ChoPhepXemKetQua)
-                    <p class="card-text"><strong>Điểm số:</strong> {{ $ketQua->TongCauDung }}/{{ $ketQua->TongSoCauHoi
-                        }}
-                        ({{ number_format($ketQua->TongCauDung/$ketQua->TongSoCauHoi * 10, 1) }} điểm)</p>
-                    @else
-                    <p class="card-text text-muted"><em>Giảng viên không cho phép xem kết quả</em></p>
-                    @endif
-                    @endif
                     @if($bai->MoTa)
                     <p class="card-text"><strong>Mô tả:</strong> {{ Str::limit($bai->MoTa, 100) }}</p>
                     @endif
-
-                    @php
-                    $now = \Carbon\Carbon::now();
-                    $thoiGianBatDau = \Carbon\Carbon::parse($bai->ThoiGianBatDau);
-                    $thoiGianKetThuc = \Carbon\Carbon::parse($bai->ThoiGianKetThuc);
-                    @endphp
-
                     <div class="mt-3">
                         @if($bai->daLam)
                         <span class="badge bg-success mb-2">Đã làm bài</span>
                         <br>
+                        @if($bai->ChoPhepXemKetQua)
                         <a href="{{ route('ket-qua-bai-kiem-tra', $bai->MaBaiKiemTra) }}" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i> Xem kết quả
                         </a>
                         @else
-                        @if($now < $thoiGianBatDau) <span class="badge bg-warning mb-2">Chưa bắt đầu</span>
-                            <br>
-                            <button class="btn btn-secondary btn-sm" disabled>
-                                <i class="bi bi-clock"></i> Chưa đến giờ
-                            </button>
-                            @elseif($now > $thoiGianKetThuc)
-                            <span class="badge bg-danger mb-2">Đã kết thúc</span>
-                            <br>
-                            <button class="btn btn-secondary btn-sm" disabled>
-                                <i class="bi bi-x-circle"></i> Hết thời gian
-                            </button>
-                            @else
-                            <span class="badge bg-primary mb-2">Đang diễn ra</span>
-                            <br>
-                            <a href="{{ route('lam-bai-kiem-tra', $bai->MaBaiKiemTra) }}"
-                                class="btn btn-success btn-sm">
-                                <i class="bi bi-pencil"></i> Làm bài
-                            </a>
-                            @endif
-                            @endif
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            <i class="bi bi-eye-slash"></i> Không cho xem kết quả
+                        </button>
+                        @endif
+                        @else
+                        @if($bai->trangThai == 'Sắp diễn ra')
+                        <span class="badge bg-warning mb-2">Sắp diễn ra</span>
+                        <br>
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            <i class="bi bi-clock"></i> Chưa đến giờ
+                        </button>
+                        @elseif($bai->trangThai == 'Đã kết thúc')
+                        <span class="badge bg-danger mb-2">Đã kết thúc</span>
+                        <br>
+                        <button class="btn btn-secondary btn-sm" disabled>
+                            <i class="bi bi-x-circle"></i> Hết thời gian
+                        </button>
+                        @else
+                        <span class="badge bg-primary mb-2">Đang diễn ra</span>
+                        <br>
+                        <a href="{{ route('lam-bai-kiem-tra', $bai->MaBaiKiemTra) }}" class="btn btn-success btn-sm">
+                            <i class="bi bi-pencil"></i> Làm bài
+                        </a>
+                        @endif
+                        @endif
                     </div>
                 </div>
             </div>
