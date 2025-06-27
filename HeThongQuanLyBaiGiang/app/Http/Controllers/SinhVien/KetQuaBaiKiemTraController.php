@@ -24,6 +24,7 @@ class KetQuaBaiKiemTraController extends Controller
 
         // Kiểm tra sinh viên có thuộc lớp học phần không
         $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
+
         $thuocLop = $sinhVien->danhSachLop()
             ->where('MaLopHocPhan', $baiKiemTra->MaLopHocPhan)
             ->where('TrangThai', 1)
@@ -44,7 +45,7 @@ class KetQuaBaiKiemTraController extends Controller
             ->first();
 
         if ($ketQuaBaiLam) {
-            return redirect()->route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
+            return redirect()->route('danh-sach-bai-kiem-tra')
                 ->with('error', 'Bạn đã làm bài kiểm tra này rồi!');
         }
 
@@ -63,13 +64,11 @@ class KetQuaBaiKiemTraController extends Controller
 
         // Tính thời gian còn lại
         $thoiGianConLai = $this->getThoiGianConLai($baiKiemTra, $maBaiKiemTra);
-
         if ($thoiGianConLai <= 0) {
             session()->forget('exam_start_time_' . $maBaiKiemTra);
-            return redirect()->route('danh-sach-bai-kiem-tra')
-                ->with('error', 'Thời gian làm bài đã hết!');
+            return redirect()->route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
+                ->with('error', 'Thời gian làm bài đã hết! Bài làm của bạn đã được nộp tự động.');
         }
-
         return view('sinhvien.lambaikiemtra', compact('baiKiemTra', 'thoiGianConLai'));
     }
 
@@ -88,73 +87,20 @@ class KetQuaBaiKiemTraController extends Controller
             ->exists();
 
         if (!$thuocLop) {
-            return redirect()->back()->with('error', 'Bạn không thuộc lớp học phần này!');
-        }
-
-        // Validate đáp án
-        foreach ($baiKiemTra->cauHoiBaiKiemTra as $cauHoi) {
-            $dapAn = $request->input("cauhoi_{$cauHoi->MaCauHoi}");
-            if (!in_array($dapAn, ['A', 'B', 'C', 'D'])) {
-                return redirect()->back()->with('error', 'Đáp án không hợp lệ!');
-            }
+            return response()->json([
+                'message' => 'Bạn không thuộc lớp học phần này!',
+                'redirect' => route('danh-sach-bai-kiem-tra')
+            ], 403);
         }
 
         // Kiểm tra thời gian
         $now = Carbon::now();
         $thoiGianKetThuc = Carbon::parse($baiKiemTra->ThoiGianKetThuc);
-
-        // Kiểm tra thời gian làm bài dựa trên session
-        if (session()->has('exam_start_time_' . $maBaiKiemTra)) {
-            $thoiGianConLai = $this->getThoiGianConLai($baiKiemTra, $maBaiKiemTra);
-            if ($thoiGianConLai <= 0) {
-                session()->forget('exam_start_time_' . $maBaiKiemTra);
-                // Tự động nộp bài với các đáp án hiện tại (có thể null)
-                $tongCauDung = 0;
-                $tongSoCauHoi = $baiKiemTra->cauHoiBaiKiemTra->count();
-                $chiTietKetQua = [];
-                foreach ($baiKiemTra->cauHoiBaiKiemTra as $cauHoi) {
-                    $dapAnSinhVien = $request->input("cauhoi_{$cauHoi->MaCauHoi}");
-                    $ketQua = 0;
-                    if ($dapAnSinhVien !== null) {
-                        $ketQua = ($dapAnSinhVien == $cauHoi->DapAnDung) ? 1 : 0;
-                        if ($ketQua) {
-                            $tongCauDung++;
-                        }
-                    }
-                    $chiTietKetQua[] = [
-                        'MaCauHoi' => $cauHoi->MaCauHoi,
-                        'DapAnSinhVien' => $dapAnSinhVien,
-                        'KetQua' => $ketQua
-                    ];
-                }
-                $now = Carbon::now();
-                $ketQuaBaiKiemTra = KetQuaBaiKiemTra::create([
-                    'MaBaiKiemTra' => $maBaiKiemTra,
-                    'MaSinhVien' => $sinhVien->MaNguoiDung,
-                    'TongCauDung' => $tongCauDung,
-                    'TongSoCauHoi' => $tongSoCauHoi,
-                    'NgayNop' => $now,
-                    'created_at' => $now,
-                    'updated_at' => $now
-                ]);
-                foreach ($chiTietKetQua as $chiTiet) {
-                    ChiTietKetQua::create([
-                        'MaKetQua' => $ketQuaBaiKiemTra->MaKetQua,
-                        'MaCauHoi' => $chiTiet['MaCauHoi'],
-                        'DapAnSinhVien' => $chiTiet['DapAnSinhVien'],
-                        'KetQua' => $chiTiet['KetQua'],
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ]);
-                }
-                return redirect()->route('danh-sach-bai-kiem-tra')
-                    ->with('error', 'Thời gian làm bài đã hết! Bài làm của bạn đã được nộp tự động.');
-            }
-        }
-
         if ($now > $thoiGianKetThuc) {
-            return redirect()->route('danh-sach-bai-kiem-tra')
-                ->with('error', 'Bài kiểm tra đã kết thúc!');
+            return response()->json([
+                'message' => 'Bài kiểm tra đã kết thúc!',
+                'redirect' => route('danh-sach-bai-kiem-tra')
+            ], 422);
         }
 
         // Kiểm tra sinh viên đã làm bài chưa
@@ -164,8 +110,32 @@ class KetQuaBaiKiemTraController extends Controller
 
         if ($daLamBai) {
             session()->forget('exam_start_time_' . $maBaiKiemTra);
-            return redirect()->route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
-                ->with('error', 'Bạn đã làm bài kiểm tra này rồi!');
+            return response()->json([
+                'message' => 'Bạn đã làm bài kiểm tra này rồi!',
+                'redirect' => route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
+            ], 422);
+        }
+
+        // Kiểm tra thời gian làm bài dựa trên session
+        $isTimeUp = false;
+        if (session()->has('exam_start_time_' . $maBaiKiemTra)) {
+            $thoiGianConLai = $this->getThoiGianConLai($baiKiemTra, $maBaiKiemTra);
+            if ($thoiGianConLai <= 0) {
+                $isTimeUp = true;
+            }
+        }
+
+        // Kiểm tra đáp án (trừ trường hợp hết thời gian)
+        if (!$isTimeUp) {
+            foreach ($baiKiemTra->cauHoiBaiKiemTra as $cauHoi) {
+                $dapAn = $request->input("cauhoi_{$cauHoi->MaCauHoi}");
+                if ($dapAn === null || !in_array($dapAn, ['A', 'B', 'C', 'D'])) {
+                    return response()->json([
+                        'message' => 'Vui lòng chọn đáp án cho tất cả câu hỏi!',
+                        'redirect' => route('lam-bai-kiem-tra', $maBaiKiemTra)
+                    ], 422);
+                }
+            }
         }
 
         // Tính điểm
@@ -175,7 +145,7 @@ class KetQuaBaiKiemTraController extends Controller
 
         foreach ($baiKiemTra->cauHoiBaiKiemTra as $cauHoi) {
             $dapAnSinhVien = $request->input("cauhoi_{$cauHoi->MaCauHoi}");
-            $ketQua = ($dapAnSinhVien == $cauHoi->DapAnDung) ? 1 : 0;
+            $ketQua = ($dapAnSinhVien && $dapAnSinhVien == $cauHoi->DapAnDung) ? 1 : 0;
 
             if ($ketQua) {
                 $tongCauDung++;
@@ -189,33 +159,40 @@ class KetQuaBaiKiemTraController extends Controller
         }
 
         // Lưu kết quả bài kiểm tra
-        $ketQuaBaiKiemTra = KetQuaBaiKiemTra::create([
-            'MaBaiKiemTra' => $maBaiKiemTra,
-            'MaSinhVien' => $sinhVien->MaNguoiDung,
-            'TongCauDung' => $tongCauDung,
-            'TongSoCauHoi' => $tongSoCauHoi,
-            'NgayNop' => $now,
-            'created_at' => $now,
-            'updated_at' => $now
-        ]);
-
-        // Lưu chi tiết kết quả
-        foreach ($chiTietKetQua as $chiTiet) {
-            ChiTietKetQua::create([
-                'MaKetQua' => $ketQuaBaiKiemTra->MaKetQua,
-                'MaCauHoi' => $chiTiet['MaCauHoi'],
-                'DapAnSinhVien' => $chiTiet['DapAnSinhVien'],
-                'KetQua' => $chiTiet['KetQua'],
+        try {
+            $ketQuaBaiKiemTra = KetQuaBaiKiemTra::create([
+                'MaBaiKiemTra' => $maBaiKiemTra,
+                'MaSinhVien' => $sinhVien->MaNguoiDung,
+                'TongCauDung' => $tongCauDung,
+                'TongSoCauHoi' => $tongSoCauHoi,
+                'NgayNop' => $now,
                 'created_at' => $now,
                 'updated_at' => $now
             ]);
+
+            foreach ($chiTietKetQua as $chiTiet) {
+                ChiTietKetQua::create([
+                    'MaKetQua' => $ketQuaBaiKiemTra->MaKetQua,
+                    'MaCauHoi' => $chiTiet['MaCauHoi'],
+                    'DapAnSinhVien' => $chiTiet['DapAnSinhVien'],
+                    'KetQua' => $chiTiet['KetQua'],
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ]);
+            }
+
+            session()->forget('exam_start_time_' . $maBaiKiemTra);
+            return response()->json([
+                'message' => $isTimeUp ? 'Thời gian làm bài đã hết! Bài làm của bạn đã được nộp tự động.' : 'Nộp bài kiểm tra thành công!',
+                'redirect' => route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Lỗi khi lưu kết quả bài kiểm tra: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Lỗi khi lưu kết quả bài kiểm tra!',
+                'redirect' => route('danh-sach-bai-kiem-tra')
+            ], 500);
         }
-
-        // Xóa session thời gian bắt đầu làm bài
-        session()->forget('exam_start_time_' . $maBaiKiemTra);
-
-        return redirect()->route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
-            ->with('success', 'Nộp bài kiểm tra thành công!');
     }
 
     /**
@@ -236,7 +213,6 @@ class KetQuaBaiKiemTraController extends Controller
             return redirect()->back()->with('error', 'Bạn chưa làm bài kiểm tra này!');
         }
 
-        // Kiểm tra quyền xem kết quả
         if (!$baiKiemTra->ChoPhepXemKetQua) {
             return view('sinhvien.ketquabaikiemtra', [
                 'baiKiemTra' => $baiKiemTra,
@@ -254,6 +230,7 @@ class KetQuaBaiKiemTraController extends Controller
     public function danhSachBaiKiemTra(Request $request)
     {
         $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
+
         $lopHocPhanIds = $sinhVien->danhSachLop()->pluck('MaLopHocPhan');
 
         $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
@@ -261,7 +238,7 @@ class KetQuaBaiKiemTraController extends Controller
 
         // Lọc theo trạng thái
         $trangThai = $request->input('trang_thai');
-        $now = Carbon::now();
+        $now = Carbon::now('Asia/Ho_Chi_Minh');
 
         switch ($trangThai) {
             case 'sap_dien_ra':
@@ -278,24 +255,26 @@ class KetQuaBaiKiemTraController extends Controller
 
         $baiKiemTra = $query->orderBy('ThoiGianBatDau', 'desc')->get();
 
-        // Kiểm tra sinh viên đã làm bài nào
         foreach ($baiKiemTra as $bai) {
             $bai->daLam = KetQuaBaiKiemTra::where('MaBaiKiemTra', $bai->MaBaiKiemTra)
                 ->where('MaSinhVien', $sinhVien->MaNguoiDung)
                 ->exists();
 
-            // Thêm trạng thái cho từng bài kiểm tra
-            if (Carbon::parse($bai->ThoiGianBatDau) > $now) {
+            $thoiGianBatDau = Carbon::parse($bai->ThoiGianBatDau, 'Asia/Ho_Chi_Minh');
+            $thoiGianKetThuc = Carbon::parse($bai->ThoiGianKetThuc, 'Asia/Ho_Chi_Minh');
+
+            if ($thoiGianBatDau > $now) {
                 $bai->trangThai = 'Sắp diễn ra';
-            } elseif (Carbon::parse($bai->ThoiGianKetThuc) < $now) {
-                $bai->trangThai = 'Đã kết thúc';
-            } else {
+            } elseif ($thoiGianBatDau <= $now && $thoiGianKetThuc >= $now) {
                 $bai->trangThai = 'Đang diễn ra';
+            } else {
+                $bai->trangThai = 'Đã kết thúc';
             }
         }
 
         return view('sinhvien.danhsachbaikiemtra', compact('baiKiemTra'));
     }
+
 
     /**
      * Tính thời gian còn lại (giây) cho sinh viên làm bài
