@@ -206,11 +206,11 @@ class BaiKiemTraController extends Controller
 
             $tenBaiKiemTra = trim($sheet->getCell('B1')->getValue());
             $moTa = trim($sheet->getCell('B4')->getValue());
-            $trangThaiRaw = strtolower(trim($sheet->getCell('B5')->getValue()));
+            $trangThaiRaw = strtolower(trim($sheet->getCell('B7')->getValue()));
             $thoiGianBatDauRaw = $sheet->getCell('B2')->getValue();
             $thoiGianKetThucRaw = $sheet->getCell('B3')->getValue();
-            $thoiGianLamBaiRaw = trim($sheet->getCell('B6')->getValue());
-            $choPhepXemKetQuaRaw = strtolower(trim($sheet->getCell('B7')->getValue()));
+            $thoiGianLamBaiRaw = trim($sheet->getCell('B5')->getValue());
+            $choPhepXemKetQuaRaw = strtolower(trim($sheet->getCell('B6')->getValue()));
 
             try {
                 $thoiGianBatDau = is_numeric($thoiGianBatDauRaw)
@@ -278,7 +278,7 @@ class BaiKiemTraController extends Controller
             $highestRow = $sheet->getHighestRow();
             $errors = [];
 
-            for ($row = 7; $row <= $highestRow; $row++) {
+            for ($row = 9; $row <= $highestRow; $row++) {
                 $rowValues = [
                     $sheet->getCell("A$row")->getValue(),
                     $sheet->getCell("B$row")->getValue(),
@@ -410,6 +410,8 @@ class BaiKiemTraController extends Controller
                 'TenBaiKiemTra' => 'Bản sao của ' .  $baiGoc->TenBaiKiemTra,
                 'ThoiGianBatDau' => $baiGoc->ThoiGianBatDau,
                 'ThoiGianKetThuc' => $baiGoc->ThoiGianKetThuc,
+                'ThoiGianLamBai' => $baiGoc->ThoiGianLamBai,
+                'ChoPhepXemKetQua' => $baiGoc->ChoPhepXemKetQua,
                 'MoTa' => $baiGoc->MoTa,
                 'TrangThai' => $request->TrangThai,
                 'created_at' => now('Asia/Ho_Chi_Minh'),
@@ -745,18 +747,20 @@ class BaiKiemTraController extends Controller
             ['Thời gian cập nhật:', \Carbon\Carbon::parse($baiKiemTra->updated_at)->format('d/m/Y H:i:s')],
             ['Thời gian bắt đầu:', \Carbon\Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('d/m/Y H:i:s')],
             ['Thời gian kết thúc:', \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('d/m/Y H:i:s')],
+            ['Thời gian làm bài (phút):', $baiKiemTra->ThoiGianLamBai],
+            ['Cho phép xem kết quả:', $baiKiemTra->ChoPhepXemKetQua ?  'Có' : 'Không'],
             ['Tổng số câu hỏi:', $soCauHoi ?? 'Không có câu hỏi'],
             ['Số sinh viên nộp:', count($ketQua)],
             ['Ngày xuất báo cáo:', now('Asia/Ho_Chi_Minh')->format('d/m/Y H:i:s')],
         ], null, 'A3');
 
-        $sheet1->getStyle('A3:A11')->getFont()->setBold(true);
-        $sheet1->getStyle('A3:B11')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet1->getStyle('A3:B11')->getAlignment()->setWrapText(true);
-        $sheet1->getStyle('A3:B11')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-        $sheet1->getStyle('A3:B11')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-        $sheet1->getStyle('A3:B11')->getFont()->setSize(12);
-        $sheet1->getStyle('A3:B11')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $sheet1->getStyle('A3:A13')->getFont()->setBold(true);
+        $sheet1->getStyle('A3:B13')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet1->getStyle('A3:B13')->getAlignment()->setWrapText(true);
+        $sheet1->getStyle('A3:B13')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $sheet1->getStyle('A3:B13')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet1->getStyle('A3:B13')->getFont()->setSize(12);
+        $sheet1->getStyle('A3:B13')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $sheet1->getColumnDimension('A')->setAutoSize(true);
         $sheet1->getColumnDimension('B')->setAutoSize(true);
 
