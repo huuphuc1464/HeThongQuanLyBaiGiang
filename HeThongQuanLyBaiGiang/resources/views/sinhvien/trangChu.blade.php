@@ -16,7 +16,7 @@
                 <div class="card card-class position-relative">
                     <img class="card-img-top"
                         src="{{ $baiGiang->AnhHocPhan ? asset('img/' . $baiGiang->AnhHocPhan) : asset('img/hocphan/default.png') }}"
-                        alt="Class image">
+                        alt="{{ $baiGiang->TenLopHocPhan }}">
                     <div class="card-body pb-0">
                         <div class="fw-bold mb-1 fs-5">{{ $baiGiang->TenLopHocPhan }}</div>
                         <div class="mb-1 text-muted" style="font-size: 14px;">{{ $baiGiang->TenHocPhan }}</div>

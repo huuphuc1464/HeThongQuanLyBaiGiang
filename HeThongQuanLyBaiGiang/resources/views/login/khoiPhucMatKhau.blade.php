@@ -10,8 +10,7 @@
     <form action="{{ route('forgot.sendOtp') }}" method="POST">
         @csrf
         <div class="wrap-input100 validate-input" data-validate="Bạn cần nhập đúng thông tin như: ex@abc.xyz">
-            <input class="input100" type="text" placeholder="Nhập email" name="email" id="emailInput" value="" />
-
+            <input class="input100" type="email" placeholder="Nhập email" name="email" id="emailInput" required value="{{ old('email') }}" />
             <span class="symbol-input100">
                 <i class='bx bx-mail-send'></i>
             </span>

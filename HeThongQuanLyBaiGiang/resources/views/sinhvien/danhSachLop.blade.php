@@ -10,7 +10,7 @@
             <h5 class="fw-bold fs-4">Giảng viên</h5>
             <hr class="my-2">
             <div class="d-flex align-items-center py-2">
-                <img src="{{ asset($giangVien->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="me-3 rounded-circle border" width="40" height="40" alt="Avatar">
+                <img src="{{ asset($giangVien->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="me-3 rounded-circle border" width="40" height="40" alt="{{ $giangVien->HoTen }}">
                 <div class="fw-semibold">{{ $giangVien->HoTen ?? 'Tên giảng viên' }}</div>
             </div>
 
@@ -22,7 +22,7 @@
             <hr class="my-2">
             @foreach ($sinhViens as $sv)
             <div class="d-flex align-items-center py-2 border-bottom">
-                <img src="{{ asset($sv->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="me-3 rounded-circle border" width="36" height="36" alt="Avatar">
+                <img src="{{ asset($sv->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="me-3 rounded-circle border" width="36" height="36" alt="{{ $sv->HoTen }}">
                 <div class="fw-semibold">{{ $sv->HoTen }}</div>
             </div>
             @endforeach

@@ -13,14 +13,14 @@
         @csrf
         <input type="hidden" name="username" value="{{ request('username') }}">
         <div class="wrap-input100 validate-input">
-            <input autocomplete="off" class="input100" type="password" placeholder="Nhập mật khẩu mới" name="password" id="password">
+            <input autocomplete="off" class="input100" type="password" placeholder="Nhập mật khẩu mới" name="password" id="password" required>
             <span toggle="#password" class="bx fa-fw bx-hide field-icon click-eye"></span>
             <span class="symbol-input100">
                 <i class='bx bx-lock-open-alt'></i>
             </span>
         </div>
         <div class="wrap-input100 validate-input">
-            <input autocomplete="off" class="input100" type="password" placeholder="Xác nhận mật khẩu mới" name="password_confirmation" id="password_confirmation">
+            <input autocomplete="off" class="input100" type="password" placeholder="Xác nhận mật khẩu mới" name="password_confirmation" id="password_confirmation" required>
             <span toggle="#password_confirmation" class="bx fa-fw bx-hide field-icon click-eye"></span>
             <span class="symbol-input100">
                 <i class='bx bx-lock-alt'></i>

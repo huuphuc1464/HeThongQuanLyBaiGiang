@@ -37,6 +37,7 @@ class SinhVienController extends Controller
             ->select(
                 'dsl.MaDanhSachLop',
                 'nd.HoTen',
+                'nd.AnhDaiDien',
                 'sv.MSSV',
                 'nd.Email',
                 'nd.NgaySinh',
