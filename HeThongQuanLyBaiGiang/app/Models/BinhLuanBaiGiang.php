@@ -8,7 +8,7 @@ class BinhLuanBaiGiang extends Model
 {
     protected $table = 'binh_luan_bai_giang';
     protected $primaryKey = 'MaBinhLuan';
-    protected $fillable = ['MaNguoiGui', 'MaBaiGiang', 'MaBinhLuanCha', 'NoiDung', 'DaChinhSua'];
+    protected $fillable = ['MaNguoiGui', 'MaBai', 'MaBinhLuanCha', 'NoiDung', 'DaChinhSua'];
     public $timestamps = true;
 
     // Relationships
@@ -17,9 +17,9 @@ class BinhLuanBaiGiang extends Model
         return $this->belongsTo(NguoiDung::class, 'MaNguoiGui', 'MaNguoiDung');
     }
 
-    public function baiGiang()
+    public function bai()
     {
-        return $this->belongsTo(BaiGiang::class, 'MaBaiGiang', 'MaBaiGiang');
+        return $this->belongsTo(Bai::class, 'MaBai', 'MaBai');
     }
 
     public function binhLuanCha()

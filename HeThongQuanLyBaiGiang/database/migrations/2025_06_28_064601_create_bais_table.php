@@ -9,15 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('bai_giang', function (Blueprint $table) {
-            $table->id('MaBaiGiang');
+        Schema::create('bai', function (Blueprint $table) {
+            $table->id('MaBai');
+            $table->foreignId('MaChuong')->constrained('chuong', 'MaChuong');
             $table->foreignId('MaGiangVien')->constrained('nguoi_dung', 'MaNguoiDung');
-            $table->foreignId('MaHocPhan')->constrained('hoc_phan', 'MaHocPhan');
-            $table->string('TenChuong', 255);
             $table->string('TenBai', 255);
-            $table->string('TenBaiGiang', 255);
             $table->text('NoiDung');
             $table->string('MoTa', 255)->nullable();
             $table->integer('TrangThai')->default(1);
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bai_giang');
+        Schema::dropIfExists('bai');
     }
 };

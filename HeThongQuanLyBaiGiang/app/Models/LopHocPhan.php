@@ -8,13 +8,13 @@ class LopHocPhan extends Model
 {
     protected $table = 'lop_hoc_phan';
     protected $primaryKey = 'MaLopHocPhan';
-    protected $fillable = ['MaHocPhan', 'MaNguoiTao', 'TenLopHocPhan', 'MoTa', 'TrangThai'];
+    protected $fillable = ['MaBaiGiang', 'MaNguoiTao', 'TenLopHocPhan', 'MoTa', 'TrangThai'];
     public $timestamps = true;
 
     // Relationships
-    public function hocPhan()
+    public function baiGiang()
     {
-        return $this->belongsTo(HocPhan::class, 'MaHocPhan', 'MaHocPhan');
+        return $this->belongsTo(BaiGiang::class, 'MaBaiGiang', 'MaBaiGiang');
     }
 
     public function nguoiTao()

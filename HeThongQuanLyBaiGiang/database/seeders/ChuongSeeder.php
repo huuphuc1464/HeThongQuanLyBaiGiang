@@ -4,12 +4,14 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
-class LopHocPhanSeeder extends Seeder
+class ChuongSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run(): void {}
+    public function run(): void
+    {
+        //
+    }
 }

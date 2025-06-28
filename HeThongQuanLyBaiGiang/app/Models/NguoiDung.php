@@ -36,11 +36,6 @@ class NguoiDung extends Authenticatable
         return $this->hasOne(SinhVien::class, 'MaNguoiDung', 'MaNguoiDung');
     }
 
-    public function hocPhans()
-    {
-        return $this->hasMany(HocPhan::class, 'MaNguoiTao', 'MaNguoiDung');
-    }
-
     public function lopHocPhans()
     {
         return $this->hasMany(LopHocPhan::class, 'MaNguoiTao', 'MaNguoiDung');
@@ -69,6 +64,10 @@ class NguoiDung extends Authenticatable
     public function thongBao()
     {
         return $this->hasMany(ThongBao::class, 'MaNguoiTao', 'MaNguoiDung');
+    }
+    public function chuong()
+    {
+        return $this->hasMany(Chuong::class, 'MaGiangVien', 'MaNguoiDung');
     }
     public function getAuthPassword()
     {

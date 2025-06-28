@@ -21,10 +21,6 @@ class DatabaseSeeder extends Seeder
             NguoiDungSeeder::class,
             SinhVienSeeder::class,
             KhoaSeeder::class,
-            MonHocSeeder::class,
-            HocPhanSeeder::class,
-            LopHocPhanSeeder::class,
-            DanhSachLopSeeder::class
         ]);
     }
 }

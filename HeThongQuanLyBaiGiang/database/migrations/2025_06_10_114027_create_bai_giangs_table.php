@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('hoc_phan', function (Blueprint $table) {
-            $table->id('MaHocPhan');
-            $table->foreignId('MaMonHoc')->constrained('mon_hoc', 'MaMonHoc');
-            $table->foreignId('MaNguoiTao')->constrained('nguoi_dung', 'MaNguoiDung');
-            $table->string('TenHocPhan', 100);
+        Schema::create('bai_giang', function (Blueprint $table) {
+            $table->id('MaBaiGiang');
+            $table->foreignId('MaGiangVien')->constrained('nguoi_dung', 'MaNguoiDung');
+            $table->foreignId('MaKhoa')->constrained('khoa', 'MaKhoa');
+            $table->string('TenBaiGiang', 255);
+            $table->string('AnhBaiGiang', 255)->nullable();
             $table->string('MoTa', 255)->nullable();
-            $table->string('AnhHocPhan', 255)->nullable();
             $table->integer('TrangThai')->default(1);
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hoc_phan');
+        Schema::dropIfExists('bai_giang');
     }
 };

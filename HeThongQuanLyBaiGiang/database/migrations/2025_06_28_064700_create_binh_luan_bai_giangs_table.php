@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('binh_luan_bai_giang', function (Blueprint $table) {
             $table->id('MaBinhLuan');
             $table->foreignId('MaNguoiGui')->constrained('nguoi_dung', 'MaNguoiDung');
-            $table->foreignId('MaBaiGiang')->constrained('bai_giang', 'MaBaiGiang');
+            $table->foreignId('MaBai')->constrained('bai', 'MaBai');
             $table->foreignId('MaBinhLuanCha')->nullable()->constrained('binh_luan_bai_giang', 'MaBinhLuan');
             $table->string('NoiDung', 255);
             $table->boolean('DaChinhSua')->default(false);

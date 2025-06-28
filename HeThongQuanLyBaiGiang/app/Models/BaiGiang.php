@@ -10,11 +10,9 @@ class BaiGiang extends Model
     protected $primaryKey = 'MaBaiGiang';
     protected $fillable = [
         'MaGiangVien',
-        'MaHocPhan',
-        'TenChuong',
-        'TenBai',
+        'MaKhoa',
         'TenBaiGiang',
-        'NoiDung',
+        'AnhBaiGiang',
         'MoTa',
         'TrangThai'
     ];
@@ -25,19 +23,19 @@ class BaiGiang extends Model
     {
         return $this->belongsTo(NguoiDung::class, 'MaGiangVien', 'MaNguoiDung');
     }
-
-    public function hocPhan()
+    
+    public function khoa()
     {
-        return $this->belongsTo(HocPhan::class, 'MaHocPhan', 'MaHocPhan');
+        return $this->belongsTo(Khoa::class, 'MaKhoa', 'MaKhoa');
     }
 
-    public function fileBaiGiang()
+    public function lopHocPhan()
     {
-        return $this->hasMany(FileBaiGiang::class, 'MaBaiGiang', 'MaBaiGiang');
+        return $this->hasMany(LopHocPhan::class, 'MaBaiGiang', 'MaBaiGiang');
     }
-
-    public function binhLuanBaiGiang()
+    
+    public function chuong()
     {
-        return $this->hasMany(BinhLuanBaiGiang::class, 'MaBaiGiang', 'MaBaiGiang');
+        return $this->hasMany(Chuong::class, 'MaBaiGiang', 'MaBaiGiang');
     }
 }

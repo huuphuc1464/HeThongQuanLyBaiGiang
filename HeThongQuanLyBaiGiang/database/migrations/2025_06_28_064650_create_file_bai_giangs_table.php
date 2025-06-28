@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('file_bai_giang', function (Blueprint $table) {
             $table->id('MaFileBaiGiang');
-            $table->foreignId('MaBaiGiang')->constrained('bai_giang', 'MaBaiGiang');
+            $table->foreignId('MaBai')->constrained('bai', 'MaBai');
             $table->string('DuongDan', 255);
             $table->string('LoaiFile', 50);
             $table->integer('TrangThai')->default(1);
