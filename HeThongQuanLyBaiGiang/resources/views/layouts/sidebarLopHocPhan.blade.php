@@ -13,7 +13,7 @@
         <!-- Tên lớp học phần -->
         <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-2">
-                <img src=" {{ $lopHocPhan->AnhHocPhan ? asset('img/' . $lopHocPhan->AnhHocPhan) : asset('img/hocphan/default.png') }}"
+                <img src=" {{ $lopHocPhan->AnhBaiGiang ? asset('img/' . $lopHocPhan->AnhBaiGiang) : asset('img/hocphan/default.png') }}"
                     width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
                 <span class="text-truncate d-inline-block"
                     style="max-width: 220px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
@@ -32,7 +32,8 @@
                 </a>
             </li>
             <li class="nav-item gachDuoi">
-                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="{{ route('hoc-phan.bai-giang.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark"
+                    href="{{ route('hoc-phan.bai-giang.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
                     <i class="fas fa-video"></i>
                     <span>Sự kiện học trực tuyến</span>
                 </a>

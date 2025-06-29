@@ -12,13 +12,13 @@ class BinhLuanBaiGiangController extends Controller
     public function guiBinhLuan(Request $request)
     {
         $request->validate([
-            'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
+            'MaBai' => 'required|exists:bai,MaBai',
             'NoiDung' => 'required|string|max:255',
         ]);
 
         DB::table('binh_luan_bai_giang')->insert([
             'MaNguoiGui' => Auth::id(),
-            'MaBaiGiang' => $request->MaBaiGiang,
+            'MaBai' => $request->MaBai,
             'MaBinhLuanCha' => null,
             'NoiDung' => $request->NoiDung,
             'DaChinhSua' => false,
@@ -33,7 +33,7 @@ class BinhLuanBaiGiangController extends Controller
     {
         $request->validate([
             'MaBinhLuan' => 'required|exists:binh_luan_bai_giang,MaBinhLuan',
-            'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
+            'MaBai' => 'required|exists:bai,MaBai',
             'NoiDung' => 'required|string|max:255',
         ]);
 
@@ -41,7 +41,7 @@ class BinhLuanBaiGiangController extends Controller
 
         DB::table('binh_luan_bai_giang')->insert([
             'MaNguoiGui' => $nguoiGui,
-            'MaBaiGiang' => $request->MaBaiGiang,
+            'MaBai' => $request->MaBai,
             'MaBinhLuanCha' => $request->MaBinhLuan,
             'NoiDung' => $request->NoiDung,
             'DaChinhSua' => false,
@@ -59,6 +59,15 @@ class BinhLuanBaiGiangController extends Controller
             'NoiDung' => 'required|string|max:255',
         ]);
 
+        $binhLuan = DB::table('binh_luan_bai_giang')
+            ->where('MaBinhLuan', $request->MaBinhLuan)
+            ->where('MaNguoiGui', Auth::id())
+            ->first();
+
+        if (!$binhLuan) {
+            return back()->with('error', 'Bạn không có quyền chỉnh sửa bình luận này.');
+        }
+
         DB::table('binh_luan_bai_giang')
             ->where('MaBinhLuan', $request->MaBinhLuan)
             ->update([
@@ -67,17 +76,30 @@ class BinhLuanBaiGiangController extends Controller
                 'updated_at' => now(),
             ]);
 
-        return back()->with('success', 'Cập nhật bình luận thành công');
+        return back()->with('success', 'Đã cập nhật bình luận thành công.');
     }
 
-    public function xoa($id)
+    public function xoa($maBinhLuan)
     {
-        DB::transaction(
-            function () use ($id) {
-                DB::table('binh_luan_bai_giang')->where('MaBinhLuanCha', $id)->delete();
-                DB::table('binh_luan_bai_giang')->where('MaBinhLuan', $id)->delete();
-            }
-        );
-        return redirect()->back()->with('success', 'Đã xóa bình luận và các phản hồi liên quan.');
+        $binhLuan = DB::table('binh_luan_bai_giang')
+            ->where('MaBinhLuan', $maBinhLuan)
+            ->where('MaNguoiGui', Auth::id())
+            ->first();
+
+        if (!$binhLuan) {
+            return back()->with('error', 'Bạn không có quyền xóa bình luận này.');
+        }
+
+        // Xóa tất cả bình luận con trước
+        DB::table('binh_luan_bai_giang')
+            ->where('MaBinhLuanCha', $maBinhLuan)
+            ->delete();
+
+        // Xóa bình luận chính
+        DB::table('binh_luan_bai_giang')
+            ->where('MaBinhLuan', $maBinhLuan)
+            ->delete();
+
+        return back()->with('success', 'Đã xóa bình luận thành công.');
     }
 }

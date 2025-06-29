@@ -24,23 +24,16 @@ class Bai extends Model
         return $this->belongsTo(NguoiDung::class, 'MaGiangVien', 'MaNguoiDung');
     }
 
-    public function fileBaiGiang()
-    {
-        return $this->hasMany(FileBaiGiang::class, 'MaBaiGiang', 'MaBaiGiang');
-    }
-
-    public function binhLuanBaiGiang()
-    {
-        return $this->hasMany(BinhLuanBaiGiang::class, 'MaBaiGiang', 'MaBaiGiang');
-    }
     public function fileBai()
     {
         return $this->hasMany(FileBaiGiang::class, 'MaBai', 'MaBai');
     }
+
     public function binhLuanBai()
     {
         return $this->hasMany(BinhLuanBaiGiang::class, 'MaBai', 'MaBai');
     }
+
     public function chuong()
     {
         return $this->belongsTo(Chuong::class, 'MaChuong', 'MaChuong');

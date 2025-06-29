@@ -18,7 +18,7 @@ class BinhLuan extends Component
 
         $this->binhLuans = DB::table('binh_luan_bai_giang as bl')
             ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'bl.MaNguoiGui')
-            ->where('bl.MaBaiGiang', $baiGiang->MaBaiGiang)
+            ->where('bl.MaBai', $baiGiang->MaBai)
             ->whereNull('bl.MaBinhLuanCha')
             ->select('bl.*', 'nd.HoTen', 'nd.AnhDaiDien')
             ->orderBy('bl.created_at', 'desc')

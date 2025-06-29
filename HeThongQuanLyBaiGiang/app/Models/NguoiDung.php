@@ -65,10 +65,17 @@ class NguoiDung extends Authenticatable
     {
         return $this->hasMany(ThongBao::class, 'MaNguoiTao', 'MaNguoiDung');
     }
+
     public function chuong()
     {
         return $this->hasMany(Chuong::class, 'MaGiangVien', 'MaNguoiDung');
     }
+
+    public function bai()
+    {
+        return $this->hasMany(Bai::class, 'MaGiangVien', 'MaNguoiDung');
+    }
+
     public function getAuthPassword()
     {
         return $this->MatKhau;
