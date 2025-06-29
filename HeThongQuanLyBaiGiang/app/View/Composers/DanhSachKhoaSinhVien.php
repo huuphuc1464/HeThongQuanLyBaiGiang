@@ -12,26 +12,25 @@ class DanhSachKhoaSinhVien
     {
         $maSinhVien = Auth::id();
         $rows = DB::table('khoa as k')
-            ->join('mon_hoc as mh', 'mh.MaKhoa', '=', 'k.MaKhoa')
-            ->join('hoc_phan as hp', 'hp.MaMonHoc', '=', 'mh.MaMonHoc')
-            ->join('lop_hoc_phan as lhp', 'lhp.MaHocPhan', '=', 'hp.MaHocPhan')
+            ->join('bai_giang as bg', 'bg.MaKhoa', '=', 'k.MaKhoa')
+            ->join('lop_hoc_phan as lhp', 'lhp.MaBaiGiang', '=', 'bg.MaBaiGiang')
             ->join('danh_sach_lop as dsl', function ($join) use ($maSinhVien) {
                 $join->on('dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
                     ->where('dsl.MaSinhVien', '=', $maSinhVien)
                     ->where('dsl.TrangThai', '=', 1);
             })
-            ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'hp.MaNguoiTao')
+            ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'lhp.MaNguoiTao')
             ->select(
                 'k.MaKhoa',
                 'k.TenKhoa',
-                'mh.MaMonHoc',
-                'mh.TenMonHoc',
+                'bg.MaBaiGiang',
+                'bg.TenBaiGiang',
                 'nd.MaNguoiDung as MaGiangVien',
                 'nd.HoTen as TenGiangVien'
             )
             ->distinct()
             ->orderBy('k.TenKhoa')
-            ->orderBy('mh.TenMonHoc')
+            ->orderBy('bg.TenBaiGiang')
             ->orderBy('nd.HoTen')
             ->get();
 
@@ -39,24 +38,24 @@ class DanhSachKhoaSinhVien
 
         foreach ($rows as $row) {
             $khoaKey = $row->MaKhoa;
-            $monKey = $row->MaMonHoc;
+            $baiGiangKey = $row->MaBaiGiang;
 
             if (!isset($menuData[$khoaKey])) {
                 $menuData[$khoaKey] = [
                     'TenKhoa' => $row->TenKhoa,
-                    'MonHoc' => []
+                    'BaiGiang' => []
                 ];
             }
 
-            if (!isset($menuData[$khoaKey]['MonHoc'][$monKey])) {
-                $menuData[$khoaKey]['MonHoc'][$monKey] = [
-                    'TenMonHoc' => $row->TenMonHoc,
-                    'MaMonHoc' => $row->MaMonHoc,
+            if (!isset($menuData[$khoaKey]['BaiGiang'][$baiGiangKey])) {
+                $menuData[$khoaKey]['BaiGiang'][$baiGiangKey] = [
+                    'TenBaiGiang' => $row->TenBaiGiang,
+                    'MaBaiGiang' => $row->MaBaiGiang,
                     'GiangVien' => []
                 ];
             }
 
-            $menuData[$khoaKey]['MonHoc'][$monKey]['GiangVien'][] = [
+            $menuData[$khoaKey]['BaiGiang'][$baiGiangKey]['GiangVien'][] = [
                 'MaGiangVien' => $row->MaGiangVien,
                 'TenGiangVien' => $row->TenGiangVien
             ];

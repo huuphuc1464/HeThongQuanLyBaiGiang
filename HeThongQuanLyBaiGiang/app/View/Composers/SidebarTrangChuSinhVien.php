@@ -19,12 +19,12 @@ class SidebarTrangChuSinhVien
                 'lop_hoc_phan.TenLopHocPhan',
                 'lop_hoc_phan.MoTa',
                 'lop_hoc_phan.MaLopHocPhan',
-                'hoc_phan.AnhHocPhan'
+                'bai_giang.AnhBaiGiang'
             )
-                ->join('hoc_phan', 'lop_hoc_phan.MaHocPhan', '=', 'hoc_phan.MaHocPhan')
+                ->join('bai_giang', 'lop_hoc_phan.MaBaiGiang', '=', 'bai_giang.MaBaiGiang')
                 ->join('danh_sach_lop', 'danh_sach_lop.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
                 ->where('lop_hoc_phan.TrangThai', 1)
-                ->where('hoc_phan.TrangThai', 1)
+                ->where('bai_giang.TrangThai', 1)
                 ->where('danh_sach_lop.MaSinhVien', $sinhVien->MaNguoiDung)
                 ->where('danh_sach_lop.TrangThai', 1)
                 ->get();

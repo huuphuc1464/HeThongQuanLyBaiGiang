@@ -15,16 +15,16 @@
                 class="text-decoration-none text-dark">
                 <div class="card card-class position-relative">
                     <img class="card-img-top"
-                        src="{{ $baiGiang->AnhHocPhan ? asset('img/' . $baiGiang->AnhHocPhan) : asset('img/hocphan/default.png') }}"
+                        src="{{ $baiGiang->AnhBaiGiang ? asset('img/' . $baiGiang->AnhBaiGiang) : asset('img/hocphan/default.png') }}"
                         alt="{{ $baiGiang->TenLopHocPhan }}">
                     <div class="card-body pb-0">
                         <div class="fw-bold mb-1 fs-5">{{ $baiGiang->TenLopHocPhan }}</div>
-                        <div class="mb-1 text-muted" style="font-size: 14px;">{{ $baiGiang->TenHocPhan }}</div>
+                        <div class="mb-1 text-muted" style="font-size: 14px;">{{ $baiGiang->TenBaiGiang }}</div>
                         <p class="card-text"></p>{{ $baiGiang->MoTa }}</p>
                     </div>
                     <div class="card-footer">
                         <div class="instructor"><img class="anh-giang-vien"
-                                src="{{ asset($sv->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}"
+                                src="{{ asset($baiGiang->AnhGiangVien ?? '/AnhDaiDien/default-avatar.png') }}"
                                 alt="{{ $baiGiang->TenGiangVien }}"><span class="ms-1">{{ $baiGiang->TenGiangVien
                                 }}</span></div>
                         <div class="students"><i class="fas fa-users"></i><span>{{ $baiGiang->SoLuongSinhVien }}</span>
