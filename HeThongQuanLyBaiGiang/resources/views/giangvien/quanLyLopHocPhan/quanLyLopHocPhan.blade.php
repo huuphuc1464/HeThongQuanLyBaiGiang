@@ -143,7 +143,7 @@
                         <tr>
                             <th style="width: 5%;">Mã lớp</th>
                             <th style="width: 25%;">Tên lớp học phần</th>
-                            <th style="width: 20%;">Học phần</th>
+                            <th style="width: 20%;">Bài giảng</th>
                             <th style="width: 15%;">Mô tả</th>
                             <th style="width: 15%;">Thời gian tạo</th>
                             <th style="width: 10%;">Danh sách sinh viên</th>
@@ -155,7 +155,7 @@
                         <tr>
                             <td class="text-center">{{ $lop->MaLopHocPhan }}</td>
                             <td>{{ $lop->TenLopHocPhan }}</td>
-                            <td>{{ $lop->hocPhan->TenHocPhan ?? '' }}</td>
+                            <td>{{ $lop->baiGiang->TenBaiGiang ?? '' }}</td>
                             <td>{{ $lop->MoTa }}</td>
                             <td class="text-center">{{ $lop->created_at ? $lop->created_at->format('H:i:s d/m/Y') : '' }}</td>
                             <td class="text-center">
@@ -173,7 +173,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4">Không có dữ liệu lớp học phần nào.</td>
+                            <td colspan="7" class="text-center py-4">Không có dữ liệu lớp học phần nào.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -209,11 +209,11 @@
                         <textarea class="form-control" id="MoTa" name="MoTa" rows="2"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Chọn học phần <span class="text-danger">*</span></label>
-                        <select class="form-select" name="MaHocPhan" id="MaHocPhan" required>
-                            <option value="">-- Chọn học phần --</option>
-                            @foreach($hocPhans as $hp)
-                                <option value="{{ $hp->MaHocPhan }}">{{ $hp->TenHocPhan }}</option>
+                        <label class="form-label">Chọn bài giảng <span class="text-danger">*</span></label>
+                        <select class="form-select" name="MaBaiGiang" id="MaBaiGiang" required>
+                            <option value="">-- Chọn bài giảng --</option>
+                            @foreach($baiGiang as $bg)
+                                <option value="{{ $bg->MaBaiGiang }}">{{ $bg->TenBaiGiang }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -289,7 +289,7 @@
                 .then(data => {
                     document.getElementById('TenLopHocPhan').value = data.TenLopHocPhan;
                     document.getElementById('MoTa').value = data.MoTa || '';
-                    document.getElementById('MaHocPhan').value = data.MaHocPhan;
+                    document.getElementById('MaBaiGiang').value = data.MaBaiGiang;
                     lopHocPhanModal.show();
                 })
                 .catch(error => {
@@ -314,7 +314,7 @@
                     <dl class="row">
                         <dt class="col-sm-4">Mã lớp học phần:</dt><dd class="col-sm-8">${data.MaLopHocPhan}</dd>
                         <dt class="col-sm-4">Tên lớp học phần:</dt><dd class="col-sm-8">${data.TenLopHocPhan}</dd>
-                        <dt class="col-sm-4">Học phần:</dt><dd class="col-sm-8">${data.hoc_phan ? data.hoc_phan.TenHocPhan : ''}</dd>
+                        <dt class="col-sm-4">Học phần:</dt><dd class="col-sm-8">${data.hoc_phan ? data.hoc_phan.TenBaiGiang : ''}</dd>
                         <dt class="col-sm-4">Mô tả:</dt><dd class="col-sm-8">${data.MoTa || ''}</dd>
                         <dt class="col-sm-4">Ngày tạo:</dt><dd class="col-sm-8">${new Date(data.created_at).toLocaleDateString('vi-VN')}</dd>
                     </dl>

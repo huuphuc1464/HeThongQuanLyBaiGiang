@@ -1,44 +1,44 @@
 @extends('layouts.teacherLayout')
-@section('title','Chi tiết bài giảng')
-@section('tenTrang', $hocPhan->TenHocPhan . ' / Chi tiết bài giảng / ' . $baiGiang->TenBaiGiang)
+@section('title','Giảng viên - Chi tiết bài học')
+@section('tenTrang', $baiHoc->TenBaiGiang . ' / ' . $baiHoc->TenChuong . ' / ' . $baiHoc->TenBai)
 
 @section('content')
 <div class="row pe-0">
     <div class="col-md-12 pe-0">
         <div class="tile">
-            <h3 class="tile-title text-primary mb-3">{{ $baiGiang->TenBaiGiang }}</h3>
+            <h3 class="tile-title text-primary mb-3">{{ $baiHoc->TenBai }}</h3>
             <div class="tile-body">
                 <div class="row mb-3">
                     <div class="col-md-6 mb-2">
-                        <strong>Chương:</strong> {{ $baiGiang->TenChuong }}
+                        <strong>Bài giảng:</strong> {{ $baiHoc->TenBaiGiang }}
                     </div>
                     <div class="col-md-6 mb-2">
-                        <strong>Bài:</strong> {{ $baiGiang->TenBai }}
+                        <strong>Chương:</strong> {{ $baiHoc->TenChuong }}
                     </div>
                     <div class="col-md-6 mb-2">
-                        <strong>Mô tả:</strong> {{ $baiGiang->MoTa ?? 'Không có' }}
+                        <strong>Mô tả:</strong> {{ $baiHoc->MoTa ?? 'Không có' }}
                     </div>
                     <div class="col-md-6 mb-2">
                         <strong>Trạng thái:</strong>
-                        @if ($baiGiang->TrangThai == 1)
+                        @if ($baiHoc->TrangThai == 1)
                         <span class="badge bg-success">Đang hiển thị</span>
                         @else
-                        <span class="badge bg-secondary">Đang ẩn / xóa</span>
+                        <span class="badge bg-secondary">Đang ẩn</span>
                         @endif
                     </div>
                     <div class="col-md-6 mb-2">
-                        <strong>Ngày tạo:</strong> {{ \Carbon\Carbon::parse($baiGiang->created_at)->format('d/m/Y H:i') }}
+                        <strong>Ngày tạo:</strong> {{ \Carbon\Carbon::parse($baiHoc->created_at)->format('d/m/Y H:i:s') }}
                     </div>
                     <div class="col-md-6 mb-2">
-                        <strong>Ngày cập nhật:</strong> {{ \Carbon\Carbon::parse($baiGiang->updated_at)->format('d/m/Y H:i') }}
+                        <strong>Ngày cập nhật:</strong> {{ \Carbon\Carbon::parse($baiHoc->updated_at)->format('d/m/Y H:i:s') }}
                     </div>
                 </div>
 
                 <!-- Nội dung -->
                 <div class="mb-3">
-                    <h5 class="text-primary">Nội dung bài giảng:</h5>
+                    <h5 class="text-primary">Nội dung bài học:</h5>
                     <div class="p-3 bg-light rounded" style="min-height: 150px;">
-                        {!! $baiGiang->NoiDung !!}
+                        {!! $baiHoc->NoiDung !!}
                     </div>
                 </div>
 
@@ -61,10 +61,10 @@
 
                 <!-- Hành động -->
                 <div class="mt-4">
-                    <a href="{{ route('giangvien.bai-giang.danh-sach', ['maHocPhan' => $hocPhan->MaHocPhan]) }}" class="btn btn-secondary me-2">
+                    <a href="{{ route('giangvien.bai-giang.chuong.danh-sach', ['maBaiGiang' => $baiHoc->MaBaiGiang]) }}" class="btn btn-secondary me-2">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
-                    <a href="{{ route('giangvien.bai-giang.form-sua', ['maHocPhan' => $hocPhan->MaHocPhan, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="btn btn-primary">
+                    <a href="{{ route('giangvien.bai-giang.chuong.bai.form-sua', ['maBaiGiang' => $baiHoc->MaBaiGiang, 'maChuong' => $baiHoc->MaChuong, 'maBai' => $baiHoc->MaBai]) }}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Chỉnh sửa
                     </a>
                 </div>
@@ -72,7 +72,7 @@
             </div>
         </div>
     </div>
-    <x-binh-luan :bai-giang="$baiGiang" />
+    {{-- <x-binh-luan :bai-giang="$baiHoc" /> --}}
 </div>
 
 

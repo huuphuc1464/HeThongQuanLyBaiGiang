@@ -1,79 +1,3 @@
-const chuongBai = window.chuongBai || {};
-
-function onChangeChuong() {
-    const chuongSelect = document.getElementById('selectChuong');
-    const baiSelect = document.getElementById('selectBai');
-    const inputChuongMoi = document.getElementById('inputChuongMoi');
-    const inputBaiMoi = document.getElementById('inputBaiMoi');
-    const selectedChuong = chuongSelect.value;
-
-    if (selectedChuong === 'other') {
-        inputChuongMoi.style.display = 'block';
-        inputChuongMoi.setAttribute('name', 'TenChuong');
-        inputChuongMoi.setAttribute('required', true);
-
-        chuongSelect.removeAttribute('name');
-        chuongSelect.removeAttribute('required');
-
-        inputBaiMoi.style.display = 'block';
-        inputBaiMoi.setAttribute('name', 'TenBai');
-        inputBaiMoi.setAttribute('required', true);
-
-        baiSelect.innerHTML = '<option value="">-- Nhập bài mới --</option>';
-        baiSelect.removeAttribute('name');
-        baiSelect.removeAttribute('required');
-    } else {
-        inputChuongMoi.style.display = 'none';
-        inputChuongMoi.removeAttribute('name');
-        inputChuongMoi.removeAttribute('required');
-
-        chuongSelect.setAttribute('name', 'TenChuong');
-        chuongSelect.setAttribute('required', true);
-
-        baiSelect.innerHTML = '<option value="">-- Chọn bài --</option>';
-        if (chuongBai[selectedChuong]) {
-            chuongBai[selectedChuong].forEach(function (bai) {
-                const option = document.createElement('option');
-                option.value = bai;
-                option.text = bai;
-                baiSelect.appendChild(option);
-            });
-            const other = document.createElement('option');
-            other.value = 'other';
-            other.text = 'Khác';
-            baiSelect.appendChild(other);
-        }
-
-        inputBaiMoi.style.display = 'none';
-        inputBaiMoi.removeAttribute('name');
-        inputBaiMoi.removeAttribute('required');
-
-        baiSelect.setAttribute('name', 'TenBai');
-        baiSelect.setAttribute('required', true);
-    }
-}
-
-function onChangeBai() {
-    const baiSelect = document.getElementById('selectBai');
-    const inputBaiMoi = document.getElementById('inputBaiMoi');
-
-    if (baiSelect.value === 'other') {
-        inputBaiMoi.style.display = 'block';
-        inputBaiMoi.setAttribute('name', 'TenBai');
-        inputBaiMoi.setAttribute('required', true);
-
-        baiSelect.removeAttribute('name');
-        baiSelect.removeAttribute('required');
-    } else {
-        inputBaiMoi.style.display = 'none';
-        inputBaiMoi.removeAttribute('name');
-        inputBaiMoi.removeAttribute('required');
-
-        baiSelect.setAttribute('name', 'TenBai');
-        baiSelect.setAttribute('required', true);
-    }
-}
-
 // TinyMCE
 function initTinyMCE(maHocPhan, csrfToken) {
     tinymce.init({
@@ -134,8 +58,8 @@ function initTinyMCE(maHocPhan, csrfToken) {
 }
 
 // Nút hủy
-function handleCancelBaiGiang({ routeUrl, maHocPhan, maBaiGiang = null }) {
-    if (confirm('Bạn có chắc muốn hủy bỏ bài giảng không?')) {
+function handleCancelBaiGiang({ routeUrl, maBaiGiang, maBai = null }) {
+    if (confirm('Bạn có chắc muốn hủy bỏ bài học không?')) {
         fetch(routeUrl, {
             method: 'POST',
             headers: {
@@ -143,8 +67,8 @@ function handleCancelBaiGiang({ routeUrl, maHocPhan, maBaiGiang = null }) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                MaHocPhan: maHocPhan,
-                MaBaiGiang: maBaiGiang
+                MaBaiGiang: maBaiGiang,
+                MaBai: maBai
             })
         })
             .then(res => {

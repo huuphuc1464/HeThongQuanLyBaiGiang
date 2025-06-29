@@ -15,19 +15,22 @@ class ElfinderController extends Controller
 
     public function connector(Request $request)
     {
-        $maHocPhan = $request->query('maHocPhan');
         $maBaiGiang = $request->query('maBaiGiang');
+        $maBai = $request->query('maBai');
         $maNguoiDung = Auth::id();
-        if ($maBaiGiang) {
-            // Sửa bài giảng
-            $path = public_path("BaiGiang/HocPhan_{$maHocPhan}/{$maBaiGiang}");
-            $url  = asset("BaiGiang/HocPhan_{$maHocPhan}/{$maBaiGiang}");
-        } else {
-            // Thêm bài giảng
-            $path = public_path("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
-            $url  = asset("BaiGiang/HocPhan_{$maHocPhan}/temp_{$maNguoiDung}");
+        
+        if (!$maBaiGiang) {
+            abort(400, 'Thiếu mã bài giảng');
         }
 
+        // Tạo đường dẫn lưu file
+        $folderName = $maBai
+            ? "BaiGiang_{$maBaiGiang}/Bai_{$maBai}" // Sửa bài
+            : "BaiGiang_{$maBaiGiang}/temp_{$maNguoiDung}_{$maBaiGiang}"; // Thêm bài
+
+        $path = public_path("BaiGiang/{$folderName}");
+        $url  = asset("BaiGiang/{$folderName}");
+        
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
@@ -40,7 +43,7 @@ class ElfinderController extends Controller
                 'accessControl' => function ($attr, $path, $data, $volume, $isDir, $relpath) {
                     return null;
                 },
-                'alias' => 'Tài liệu bài giảng',
+                'alias' => 'Tài liệu bài học',
                 'attributes' => [
                     [
                         'pattern' => '/\.tmb$/',

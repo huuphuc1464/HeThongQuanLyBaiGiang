@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\GiangVien;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bai;
+use App\Models\BaiGiang;
 use App\Models\LopHocPhan;
-use App\Models\HocPhan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -14,7 +15,7 @@ class LopHocPhanController extends Controller
     public function danhSach(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $query = LopHocPhan::with(['hocPhan'])
+        $query = LopHocPhan::with(['baiGiang'])
             ->where('MaNguoiTao', Auth::id());
         // Tìm kiếm
         if ($request->has('search') && $request->search) {
@@ -24,8 +25,8 @@ class LopHocPhanController extends Controller
             });
         }
         $lopHocPhans = $query->orderBy('created_at', 'desc')->paginate($perPage);
-        $hocPhans = HocPhan::where('MaNguoiTao', Auth::id())->get();
-        return view('giangvien.quanLyLopHocPhan.quanLyLopHocPhan', compact('lopHocPhans', 'hocPhans'));
+        $baiGiang = BaiGiang::where('MaGiangVien', Auth::id())->get();
+        return view('giangvien.quanLyLopHocPhan.quanLyLopHocPhan', compact('lopHocPhans', 'baiGiang'));
     }
 
     public function themMoi(Request $request)
@@ -40,7 +41,7 @@ class LopHocPhanController extends Controller
                 })
             ],
             'MoTa' => 'nullable|string|max:255',
-            'MaHocPhan' => 'required|exists:hoc_phan,MaHocPhan',
+            'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
         ],[
             'TenLopHocPhan.unique' => 'Tên lớp học phần đã tồn tại.'
         ]);
@@ -48,7 +49,7 @@ class LopHocPhanController extends Controller
         LopHocPhan::create([
             'TenLopHocPhan' => $request->TenLopHocPhan,
             'MoTa' => $request->MoTa,
-            'MaHocPhan' => $request->MaHocPhan,
+            'MaBaiGiang' => $request->MaBaiGiang,
             'MaNguoiTao' => Auth::id(),
             'TrangThai' => 1,
         ]);
@@ -89,14 +90,14 @@ class LopHocPhanController extends Controller
                 })->ignore($lopHocPhan->MaLopHocPhan, 'MaLopHocPhan')
             ],
             'MoTa' => 'nullable|string|max:255',
-            'MaHocPhan' => 'required|exists:hoc_phan,MaHocPhan',
+            // 'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
         ],[
             'TenLopHocPhan.unique' => 'Tên lớp học phần đã tồn tại.'
         ]);
         $lopHocPhan->update([
             'TenLopHocPhan' => $request->TenLopHocPhan,
             'MoTa' => $request->MoTa,
-            'MaHocPhan' => $request->MaHocPhan,
+            'MaBaiGiang' => $request->MaBaiGiang,
         ]);
         return redirect()->back()->with('success', 'Cập nhật lớp học phần thành công!');
     }

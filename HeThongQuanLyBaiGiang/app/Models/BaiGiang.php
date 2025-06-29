@@ -24,11 +24,6 @@ class BaiGiang extends Model
         return $this->belongsTo(NguoiDung::class, 'MaGiangVien', 'MaNguoiDung');
     }
     
-    public function khoa()
-    {
-        return $this->belongsTo(Khoa::class, 'MaKhoa', 'MaKhoa');
-    }
-
     public function lopHocPhan()
     {
         return $this->hasMany(LopHocPhan::class, 'MaBaiGiang', 'MaBaiGiang');

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <link rel="stylesheet" href="{{ asset('/css/teacher/main.css') }}">
     @yield('styles')
 </head>
@@ -19,8 +19,10 @@
         <div class="p-3 text-center border-bottom border-secondary">
             <h5 class="text-white">Quản trị hệ thống</h5>
         </div>
-        <a href="{{ route('giangvien.hocphan.danh-sach') }}" class="sidebar-item {{ request()->is('giang-vien/hoc-phan*') ? 'active' : '' }}">
-            <i class="fas fa-book-open me-2"></i> Quản lý Học Phần</a>
+        <a href="{{ route('giangvien.dashboard') }}" class="sidebar-item {{ request()->is('giang-vien') ? 'active' : '' }}">
+            <i class="fas fa-home me-2"></i> Dashboard</a>
+        <a href="{{ route('giangvien.bai-giang.danh-sach') }}" class="sidebar-item {{ request()->is('giang-vien/bai-giang*') ? 'active' : '' }}">
+            <i class="fas fa-book-open me-2"></i> Quản lý Bài Giảng</a>
         <a href="{{ route('giangvien.su-kien-zoom.danhsach') }}" class="sidebar-item {{ request()->is('giang-vien/su-kien-zoom*') ? 'active' : '' }}">
             <i class="fas fa-video me-2"></i> Quản lý Sự Kiện Zoom
         </a>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GiangVien\BaiController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\GiangVien\HomeController as GiangVienHomeController;
 use App\Http\Controllers\SinhVien\HomeController as SinhVienHomeController;
@@ -15,9 +16,11 @@ use App\Http\Controllers\Shared\BinhLuanBaiGiangController;
 use App\Http\Controllers\GiangVien\BaiKiemTraController;
 use App\Http\Controllers\ElfinderController;
 use App\Http\Controllers\GiangVien\BaiGiangController;
+use App\Http\Controllers\GiangVien\ChuongController;
 use App\Http\Controllers\GiangVien\SinhVienController;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
+use App\Models\Bai;
 
 Route::prefix('auth')->group(function () {
     Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
@@ -61,14 +64,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::clas
         Route::delete('/{khoa}', [KhoaController::class, 'xoa'])->name('xoa');
     });
 
-    // Routes cho quản lý môn học
-    Route::prefix('mon-hoc')->name('mon-hoc.')->group(function () {
-        Route::get('/', [MonHocController::class, 'danhSach'])->name('danh-sach');
-        Route::post('/', [MonHocController::class, 'themMoi'])->name('them-moi');
-        Route::put('/{monHoc}', [MonHocController::class, 'capNhat'])->name('cap-nhat');
-        Route::delete('/{monHoc}', [MonHocController::class, 'xoa'])->name('xoa');
-    });
-
     // Routes cho quản lý giảng viên
     Route::prefix('giang-vien')->name('giang-vien.')->group(function () {
         Route::get('/', [GiangVienController::class, 'danhSachGiangVien'])->name('danh-sach');
@@ -82,7 +77,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::clas
 });
 
 Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddleware::class . ':2'])->group(function () {
-    Route::get('/', [HocPhanController::class, 'danhSach'])->name('hocphan.danh-sach');
+    Route::get('/', [GiangVienHomeController::class, 'dashboard'])->name('dashboard');
+    Route::get('/bieu-do-thong-ke', [BaiGiangController::class, 'layDuLieuBieuDoThongKe'])->name('bieu-do-thong-ke');
     Route::get('/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('doi-mat-khau');
     Route::get('/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('doi-thong-tin');
 
@@ -98,29 +94,36 @@ Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddlew
     });
 
 
-    // Quản lý bài giảng
-    Route::prefix('hoc-phan/{maHocPhan}/bai-giang')->name('bai-giang.')->group(function () {
-        Route::get('/', [BaiGiangController::class, 'danhSachBaiGiang'])->name('danh-sach');
-        Route::post('/{maBaiGiang}/thay-doi-trang-thai', [BaiGiangController::class, 'thayDoiTrangThai'])->name('thay-doi-trang-thai');
-        Route::get('/them', [BaiGiangController::class, 'hienFormThem'])->name('form-them');
-        Route::get('/sua/{maBaiGiang}', [BaiGiangController::class, 'hienFormSua'])->name('form-sua');
-        Route::post('/them', [BaiGiangController::class, 'themBaiGiang'])->name('them');
-        Route::put('/cap-nhat/{maBaiGiang}', [BaiGiangController::class, 'capNhatBaiGiang'])->name('cap-nhat');
-        Route::get('/chi-tiet/{maBaiGiang}', [BaiGiangController::class, 'chiTietBaiGiang'])->name('chi-tiet');
-        Route::post('/huy', [BaiGiangController::class, 'huyBoBaiGiang'])->name('huy');
-        Route::get('/thong-ke', [BaiGiangController::class, 'thongKeBaiGiang'])->name('thong-ke');
-        Route::get('/bieu-do-thong-ke', [BaiGiangController::class, 'layDuLieuBieuDoThongKe'])->name('bieu-do-thong-ke');
-    });
 
-    // Quản lý học phần
-    Route::prefix('hoc-phan')->name('hocphan.')->group(function () {
-        Route::get('/', [HocPhanController::class, 'danhSach'])->name('danh-sach');
-        Route::post('/', [HocPhanController::class, 'themMoi'])->name('them-moi');
-        Route::get('/{id}', [HocPhanController::class, 'chiTiet'])->name('chi-tiet');
-        Route::get('/{id}/chinh-sua', [HocPhanController::class, 'chinhSua'])->name('chinh-sua');
-        Route::put('/{id}', [HocPhanController::class, 'capNhat'])->name('cap-nhat');
-        Route::delete('/{id}', [HocPhanController::class, 'xoa'])->name('xoa');
-        Route::get('/mon-hoc/danh-sach', [HocPhanController::class, 'layDanhSachMonHoc'])->name('mon-hoc.danh-sach');
+    // Quản lý bài giảng
+    Route::prefix('bai-giang')->name('bai-giang.')->group(function () {
+        Route::get('/', [BaiGiangController::class, 'danhSachBaiGiang'])->name('danh-sach');
+        Route::post('/them', [BaiGiangController::class, 'themBaiGiang'])->name('them');
+        Route::put('/cap-nhat/{id}', [BaiGiangController::class, 'capNhatBaiGiang'])->name('cap-nhat');
+        Route::delete('/xoa/{id}', [BaiGiangController::class, 'xoaBaiGiang'])->name('xoa');
+        Route::post('/khoi-phuc/{id}', [BaiGiangController::class, 'khoiPhucBaiGiang'])->name('khoi-phuc');
+
+        Route::prefix('{maBaiGiang}')->group(function () {
+            // Quản lý chương
+            Route::prefix('chuong')->name('chuong.')->group(function () {
+                Route::get('/', [ChuongController::class, 'danhSach'])->name('danh-sach');
+                Route::post('/them', [ChuongController::class, 'themChuong'])->name('them');
+                Route::get('/thong-tin/{maChuong}', [ChuongController::class, 'layThongTinChuong'])->name('form-sua');
+                Route::put('/cap-nhat/{maChuong}', [ChuongController::class, 'capNhatChuong'])->name('cap-nhat');
+                Route::post('/doi-trang-thai/{maChuong}', [ChuongController::class, 'doiTrangThaiChuong'])->name('doi-trang-thai');
+
+                // Quản lý bài
+                Route::prefix('{maChuong}/bai')->name('bai.')->group(function () {
+                    Route::get('/them', [BaiController::class, 'hienFormThemBai'])->name('form-them');
+                    Route::post('/them', [BaiController::class, 'themBai'])->name('them');
+                    Route::post('/huy', [BaiController::class, 'huyBoBai'])->name('huy');
+                    Route::get('/cap-nhat/{maBai}', [BaiController::class, 'hienFormSuaBai'])->name('form-sua');
+                    Route::put('/cap-nhat/{maBai}', [BaiController::class, 'capNhatBai'])->name('cap-nhat');
+                    Route::post('/doi-trang-thai/{maBai}', [BaiController::class, 'doiTrangThaiBai'])->name('doi-trang-thai');
+                    Route::get('/{maBai}', [BaiController::class, 'chiTietBai'])->name('chi-tiet');
+                });
+            });
+        });
     });
 
     // Quản lý lớp học phần
