@@ -60,7 +60,7 @@
                                             <ul class="list-group">
                                                 @foreach ($baiGiangs as $baiGiang)
                                                 <li class="list-group-item p-0">
-                                                    <a href="{{ route('bai-giang.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}"
+                                                    <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}"
                                                         class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
                                                         <div>
                                                             <span>{{ $baiGiang->TenBaiGiang }}</span><br>

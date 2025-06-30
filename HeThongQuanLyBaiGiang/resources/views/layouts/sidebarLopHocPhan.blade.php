@@ -33,7 +33,7 @@
             </li>
             <li class="nav-item gachDuoi">
                 <a class="nav-link d-flex align-items-center gap-2 text-dark"
-                    href="{{ route('hoc-phan.bai-giang.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
+                    href="{{ route('bai-giang.bai.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
                     <i class="fas fa-video"></i>
                     <span>Sự kiện học trực tuyến</span>
                 </a>
@@ -70,7 +70,7 @@
                             {{-- Bài giảng --}}
                             @foreach ($dsBaiGiang as $baiGiang)
                             <li class="list-group-item p-0 ps-3">
-                                <a href="{{ route('bai-giang.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}"
+                                <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}"
                                     class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
                                     <div class="text-truncate w-100 pe-2" style="font-size:14px;"
                                         title="{{ $baiGiang->TenBaiGiang }}">

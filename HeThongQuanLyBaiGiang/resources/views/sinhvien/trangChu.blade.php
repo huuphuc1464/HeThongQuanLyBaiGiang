@@ -11,11 +11,11 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
         @foreach($danhSachBaiGiang as $baiGiang)
         <div class="col">
-            <a href="{{ route('hoc-phan.bai-giang.tab', ['id' => $baiGiang->MaLopHocPhan]) }}"
+            <a href="{{ route('bai-giang.bai.tab', ['id' => $baiGiang->MaLopHocPhan]) }}"
                 class="text-decoration-none text-dark">
                 <div class="card card-class position-relative">
                     <img class="card-img-top"
-                        src="{{ $baiGiang->AnhBaiGiang ? asset('img/' . $baiGiang->AnhBaiGiang) : asset('img/hocphan/default.png') }}"
+                        src="{{ $baiGiang->AnhBaiGiang ? asset($baiGiang->AnhBaiGiang) : asset('img/hocphan/default.png') }}"
                         alt="{{ $baiGiang->TenLopHocPhan }}">
                     <div class="card-body pb-0">
                         <div class="fw-bold mb-1 fs-5">{{ $baiGiang->TenLopHocPhan }}</div>

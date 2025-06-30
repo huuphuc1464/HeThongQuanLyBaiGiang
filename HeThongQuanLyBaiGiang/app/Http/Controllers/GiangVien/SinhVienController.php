@@ -332,7 +332,7 @@ class SinhVienController extends Controller
                 }
             }
 
-            $message = "<strong>Đã thêm thành công {$success} sinh viên.</strong>";
+            $message = `<strong>Đã thêm thành công {$success} sinh viên.</strong>`;
             if (count($errors)) {
                 $message .= '<br>Lỗi:<ul><li>' . implode('</li><li>', $errors) . '</li></ul>';
                 return back()->with('warning', $message);

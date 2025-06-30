@@ -47,15 +47,15 @@
                                 <a class="dropdown-item dropdown-toggle text-truncate" href="#"
                                     data-bs-toggle="dropdown">{{ $khoa['TenKhoa'] }}</a>
                                 <ul class="dropdown-menu">
-                                    @foreach ($khoa['MonHoc'] as $mon)
+                                    @foreach ($khoa['BaiGiang'] as $baiGiang)
                                     <li class="dropdown-submenu dropend">
                                         <a class="dropdown-item dropdown-toggle text-truncate" href="#"
-                                            data-bs-toggle="dropdown">{{ $mon['TenMonHoc'] }}</a>
+                                            data-bs-toggle="dropdown">{{ $baiGiang['TenBaiGiang'] }}</a>
                                         <ul class="dropdown-menu">
-                                            @foreach ($mon['GiangVien'] as $gv)
+                                            @foreach ($baiGiang['GiangVien'] as $gv)
                                             <li>
                                                 <a class="dropdown-item text-truncate"
-                                                    href="{{ route('trang-chu', ['giang_vien' => $gv['MaGiangVien'], 'mon_hoc' => $mon['MaMonHoc']]) }}">{{
+                                                    href="{{ route('trang-chu', ['giang_vien' => $gv['MaGiangVien'], 'bai_giang' => $baiGiang['MaBaiGiang']]) }}">{{
                                                     $gv['TenGiangVien']
                                                     }}
                                                 </a>

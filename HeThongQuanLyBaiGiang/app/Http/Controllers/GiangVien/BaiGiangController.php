@@ -3,20 +3,12 @@
 namespace App\Http\Controllers\GiangVien;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\ElfinderController;
 use App\Models\BaiGiang;
-use App\Models\DanhSachLop;
-use App\Models\FileBaiGiang;
-use App\Models\HocPhan;
 use App\Models\Khoa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class BaiGiangController extends Controller
 {

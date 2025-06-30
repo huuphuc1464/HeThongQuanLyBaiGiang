@@ -21,6 +21,7 @@ use App\Http\Controllers\GiangVien\SinhVienController;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
 use App\Models\Bai;
+use App\Services\EmailService;
 
 Route::prefix('auth')->group(function () {
     Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
@@ -173,9 +174,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
         Route::get('/{maBaiKiemTra}/ket-qua', [KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');
     });
 
-    Route::prefix('hoc-phan/{id}')->group(function () {
-        Route::get('/{tab?}', [SinhVienHomeController::class, 'renderTab'])->name('hoc-phan.bai-giang.tab');
-        Route::get('/bai-giang/chi-tiet/{maBaiGiang}', [SinhVienHomeController::class, 'chiTietBaiGiang'])->name('bai-giang.chi-tiet');
+    Route::prefix('bai-giang/{id}')->group(function () {
+        Route::get('/{tab?}', [SinhVienHomeController::class, 'renderTab'])->name('bai-giang.bai.tab');
+        Route::get('/bai/chi-tiet/{maBaiGiang}', [SinhVienHomeController::class, 'chiTietBaiGiang'])->name('bai.chi-tiet');
         Route::get('/su-kien-zoom/chi-tiet/{maSuKien}', [SinhVienHomeController::class, 'chiTietSuKienZoom'])->name('su-kien-zoom.chi-tiet');
     });
 
