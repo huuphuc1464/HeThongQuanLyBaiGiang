@@ -23,8 +23,8 @@
     <a href="{{ route('bai-giang.bai.tab', ['id' => $lop->MaLopHocPhan]) }}"
         class="nav-item class-course-item d-flex text-decoration-none text-dark">
         <div class="icon-circle">
-            <img src="{{ $lop->AnhBaiGiang ? asset($lop->AnhBaiGiang) : asset('img/hocphan/default.png') }}" alt="icon"
-                width="25" height="25" class="rounded-circle" />
+            <img src="{{ $lop->AnhBaiGiang ? asset($lop->AnhBaiGiang) : asset('img/hocphan/default.png') }}"
+                alt="ảnh bài giảng" width="25" height="25" class="rounded-circle" />
         </div>
         <div class="text-group">
             <p class="title mb-2">{{Str::limit($lop->TenLopHocPhan, 25)}}</p>

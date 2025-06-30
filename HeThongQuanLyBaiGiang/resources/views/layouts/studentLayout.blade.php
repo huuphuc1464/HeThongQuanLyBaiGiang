@@ -23,8 +23,9 @@
             </button>
             {{-- Logo --}}
             <a class="navbar-brand d-flex align-items-center gap-2" href="/">
-                <img alt="Website logo placeholder image" height="24" src="https://placehold.co/50" width="30" />
-                <span>Tên website</span>
+                <img class="logo-img" alt="Website logo placeholder image" height="24"
+                    src="{{asset('/img/web/logo.jpg')}}" width="30" />
+                <span>UniLecture</span>
             </a>
             {{-- Nút toggle menu navbar --}}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#anHienNavbar"
