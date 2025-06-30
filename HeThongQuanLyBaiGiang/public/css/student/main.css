@@ -1,67 +1,94 @@
 body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fff;
+    font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #1a1a1a;
+    line-height: 1.6;
 }
 
 /* === NAVBAR === */
+.navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+}
+
 .navbar-brand {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 1.25rem;
+    color: #1a73e8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .navbar .dropdown-toggle::after {
-    margin-left: 0.25rem;
+    margin-left: 0.5rem;
+    border-top: 0.35em solid;
+    border-right: 0.35em solid transparent;
+    border-left: 0.35em solid transparent;
 }
 
 /* === SIDEBAR === */
 .sidebar {
-    border-right: 1px solid #dee2e6;
-    min-height: calc(100vh - 60px);
-    width: 250px;
+    border-right: 1px solid #e0e4e8;
+    min-height: calc(100vh - 64px);
+    width: 260px;
     position: fixed;
-    top: 62px;
+    top: 64px;
     left: 0;
-    background: #fff;
+    background: #ffffff;
     overflow-y: auto;
     transition: width 0.3s ease, padding 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 1rem;
 }
 
 .sidebar.collapsed {
-    width: 60px;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    width: 70px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
 }
 
 .sidebar .nav-link {
-    font-weight: 600;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s ease;
 }
 
 .sidebar.collapsed .nav-link span {
     display: none;
 }
 
+.sidebar .nav-link:hover {
+    background-color: #f0f4ff;
+    color: #1a73e8;
+}
+
 .sidebar .nav-link.active {
     background-color: #e7f0ff;
-    border-radius: 0.5rem;
-    color: #212529;
+    color: #1a73e8;
+    font-weight: 600;
 }
 
 .sidebar .nav-link .fa-home {
-    font-size: 16px;
-    padding-left: 0.5rem;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
 }
 
 .sidebar .section-title {
     font-weight: 600;
-    font-size: 14px;
-    padding-top: 2px;
-    color: #212529;
+    font-size: 0.9rem;
+    color: #34495e;
+    padding: 1rem 0 0.5rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .sidebar.collapsed .section-title span {
@@ -72,13 +99,11 @@ body {
     border: none;
     background: none;
     padding: 0;
-    margin: 0;
-    color: #212529;
-    font-size: 14px;
+    color: #34495e;
+    font-size: 0.9rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding-left: 0.5rem;
 }
 
 .sidebar .section-title button:focus {
@@ -86,16 +111,25 @@ body {
 }
 
 .sidebar .fa-graduation-cap {
-    font-size: 16px;
+    font-size: 1.1rem;
 }
 
 /* Sidebar danh sách lớp học phần */
 .sidebar .class-course-item {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    padding-left: 20px;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    border: 1px solid #e0e4e8;
+    background-color: #ffffff;
+}
+
+.sidebar .class-course-item:hover {
+    background-color: #f0f4ff;
+    border-color: #1a73e8;
 }
 
 .sidebar.collapsed .class-course-item .text-group {
@@ -103,57 +137,77 @@ body {
 }
 
 .sidebar .class-course-item .icon-circle {
-    border: 1px solid #dee2e6;
+    border: 2px solid #d1d5db;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #212529;
+    color: #34495e;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease;
+}
+
+.sidebar .class-course-item:hover .icon-circle {
+    border-color: #1a73e8;
 }
 
 .sidebar .class-course-item .text-group {
-    line-height: 1.1;
+    line-height: 1.2;
 }
 
 .sidebar .class-course-item .text-group .title {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 0.95rem;
+    color: #2c3e50;
     margin: 0;
 }
 
 .sidebar .class-course-item .text-group .desc {
-    font-size: 12px;
-    color: #6c757d;
+    font-size: 0.85rem;
+    color: #6b7280;
     margin: 0;
 }
 
 main.content-area {
-    margin-left: 250px;
-    padding: 1rem 1rem 2rem 1rem;
-    margin-top: 56px;
+    margin-left: 260px;
+    padding: 2rem;
+    margin-top: 64px;
     transition: margin-left 0.3s ease;
+    background-color: #f5f7fa;
 }
 
 main.content-area.sidebar-collapsed {
-    margin-left: 60px;
+    margin-left: 70px;
 }
 
 .accordion-button {
-    padding: 1rem 1rem;
-    font-size: 18px;
+    padding: 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    background-color: #ffffff;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .list-group-item {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    border: none;
+    padding: 0.75rem 1rem;
+    background-color: #ffffff;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
 }
 
 /* === SEARCH === */
 .form-control.rounded-pill {
-    padding-left: 2.25rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #e0e4e8;
+    background-color: #ffffff;
+    font-size: 0.95rem;
 }
 
 .search-icon-inside {
@@ -161,90 +215,94 @@ main.content-area.sidebar-collapsed {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #6c757d;
+    color: #6b7280;
     pointer-events: none;
-    font-size: 14px;
+    font-size: 1rem;
 }
 
 .position-relative.search-wrapper {
-    max-width: 450px;
+    max-width: 500px;
     width: 100%;
 }
 
 /* === CARD LỚP HỌC PHẦN === */
 .card-class {
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    transition: box-shadow 0.2s;
+    border: 1px solid #e0e4e8;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    overflow: hidden;
 }
 
 .card-class:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border-color: #1a73e8;
 }
 
 a.text-decoration-none.text-dark:hover {
-    text-decoration: none;
-    color: inherit;
+    color: #1a73e8;
 }
 
 .card-class .card-img-top {
-    border-bottom: 1px solid #dee2e6;
-    border-top-left-radius: 0.375rem;
-    border-top-right-radius: 0.375rem;
-    /* height: 200px; */
+    border-bottom: 2px solid #e0e4e8;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
     aspect-ratio: 3 / 2;
     object-fit: cover;
     width: 100%;
 }
 
 .card-class .card-body {
-    background-color: #f8f9fa;
-    padding: 0.75rem 1rem;
+    background-color: #ffffff;
+    padding: 1rem 1.25rem;
 }
 
 .card-class .card-subtitle {
-    font-size: 12px;
+    font-size: 0.85rem;
+    color: #6b7280;
     padding-bottom: 0.5rem;
 }
 
 .card-class .card-text {
-    font-size: 12px;
+    font-size: 0.9rem;
+    color: #2c3e50;
 }
 
 .card-class .card-footer {
-    border-top: none;
-    padding: 0 1rem 0.5rem 1rem;
-    font-size: 12px;
-    color: #6c757d;
+    border-top: 1px solid #e0e4e8;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+    color: #6b7280;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #f8f9fa;
 }
 
 .card-class .card-footer .instructor,
 .card-class .card-footer .students {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.5rem;
 }
 
 .card-class .card-footer .students .fa-users {
-    font-size: 14px;
+    font-size: 1rem;
 }
 
 .anh-giang-vien {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     object-fit: cover;
-    border: 1px solid #ccc;
+    border: 2px solid #e0e4e8;
 }
 
 /* === Đường kẻ ngay nút trang chủ === */
 .duongke {
-    border-bottom: #dee2e6 solid 1px;
-    padding-bottom: 2px;
+    border-bottom: 1px solid #e0e4e8;
+    margin-bottom: 1rem;
 }
 
 /* === DROPDOWN === */
@@ -259,15 +317,20 @@ a.text-decoration-none.text-dark:hover {
     display: none;
     position: absolute;
     z-index: 1050;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-submenu {
-    width: 230px;
+    width: 240px;
 }
 
 .dropdown-menu {
     min-width: unset;
-    width: 230px !important;
+    width: 240px !important;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
 }
 
 .dropdown-submenu:hover>.dropdown-menu,
@@ -276,26 +339,24 @@ a.text-decoration-none.text-dark:hover {
 }
 
 .dropdown-menu>li>a.dropdown-toggle::after {
-    content: "";
     float: right;
-    margin-top: 0.3em;
-    margin-left: 0.255em;
-    vertical-align: middle;
-    border-top: 0.3em solid transparent;
+    margin-top: 0.4em;
+    margin-left: 0.5em;
+    border-top: 0.35em solid transparent;
     border-right: 0;
-    border-bottom: 0.3em solid transparent;
-    border-left: 0.3em solid;
+    border-bottom: 0.35em solid transparent;
+    border-left: 0.35em solid;
 }
 
 /* === RESPONSIVE === */
 @media (max-width: 992px) {
     .sidebar {
         position: fixed;
-        top: 56px;
+        top: 64px;
         left: 0;
-        width: 250px;
-        height: calc(100vh - 56px);
-        background: #fff;
+        width: 260px;
+        height: calc(100vh - 64px);
+        background: #ffffff;
         z-index: 1040;
         overflow-y: auto;
         transform: translateX(0);
@@ -304,28 +365,28 @@ a.text-decoration-none.text-dark:hover {
 
     .sidebar.collapsed {
         transform: translateX(-100%);
-        width: 250px !important;
+        width: 260px !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
 
     main.content-area {
         margin-left: 0 !important;
-        padding: 1rem;
+        padding: 1.5rem;
     }
 }
 
 @media (min-width: 992px) {
     main.content-area {
-        margin-left: 250px;
+        margin-left: 260px;
     }
 
     .sidebar.collapsed+main.content-area {
-        margin-left: 60px;
+        margin-left: 70px;
     }
 }
 
-/* Hiện ... khi chữ quá dài*/
+/* Hiện ... khi chữ quá dài */
 .text-truncate {
     max-width: 100%;
     white-space: nowrap;
@@ -335,8 +396,10 @@ a.text-decoration-none.text-dark:hover {
 
 /* Tab chuyển giữa các trang */
 .custom-tabs .nav-link {
-    color: #555;
+    color: #6b7280;
     font-weight: 500;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
     border: none;
     position: relative;
     background-color: transparent;
@@ -345,10 +408,12 @@ a.text-decoration-none.text-dark:hover {
 
 .custom-tabs .nav-link:hover {
     color: #1a73e8;
+    background-color: #f0f4ff;
 }
 
 .custom-tabs .nav-link.active {
     color: #1a73e8;
+    font-weight: 600;
 }
 
 .custom-tabs .nav-link.active::after {
@@ -357,8 +422,16 @@ a.text-decoration-none.text-dark:hover {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%;
-    height: 4px;
+    width: 60%;
+    height: 3px;
     background-color: #1a73e8;
     border-radius: 6px 6px 0 0;
+}
+
+.logo-img {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e0e4e8;
 }
