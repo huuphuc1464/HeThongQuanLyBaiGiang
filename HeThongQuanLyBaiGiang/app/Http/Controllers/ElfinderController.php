@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use elFinder;
 use elFinderConnector;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
 class ElfinderController extends Controller
@@ -15,10 +16,9 @@ class ElfinderController extends Controller
 
     public function connector(Request $request)
     {
-        $maBaiGiang = $request->query('maBaiGiang');
-        $maBai = $request->query('maBai');
+        $maBaiGiang = preg_replace('/[^0-9]/', '', $request->query('maBaiGiang'));
+        $maBai = preg_replace('/[^0-9]/', '', $request->query('maBai'));
         $maNguoiDung = Auth::id();
-        
         if (!$maBaiGiang) {
             abort(400, 'Thiếu mã bài giảng');
         }
@@ -30,9 +30,10 @@ class ElfinderController extends Controller
 
         $path = public_path("BaiGiang/{$folderName}");
         $url  = asset("BaiGiang/{$folderName}");
-        
-        if (!file_exists($path)) {
-            mkdir($path, 0777, true);
+
+        Log::info("Elfinder path: {$path}");
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0777, true);
         }
 
         $roots = [
@@ -59,5 +60,14 @@ class ElfinderController extends Controller
 
         $connector = new elFinderConnector(new elFinder($opts));
         $connector->run();
+    }
+
+    public function popup(Request $request)
+    {
+        $type = $request->query('type', 'file');
+        $maBaiGiang = $request->query('maBaiGiang');
+        $maBai = $request->query('maBai');
+
+        return view('elfinder.popup', compact('type', 'maBaiGiang', 'maBai'));
     }
 }

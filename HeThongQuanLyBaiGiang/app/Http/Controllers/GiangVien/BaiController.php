@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class BaiController extends Controller
 {
@@ -187,6 +188,12 @@ class BaiController extends Controller
         $oldPath = "BaiGiang/BaiGiang_{$maBaiGiang}/temp_{$maNguoiDung}_{$maBaiGiang}";
         $oldFolder = public_path($oldPath);
 
+        if (mb_strlen($request->NoiDung, '8bit') > 4294967295) {
+            return back()->withErrors([
+                'NoiDung' => 'Nội dung vượt quá dung lượng tối đa cho phép (4GB). Vui lòng rút gọn.'
+            ])->withInput();
+        }
+
         DB::beginTransaction();
 
         try {
@@ -304,14 +311,20 @@ class BaiController extends Controller
             ->where('MaChuong', $maChuong)
             ->where('TenBai', $request->TenBai)
             ->where('MaGiangVien', $maNguoiDung)
-            ->where('MaBai', '!=', $maBai) 
+            ->where('MaBai', '!=', $maBai)
             ->exists();
         if ($existsBai) {
             return redirect()->back()
                 ->withErrors(['TenBai' => 'Tên bài này đã tồn tại trong chương.'])
                 ->withInput();
         }
-        
+
+        if (mb_strlen($request->NoiDung, '8bit') > 4294967295) {
+            return back()->withErrors([
+                'NoiDung' => 'Nội dung vượt quá dung lượng tối đa cho phép (4GB). Vui lòng rút gọn.'
+            ])->withInput();
+        }
+
         DB::beginTransaction();
 
         try {
@@ -366,5 +379,39 @@ class BaiController extends Controller
             Log::error('Lỗi khi cập nhật bài', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Lỗi khi cập nhật bài: ' . $e->getMessage());
         }
+    }
+
+    public function uploadDocxImage(Request $request)
+    {
+        if (!$request->hasFile('image')) {
+            return response()->json(['error' => 'No image provided'], 400);
+        }
+
+        $file = $request->file('image');
+        $maBai = $request->input('maBai');
+        $maBaiGiang = $request->input('maBaiGiang');
+        $maNguoiDung = Auth::id();
+
+        if ($maBai) {
+            // Form cập nhật
+            $folder = "BaiGiang/BaiGiang_{$maBaiGiang}/Bai_{$maBai}";
+        } else {
+            // Form thêm mới
+            $folder = "BaiGiang/BaiGiang_{$maBaiGiang}/temp_{$maNguoiDung}_{$maBaiGiang}";
+        }
+
+        // Tạo tên file
+        $fileName = uniqid('img_') . '.' . $file->getClientOriginalExtension();
+        $filePath = public_path($folder);
+        if (!file_exists($filePath)) {
+            mkdir($filePath, 0755, true);
+        }
+
+        // Lưu file
+        $file->move($filePath, $fileName);
+
+        return response()->json([
+            'url' => asset("{$folder}/{$fileName}")
+        ]);
     }
 }

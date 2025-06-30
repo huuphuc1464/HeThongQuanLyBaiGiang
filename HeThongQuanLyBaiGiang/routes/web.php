@@ -38,6 +38,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::any('/elfinder/connector', [ElfinderController::class, 'connector'])->name('elfinder.connector');
+Route::post('/upload-docx-image', [BaiController::class, 'uploadDocxImage']);
 
 Route::middleware(['auth', RoleMiddleware::class . ':1,2,3'])->group(function () {
     Route::post('/doi-mat-khau', [AuthController::class, 'doiMatKhau'])->name('doi-mat-khau.submit');

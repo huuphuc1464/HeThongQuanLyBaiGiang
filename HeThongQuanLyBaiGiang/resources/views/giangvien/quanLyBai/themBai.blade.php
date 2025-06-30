@@ -17,7 +17,7 @@
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="form-group col-md-6">
                         <label class="control-label">Tên chương <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" value="{{ $baiHoc->TenChuong }}" readonly disabled>
@@ -75,9 +75,10 @@
         </div>
     </div>
 </div>
+<input type="file" id="upload-docx" accept=".docx" style="display: none;">
 
 {{-- Modal elFinder --}}
-<div class="modal fade" id="elfinderModal">
+<div class="modal fade" id="elfinderModal" style="z-index: 10560 !important;">
     <div class="modal-dialog modal-lg" style="max-width: 90%;">
         <div class="modal-content">
             <div class="modal-body p-0">
@@ -91,6 +92,7 @@
 @endsection
 
 @section('styles')
+<script src="https://cdn.tiny.cloud/1/mhjmnigeq5s0gc1fzivy77ol0lz6rznmxfnxscfzx0twtmin/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 <link rel="stylesheet" href="{{ asset('./css/teacher/form.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/elfinder.min.css') }}">
@@ -98,33 +100,24 @@
 @endsection
 
 @section('scripts')
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
 <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
 <script src="{{ asset('assets/js/elfinder.min.js') }}"></script>
-<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+{{-- <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script> --}}
 <script>
     window.APP_URL = @json(url('/'));
     window.ELFINDER_URL = @json(route('elfinder.connector', [
-        'maBaiGiang' => $baiHoc->MaBaiGiang
+        'maBaiGiang' => $baiHoc -> MaBaiGiang
     ]));
+    window.ELFINDER_BASE_URL = @json(route('elfinder.connector'));
     window.ELFINDER_SOUND = @json(asset('assets/sounds'));
     window.csrfToken = @json(csrf_token());
-    window.maBaiGiang = @json($baiHoc->MaBaiGiang);
-    window.maBaiGiang = @json($baiHoc->MaBaiGiang ?? '');
-
+    window.maBai = @json($baiHoc -> MaBai ?? '');
+    window.maBaiGiang = @json($baiHoc -> MaBaiGiang ?? '');
+    window.cancelRoute = '{{ route('giangvien.bai-giang.chuong.bai.huy', ['maBaiGiang' => $baiHoc->MaBaiGiang, 'maChuong' => $baiHoc->MaChuong]) }}';
 </script>
 
 <script src="{{ asset('./js/teacher/baigiang.js') }}"></script>
 
-<script>
-    initTinyMCE(window.maBaiGiang, window.csrfToken);
-
-    document.getElementById('btn-cancel')?.addEventListener('click', () => {
-        handleCancelBaiGiang({
-            routeUrl: '{{ route('giangvien.bai-giang.chuong.bai.huy', ['maBaiGiang' => $baiHoc->MaBaiGiang, 'maChuong' => $baiHoc->MaChuong]) }}'
-            , maBaiGiang: window.maBaiGiang
-        });
-    });
-
-</script>
 @endsection
