@@ -1,76 +1,55 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title','Admin - Hệ thống quản lý bài giảng')</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>UniLecture - Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar {
-            width: 250px;
-            min-height: 100vh;
-            background-color: #343a40;
-        }
-
-        .sidebar a {
-            color: #fff;
-            padding: 15px;
-            display: block;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-
-        .content {
-            flex: 1;
-            padding: 20px;
-            margin-left: 250px;
-        }
-
-        .sidebar-item.active {
-            background-color: #495057 !important;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/admin/main.css') }}" />
     @yield('styles')
 </head>
-<body>
 
-    <!-- Sidebar -->
-    <div class="sidebar position-fixed">
-        <div class="p-3 text-center border-bottom border-secondary">
-            <h5 class="text-white">Quản trị hệ thống</h5>
-        </div>
-        <a href="{{ route('admin.dashboard') }}" class="sidebar-item {{ request()->is('admin') ? 'active' : '' }}">
-            <i class="fas fa-home me-2"></i> Dashboard</a>
-        <a href="{{ route('admin.khoa.danh-sach') }}" class="sidebar-item {{ request()->is('admin/khoa*') ? 'active' : '' }}">
-            <i class="fas fa-building me-2"></i> Quản lý Khoa</a>
-        <a href="{{ route('admin.mon-hoc.danh-sach') }}" class="sidebar-item {{ request()->is('admin/mon-hoc*') ? 'active' : '' }}">
-            <i class="fas fa-book-open me-2"></i> Quản lý Môn học</a>
-        <a href="{{route('admin.giang-vien.danh-sach') }}" class="sidebar-item {{ request()->is('admin/giang-vien*') ? 'active' : '' }}">
-            <i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên</a>
-    </div>
+<body class="bg-light min-vh-100 d-flex flex-column">
+    <div class="d-flex flex-grow-1">
+        <!-- Sidebar -->
+        <aside class="sidebar d-flex flex-column">
+            <div class="p-3 d-flex align-items-center border-bottom border-secondary">
+                <img src="{{ asset('/img/web/logo.jpg') }}" alt="UniLecture Logo" class="logo me-2">
+                <h1 class="h5 mb-0 fw-bold reload-text" style="cursor: pointer;">UniLecture Admin</h1>
+            </div>
+            <nav class="nav flex-column mt-3">
+                <a href="{{ url('/admin') }}" class="nav-link {{ request()->is('admin') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+                <a href="{{ url('/admin/khoa') }}" class="nav-link {{ request()->is('admin/khoa*') ? 'active' : '' }}">
+                    <i class="fas fa-building me-2"></i> Quản lý Khoa
+                </a>
+                <a href="{{ url('/admin/giang-vien') }}"
+                    class="nav-link {{ request()->is('admin/giang-vien*') ? 'active' : '' }}">
+                    <i class="fas fa-chalkboard-teacher me-2"></i> Quản lý Giảng viên
+                </a>
+            </nav>
+        </aside>
 
-    <!-- Content -->
-    <div class="content">
-        <nav class="navbar navbar-light bg-light mb-3">
-            <div class="container-fluid justify-content-end">
-                <div class="dropdown">
-                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> {{ $tenNguoiDung }}
-                    </a>
+        <!-- Main Content -->
+        <div class="flex-grow-1 content">
+            <!-- Header -->
+            <header
+                class="bg-white shadow-sm p-3 d-flex justify-content-end align-items-center border border-secondary rounded-3"
+                style="border-width:1px !important;">
+                <button id="menu-toggle" class="btn btn-outline-secondary d-md-none me-2 order-0">
+                    <i class="fas fa-bars text-dark"></i>
+                </button>
+                <div class="dropdown ms-auto order-1">
+                    <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="me-2">{{ $tenNguoiDung }}</span>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="{{ route('admin.doi-thong-tin') }}">Thông tin tài khoản</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.doi-thong-tin') }}">Thông tin tài khoản</a>
+                        </li>
                         <li><a class="dropdown-item" href="{{ route('admin.doi-mat-khau') }}">Đổi mật khẩu</a></li>
                         <li>
                             <hr class="dropdown-divider">
@@ -78,22 +57,36 @@
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
-                        <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a></li>
-
+                        <li><a class="dropdown-item text-danger" href="#"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng
+                                xuất</a></li>
                     </ul>
                 </div>
-            </div>
-        </nav>
+            </header>
 
-        @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        <!-- Nội dung chính -->
-        @yield('content')
+            <!-- Content -->
+            <main class="p-4">
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                @endif
+                @yield('content')
+            </main>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('open');
+        });
+        document.querySelector('.reload-text').addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
     @yield('scripts')
 </body>
+
 </html>

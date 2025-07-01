@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NguoiDung;
 use App\Models\Khoa;
-use App\Models\MonHoc;
-use App\Models\HocPhan;
 use App\Models\LopHocPhan;
 use App\Models\DanhSachLop;
 use App\Models\BaiGiang;
 use App\Models\BaiKiemTra;
 use App\Models\ThongBao;
+use App\Models\Chuong;
+use App\Models\Bai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,17 +23,21 @@ class DashboardController extends Controller
         // Thống kê tổng quan hệ thống
         $thongKeTongQuan = [
             'tongKhoa' => Khoa::where('TrangThai', 1)->count(),
-            'tongMonHoc' => MonHoc::where('TrangThai', 1)->count(),
-            'tongGiangVien' => NguoiDung::where('MaVaiTro', 2)->where('TrangThai', 1)->count(), // MaVaiTro = 2: Giảng viên
-            'tongSinhVien' => NguoiDung::where('MaVaiTro', 3)->where('TrangThai', 1)->count(), // MaVaiTro = 3: Sinh viên
+            'tongBaiGiang' => BaiGiang::where('TrangThai', 1)->count(),
+            'tongChuong' => Chuong::where('TrangThai', 1)->count(),
+            'tongBai' => Bai::where('TrangThai', 1)->count(),
+            'tongGiangVien' => NguoiDung::where('MaVaiTro', 2)->where('TrangThai', 1)->count(),
+            'tongSinhVien' => NguoiDung::where('MaVaiTro', 3)->where('TrangThai', 1)->count(),
         ];
 
         // Thống kê hoạt động đào tạo
         $thongKeDaoTao = [
-            'tongHocPhan' => HocPhan::where('TrangThai', 1)->count(),
+            'tongBaiGiang' => BaiGiang::where('TrangThai', 1)->count(),
+            'tongChuong' => Chuong::where('TrangThai', 1)->count(),
+            'tongBai' => Bai::where('TrangThai', 1)->count(),
             'tongLopHocPhan' => LopHocPhan::where('TrangThai', 1)->count(),
-            'topKhoaNhieuMonHoc' => $this->getTopKhoaNhieuMonHoc(),
-            'topGiangVienNhieuHocPhan' => $this->getTopGiangVienNhieuHocPhan(),
+            'topKhoaNhieuBaiGiang' => $this->getTopKhoaNhieuBaiGiang(),
+            'topGiangVienNhieuBaiGiang' => $this->getTopGiangVienNhieuBaiGiang(),
         ];
 
         // Thống kê hoạt động sinh viên
@@ -54,27 +58,29 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('thongKeTongQuan', 'thongKeDaoTao', 'thongKeSinhVien', 'thongKeHeThong'));
     }
 
-    private function getTopKhoaNhieuMonHoc()
+    private function getTopKhoaNhieuBaiGiang()
     {
-        return Khoa::select('khoa.TenKhoa', DB::raw('COUNT(mon_hoc.MaMonHoc) as soMonHoc'))
-            ->leftJoin('mon_hoc', 'khoa.MaKhoa', '=', 'mon_hoc.MaKhoa')
+        return Khoa::select('khoa.TenKhoa', DB::raw('COUNT(bai_giang.MaBaiGiang) as soBaiGiang'))
+            ->leftJoin('bai_giang', function ($join) {
+                $join->on('khoa.MaKhoa', '=', 'bai_giang.MaKhoa')->where('bai_giang.TrangThai', 1);
+            })
             ->where('khoa.TrangThai', 1)
-            ->where('mon_hoc.TrangThai', 1)
             ->groupBy('khoa.MaKhoa', 'khoa.TenKhoa')
-            ->orderBy('soMonHoc', 'desc')
+            ->orderBy('soBaiGiang', 'desc')
             ->limit(5)
             ->get();
     }
 
-    private function getTopGiangVienNhieuHocPhan()
+    private function getTopGiangVienNhieuBaiGiang()
     {
-        return NguoiDung::select('nguoi_dung.HoTen', DB::raw('COUNT(hoc_phan.MaHocPhan) as soHocPhan'))
-            ->leftJoin('hoc_phan', 'nguoi_dung.MaNguoiDung', '=', 'hoc_phan.MaNguoiTao')
+        return NguoiDung::select('nguoi_dung.HoTen', DB::raw('COUNT(bai_giang.MaBaiGiang) as soBaiGiang'))
+            ->leftJoin('bai_giang', function ($join) {
+                $join->on('nguoi_dung.MaNguoiDung', '=', 'bai_giang.MaGiangVien')->where('bai_giang.TrangThai', 1);
+            })
             ->where('nguoi_dung.MaVaiTro', 2) // Giảng viên
             ->where('nguoi_dung.TrangThai', 1)
-            ->where('hoc_phan.TrangThai', 1)
             ->groupBy('nguoi_dung.MaNguoiDung', 'nguoi_dung.HoTen')
-            ->orderBy('soHocPhan', 'desc')
+            ->orderBy('soBaiGiang', 'desc')
             ->limit(5)
             ->get();
     }
@@ -95,7 +101,7 @@ class DashboardController extends Controller
 
         // Tính tổng số sinh viên trong tất cả các lớp
         $tongSinhVien = DanhSachLop::where('TrangThai', 1)->count();
-        
+
         // Tính trung bình
         return round($tongSinhVien / $lopCoSinhVien->count(), 0);
     }
@@ -115,20 +121,20 @@ class DashboardController extends Controller
     private function getThongKeTheoThang()
     {
         $currentYear = date('Y');
-        
+
         return [
             'baiGiangTheoThang' => $this->getThongKeTheoThangByModel(BaiGiang::class, $currentYear),
             'baiKiemTraTheoThang' => $this->getThongKeTheoThangByModel(BaiKiemTra::class, $currentYear),
         ];
     }
 
-    private function getThongKeTheoThangByModel($model, $year)
+    private function getThongKeTheoThangByModel($model, $year, $dateColumn = 'created_at')
     {
         $data = [];
         for ($month = 1; $month <= 12; $month++) {
             try {
-                $count = $model::whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month)
+                $count = $model::whereYear($dateColumn, $year)
+                    ->whereMonth($dateColumn, $month)
                     ->where('TrangThai', 1)
                     ->count();
                 $data[] = $count;
@@ -143,8 +149,8 @@ class DashboardController extends Controller
     private function hasData()
     {
         return Khoa::where('TrangThai', 1)->count() > 0 ||
-               MonHoc::where('TrangThai', 1)->count() > 0 ||
-               NguoiDung::where('TrangThai', 1)->count() > 0;
+            BaiGiang::where('TrangThai', 1)->count() > 0 ||
+            NguoiDung::where('TrangThai', 1)->count() > 0;
     }
 
     public function hienFormDoiMatKhau()
@@ -177,5 +183,33 @@ class DashboardController extends Controller
             ->first();
 
         return view('admin.thayDoiThongTinCaNhan', compact('user'));
+    }
+
+    // API: Lấy danh sách năm có dữ liệu
+    public function getYears()
+    {
+        try {
+            $yearsBG = BaiGiang::selectRaw('YEAR(created_at) as year')->distinct()->pluck('year')->toArray();
+            $yearsBKT = BaiKiemTra::selectRaw('YEAR(created_at) as year')->distinct()->pluck('year')->toArray();
+            $yearsTB = ThongBao::selectRaw('YEAR(ThoiGianTao) as year')->distinct()->pluck('year')->toArray();
+            $years = array_unique(array_merge($yearsBG, $yearsBKT, $yearsTB));
+            rsort($years);
+            return response()->json(array_values($years));
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // API: Lấy thống kê theo tháng cho 1 năm
+    public function getStatsByYear($year)
+    {
+        $baiGiang = $this->getThongKeTheoThangByModel(BaiGiang::class, $year);
+        $baiKiemTra = $this->getThongKeTheoThangByModel(BaiKiemTra::class, $year);
+        $thongBao = $this->getThongKeTheoThangByModel(ThongBao::class, $year, 'ThoiGianTao');
+        return response()->json([
+            'baiGiang' => $baiGiang,
+            'baiKiemTra' => $baiKiemTra,
+            'thongBao' => $thongBao
+        ]);
     }
 }

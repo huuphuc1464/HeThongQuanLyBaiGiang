@@ -76,6 +76,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::clas
         Route::get('/sua/{id}', [GiangVienController::class, 'hienFormSuaGiangVien'])->name('form-sua');
         Route::put('/sua/{id}', [GiangVienController::class, 'capNhatGiangVien'])->name('sua');
     });
+
+    Route::get('dashboard/years', [DashboardController::class, 'getYears']);
+    Route::get('dashboard/stats-by-year/{year}', [DashboardController::class, 'getStatsByYear']);
 });
 
 Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddleware::class . ':2'])->group(function () {
