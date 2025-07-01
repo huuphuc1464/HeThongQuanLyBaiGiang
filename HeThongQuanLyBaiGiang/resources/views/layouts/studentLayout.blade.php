@@ -8,6 +8,7 @@
     </title>
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         rel="stylesheet" />
+    <link rel="icon" type="shortcut icon" href=" {{ asset('img/web/favicon.ico') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/student/main.css') }}">
     @yield('style')
@@ -45,20 +46,20 @@
                         <ul class="dropdown-menu" aria-labelledby="khoaDropdownBtn">
                             @foreach ($danhSachKhoa as $khoa)
                             <li class="dropdown-submenu dropend">
-                                <a class="dropdown-item dropdown-toggle text-truncate" href="#"
-                                    data-bs-toggle="dropdown">{{ $khoa['TenKhoa'] }}</a>
+                                <a class="dropdown-item dropdown-toggle text-truncate" href="#" data-bs-toggle="dropdown">
+                                    {{ $khoa['TenKhoa'] }}
+                                </a>
                                 <ul class="dropdown-menu">
-                                    @foreach ($khoa['BaiGiang'] as $baiGiang)
+                                    @foreach ($khoa['GiangVien'] as $gv)
                                     <li class="dropdown-submenu dropend">
-                                        <a class="dropdown-item dropdown-toggle text-truncate" href="#"
-                                            data-bs-toggle="dropdown">{{ $baiGiang['TenBaiGiang'] }}</a>
+                                        <a class="dropdown-item dropdown-toggle text-truncate" href="#" data-bs-toggle="dropdown">
+                                            {{ $gv['TenGiangVien'] }}
+                                        </a>
                                         <ul class="dropdown-menu">
-                                            @foreach ($baiGiang['GiangVien'] as $gv)
+                                            @foreach ($gv['BaiGiang'] as $bg)
                                             <li>
-                                                <a class="dropdown-item text-truncate"
-                                                    href="{{ route('trang-chu', ['giang_vien' => $gv['MaGiangVien'], 'bai_giang' => $baiGiang['MaBaiGiang']]) }}">{{
-                                                    $gv['TenGiangVien']
-                                                    }}
+                                                <a class="dropdown-item text-truncate" href="{{ route('trang-chu', ['giang_vien' => $gv['MaGiangVien'], 'bai_giang' => $bg['MaBaiGiang']]) }}">
+                                                    {{ $bg['TenBaiGiang'] }}
                                                 </a>
                                             </li>
                                             @endforeach
@@ -69,6 +70,8 @@
                             </li>
                             @endforeach
                         </ul>
+
+                        
                     </div>
                 </div>
 
@@ -78,7 +81,7 @@
                     role="search" style="max-width: 600px;">
                     <div class="position-relative w-100">
                         <input class="form-control rounded-pill" type="search" name="search"
-                            placeholder="Tìm kiếm theo lớp học phần, học phần, giảng viên, ..." aria-label="Search" />
+                            placeholder="Tìm kiếm theo lớp học phần, bài giảng, giảng viên, ..." aria-label="Search" />
                         <i class="fas fa-search search-icon-inside"></i>
                     </div>
                 </form>

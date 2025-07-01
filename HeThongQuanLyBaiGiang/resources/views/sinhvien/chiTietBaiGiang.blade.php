@@ -41,16 +41,19 @@
                     @if(count($files) > 0)
                     <div class="mb-4">
                         <h5 class="text-primary">Tài liệu đính kèm:</h5>
-                        <ul class="list-group">
-                            @foreach ($files as $file)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>{{ basename($file->DuongDan) }}</span>
-                                <a href="{{ asset($file->DuongDan) }}" download class="btn btn-sm btn-info">
-                                    <i class="fas fa-download"></i> Tải xuống
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
+                        <div div style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
+
+                            <ul class="list-group">
+                                @foreach ($files as $file)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ basename($file->DuongDan) }}</span>
+                                    <a href="{{ asset($file->DuongDan) }}" download class="btn btn-sm btn-info">
+                                        <i class="fas fa-download"></i> Tải xuống
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                     @endif
                 </div>
@@ -58,6 +61,61 @@
         </div>
     </div>
 </div>
-<x-binh-luan :bai-giang="$bai" />
+<div id="binhLuanSection">
+    <x-binh-luan :bai-giang="$bai" />
+</div>
+<!-- Nút chuyển -->
+<button id="scrollToggleBtn" class="btn btn-primary rounded-circle" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px;">
+    <i id="scrollToggleIcon" class="fas fa-comment"></i>
+</button>
+@endsection
 
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('scrollToggleBtn');
+        const icon = document.getElementById('scrollToggleIcon');
+        const commentSection = document.getElementById('binhLuanSection');
+        if (!btn || !icon || !commentSection) return;
+
+        let isAtComment = false;
+
+        btn.addEventListener('click', function() {
+            if (!isAtComment) {
+                commentSection.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else {
+                window.scrollTo({
+                    top: 0
+                    , behavior: 'smooth'
+                });
+            }
+        });
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        isAtComment = true;
+                        icon.className = 'fas fa-chevron-up';
+                        btn.title = 'Quay về chi tiết';
+                    } else {
+                        isAtComment = false;
+                        icon.className = 'fas fa-comment';
+                        btn.title = 'Đi đến bình luận';
+                    }
+                });
+            }, {
+                threshold: 0.5
+            }
+        );
+
+        observer.observe(commentSection);
+    });
+
+</script>
+
+    
+    
 @endsection

@@ -44,7 +44,7 @@
 
                 <!-- File đính kèm -->
                 @if(count($files) > 0)
-                <div class="mb-4" id="binhLuanSection">
+                <div class="mb-4">
                     <h5 class="text-primary">Tài liệu đính kèm:</h5>
                     <div style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
                         <ul class="list-group mb-0">
@@ -61,8 +61,6 @@
                 </div>
                 @endif
 
-
-
                 <!-- Hành động -->
                 <div class="mt-4">
                     <a href="{{ route('giangvien.bai-giang.chuong.danh-sach', ['maBaiGiang' => $baiHoc->MaBaiGiang]) }}" class="btn btn-secondary me-2">
@@ -76,7 +74,9 @@
             </div>
         </div>
     </div>
-    <x-binh-luan :bai-giang="$baiHoc" />
+    <div id="binhLuanSection">
+        <x-binh-luan :bai-giang="$baiHoc" />
+    </div>
 </div>
 
 <!-- Nút chuyển -->
@@ -90,7 +90,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         const btn = document.getElementById('scrollToggleBtn');
         const icon = document.getElementById('scrollToggleIcon');
-        const commentSection = document.getElementById('binhLuanSection'); // ID phần bình luận
+        const commentSection = document.getElementById('binhLuanSection');
+        if (!btn || !icon || !commentSection) return;
 
         let isAtComment = false;
 
@@ -107,23 +108,27 @@
             }
         });
 
-        // Theo dõi vị trí cuộn để đổi biểu tượng
-        window.addEventListener('scroll', function() {
-            const commentTop = commentSection.getBoundingClientRect().top;
-            const windowHeight = window.innerHeight;
-
-            // Nếu phần bình luận đã gần trong màn hình
-            if (commentTop < windowHeight / 2) {
-                isAtComment = true;
-                icon.className = 'fas fa-chevron-up'; // biểu tượng lên
-                btn.title = 'Quay về chi tiết';
-            } else {
-                isAtComment = false;
-                icon.className = 'fas fa-comment'; // biểu tượng bình luận
-                btn.title = 'Đi đến bình luận';
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        isAtComment = true;
+                        icon.className = 'fas fa-chevron-up';
+                        btn.title = 'Quay về chi tiết';
+                    } else {
+                        isAtComment = false;
+                        icon.className = 'fas fa-comment';
+                        btn.title = 'Đi đến bình luận';
+                    }
+                });
+            }, {
+                threshold: 0.5
             }
-        });
+        );
+
+        observer.observe(commentSection);
     });
 
 </script>
+
 @endsection

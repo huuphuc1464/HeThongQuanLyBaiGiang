@@ -30,36 +30,39 @@ class DanhSachKhoaSinhVien
             )
             ->distinct()
             ->orderBy('k.TenKhoa')
-            ->orderBy('bg.TenBaiGiang')
             ->orderBy('nd.HoTen')
+            ->orderBy('bg.TenBaiGiang')
             ->get();
 
         $menuData = [];
 
         foreach ($rows as $row) {
-            $khoaKey = $row->MaKhoa;
-            $baiGiangKey = $row->MaBaiGiang;
+            $maKhoa = $row->MaKhoa;
+            $maGV = $row->MaGiangVien;
+            $maBaiGiang = $row->MaBaiGiang;
 
-            if (!isset($menuData[$khoaKey])) {
-                $menuData[$khoaKey] = [
+            if (!isset($menuData[$maKhoa])) {
+                $menuData[$maKhoa] = [
                     'TenKhoa' => $row->TenKhoa,
-                    'BaiGiang' => []
-                ];
-            }
-
-            if (!isset($menuData[$khoaKey]['BaiGiang'][$baiGiangKey])) {
-                $menuData[$khoaKey]['BaiGiang'][$baiGiangKey] = [
-                    'TenBaiGiang' => $row->TenBaiGiang,
-                    'MaBaiGiang' => $row->MaBaiGiang,
                     'GiangVien' => []
                 ];
             }
 
-            $menuData[$khoaKey]['BaiGiang'][$baiGiangKey]['GiangVien'][] = [
-                'MaGiangVien' => $row->MaGiangVien,
-                'TenGiangVien' => $row->TenGiangVien
+            if (!isset($menuData[$maKhoa]['GiangVien'][$maGV])) {
+                $menuData[$maKhoa]['GiangVien'][$maGV] = [
+                    'TenGiangVien' => $row->TenGiangVien,
+                    'MaGiangVien' => $row->MaGiangVien,
+                    'BaiGiang' => []
+                ];
+            }
+
+            // Tránh trùng bài giảng
+            $menuData[$maKhoa]['GiangVien'][$maGV]['BaiGiang'][$maBaiGiang] = [
+                'MaBaiGiang' => $row->MaBaiGiang,
+                'TenBaiGiang' => $row->TenBaiGiang
             ];
         }
+
         $view->with('danhSachKhoa', $menuData);
     }
 }

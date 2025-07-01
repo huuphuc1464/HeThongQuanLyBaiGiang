@@ -51,7 +51,14 @@ class SidebarBaiGiangSinhVien
                     ->orderBy('b.created_at')
                     ->get()
                     ->groupBy('TenChuong')
-                    ->map(fn($chuong) => $chuong->groupBy('TenBai'));
+                    ->map(function ($dsBai) {
+                        return $dsBai->map(function ($item) {
+                            return (object)[
+                                'MaBaiGiang' => $item->MaBaiGiang,
+                                'TenBaiGiang' => $item->TenBaiGiang,
+                            ];
+                        });
+                    });
             }
         }
 

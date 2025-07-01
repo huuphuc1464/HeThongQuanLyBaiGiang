@@ -34,13 +34,14 @@ body {
     min-height: calc(100vh - 64px);
     width: 260px;
     position: fixed;
-    top: 64px;
+    /* top: 64px; */
     left: 0;
     background: #ffffff;
     overflow-y: auto;
     transition: width 0.3s ease, padding 0.3s ease;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-    padding: 1.5rem 1rem;
+    /* padding: 1.5rem 1rem; */
+    padding: 5px;
 }
 
 .sidebar.collapsed {
@@ -351,8 +352,8 @@ a.text-decoration-none.text-dark:hover {
 /* === RESPONSIVE === */
 @media (max-width: 992px) {
     .sidebar {
-        position: fixed;
-        top: 64px;
+        /* position: fixed;
+        top: 64px; */
         left: 0;
         width: 260px;
         height: calc(100vh - 64px);
