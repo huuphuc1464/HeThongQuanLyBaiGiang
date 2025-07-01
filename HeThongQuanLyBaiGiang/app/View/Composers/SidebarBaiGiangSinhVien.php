@@ -47,8 +47,8 @@ class SidebarBaiGiangSinhVien
                         'b.TenBai as TenBaiGiang'
                     )
                     ->orderBy('c.TenChuong')
-                    ->orderBy('b.TenBai')
                     ->orderBy('b.created_at')
+                    ->orderBy('b.TenBai')
                     ->get()
                     ->groupBy('TenChuong')
                     ->map(function ($dsBai) {

@@ -129,6 +129,7 @@ class HomeController extends Controller
             ->where('b.TrangThai', 1)
             ->where('c.TrangThai', 1)
             ->where('bg.TrangThai', 1)
+            ->orderBy('b.created_at')
             ->select(
                 'c.TenChuong',
                 'b.TenBai',
@@ -237,6 +238,8 @@ class HomeController extends Controller
 
     public function chiTietBaiGiang($id, $maBaiGiang)
     {
+        $sinhVienId = Auth::id();
+
         $bai = DB::table('bai as b')
             ->join('chuong as c', 'b.MaChuong', '=', 'c.MaChuong')
             ->join('bai_giang as bg', 'c.MaBaiGiang', '=', 'bg.MaBaiGiang')
@@ -244,21 +247,42 @@ class HomeController extends Controller
             ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
             ->where('lhp.MaLopHocPhan', $id)
             ->where('b.MaBai', $maBaiGiang)
-            ->where('dsl.MaSinhVien', Auth::id())
-            ->where('dsl.TrangThai', '=', 1)
-            ->select('b.*', 'c.TenChuong', 'bg.TenBaiGiang as TenBaiGiangCha')
+            ->where('dsl.MaSinhVien', $sinhVienId)
+            ->where('dsl.TrangThai', 1)
+            ->select('b.*', 'c.TenChuong', 'bg.TenBaiGiang as TenBaiGiangCha', 'bg.MaBaiGiang')
             ->first();
 
         if (!$bai) {
             abort(404, 'Không tìm thấy bài giảng');
         }
 
-        $files = DB::table('file_bai_giang')->where('MaBai', $maBaiGiang)
+        $dsBai = DB::table('bai as b')
+            ->join('chuong as c', 'b.MaChuong', '=', 'c.MaChuong')
+            ->join('bai_giang as bg', 'c.MaBaiGiang', '=', 'bg.MaBaiGiang')
+            ->join('lop_hoc_phan as lhp', 'lhp.MaBaiGiang', '=', 'bg.MaBaiGiang')
+            ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+            ->where('lhp.MaLopHocPhan', $id)
+            ->where('dsl.MaSinhVien', Auth::id())
+            ->where('dsl.TrangThai', 1)
+            ->select('b.MaBai', 'b.TenBai')
+            ->orderBy('b.created_at')
+            ->get()
+            ->values();
+
+        $currentIndex = $dsBai->search(fn($item) => $item->MaBai == $maBaiGiang);
+
+        $baiTruoc = $currentIndex > 0 ? $dsBai[$currentIndex - 1] : null;
+        $baiSau = $currentIndex < $dsBai->count() - 1 ? $dsBai[$currentIndex + 1] : null;
+
+        $files = DB::table('file_bai_giang')
+            ->where('MaBai', $maBaiGiang)
             ->where('TrangThai', 1)
             ->get();
+
         $tab = 'bai-giang';
-        return view('sinhvien.chiTietBaiGiang', compact('bai', 'files', 'tab', 'id'));
+        return view('sinhvien.chiTietBaiGiang', compact('bai', 'files', 'tab', 'id', 'baiTruoc', 'baiSau'));
     }
+
 
     public function chiTietSuKienZoom($id, $maSuKien)
     {

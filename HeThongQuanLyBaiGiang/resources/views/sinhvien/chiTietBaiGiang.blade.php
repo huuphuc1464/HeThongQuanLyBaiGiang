@@ -56,6 +56,22 @@
                         </div>
                     </div>
                     @endif
+
+                    <div class="d-flex justify-content-between my-3">
+                        @if($baiTruoc)
+                        <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiTruoc->MaBai]) }}" class="btn btn-outline-primary" title="{{ $baiTruoc->TenBai }}">
+                            ← {{ Str::limit($baiTruoc->TenBai, 20) }}
+                        </a>
+                        @else
+                        <div></div>
+                        @endif
+
+                        @if($baiSau)
+                        <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiSau->MaBai]) }}" class="btn btn-outline-primary" title="{{ $baiSau->TenBai }}">
+                            {{ Str::limit($baiSau->TenBai, 20) }} →
+                        </a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -116,6 +132,6 @@
 
 </script>
 
-    
-    
+
+
 @endsection
