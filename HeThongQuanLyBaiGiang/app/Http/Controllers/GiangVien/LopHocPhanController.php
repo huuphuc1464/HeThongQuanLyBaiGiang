@@ -19,9 +19,9 @@ class LopHocPhanController extends Controller
             ->where('MaNguoiTao', Auth::id());
         // Tìm kiếm
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('TenLopHocPhan', 'like', '%' . $request->search . '%')
-                  ->orWhere('MoTa', 'like', '%' . $request->search . '%');
+                    ->orWhere('MoTa', 'like', '%' . $request->search . '%');
             });
         }
         $lopHocPhans = $query->orderBy('created_at', 'desc')->paginate($perPage);
@@ -42,10 +42,10 @@ class LopHocPhanController extends Controller
             ],
             'MoTa' => 'nullable|string|max:255',
             'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
-        ],[
+        ], [
             'TenLopHocPhan.unique' => 'Tên lớp học phần đã tồn tại.'
         ]);
-        
+
         LopHocPhan::create([
             'TenLopHocPhan' => $request->TenLopHocPhan,
             'MoTa' => $request->MoTa,
@@ -53,13 +53,13 @@ class LopHocPhanController extends Controller
             'MaNguoiTao' => Auth::id(),
             'TrangThai' => 1,
         ]);
-        
+
         return redirect()->back()->with('success', 'Thêm lớp học phần thành công!');
     }
 
     public function chiTiet($id)
     {
-        $lopHocPhan = LopHocPhan::with(['hocPhan'])
+        $lopHocPhan = LopHocPhan::with(['baiGiang.chuong.bai'])
             ->where('MaLopHocPhan', $id)
             ->where('MaNguoiTao', Auth::id())
             ->firstOrFail();
@@ -68,7 +68,7 @@ class LopHocPhanController extends Controller
 
     public function chinhSua($id)
     {
-        $lopHocPhan = LopHocPhan::with(['hocPhan'])
+        $lopHocPhan = LopHocPhan::with(['baiGiang.chuong.bai'])
             ->where('MaLopHocPhan', $id)
             ->where('MaNguoiTao', Auth::id())
             ->firstOrFail();
@@ -91,7 +91,7 @@ class LopHocPhanController extends Controller
             ],
             'MoTa' => 'nullable|string|max:255',
             // 'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
-        ],[
+        ], [
             'TenLopHocPhan.unique' => 'Tên lớp học phần đã tồn tại.'
         ]);
         $lopHocPhan->update([
@@ -108,7 +108,7 @@ class LopHocPhanController extends Controller
             ->where('MaLopHocPhan', $id)
             ->where('MaNguoiTao', Auth::id())
             ->firstOrFail();
-            
+
         if ($lopHocPhan->danh_sach_lop_count > 0 || $lopHocPhan->bai_kiem_tra_count > 0 || $lopHocPhan->su_kien_zoom_count > 0) {
             return redirect()->back()->with('errorSystem', 'Không thể xóa lớp học phần này vì đã có dữ liệu liên quan (sinh viên, bài kiểm tra, zoom...).');
         }

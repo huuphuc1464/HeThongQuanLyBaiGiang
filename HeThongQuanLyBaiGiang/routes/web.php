@@ -20,8 +20,6 @@ use App\Http\Controllers\GiangVien\ChuongController;
 use App\Http\Controllers\GiangVien\SinhVienController;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
-use App\Models\Bai;
-use App\Services\EmailService;
 
 Route::prefix('auth')->group(function () {
     Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
