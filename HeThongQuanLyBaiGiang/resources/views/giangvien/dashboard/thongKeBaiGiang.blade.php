@@ -148,20 +148,22 @@
                     "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6"
                     , "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
                 ]
-                , datasets: [{
-                        label: "Số bài giảng"
-                        , data: thongKeData
-                        , borderColor: "rgba(54, 162, 235, 1)"
-                        , backgroundColor: "rgba(54, 162, 235, 0.2)"
-                        , pointBackgroundColor: "rgba(255, 99, 132, 1)"
-                        , pointBorderColor: "#fff"
-                        , pointHoverBackgroundColor: "#fff"
-                        , pointHoverBorderColor: "rgba(255,99,132,1)"
-                        , fill: true
-                        , tension: 0.4
-                        , borderWidth: 2
-                    }
-                    , {
+                , datasets: [
+                    // {
+                    //     label: "Số bài giảng"
+                    //     , data: thongKeData
+                    //     , borderColor: "rgba(54, 162, 235, 1)"
+                    //     , backgroundColor: "rgba(54, 162, 235, 0.2)"
+                    //     , pointBackgroundColor: "rgba(255, 99, 132, 1)"
+                    //     , pointBorderColor: "#fff"
+                    //     , pointHoverBackgroundColor: "#fff"
+                    //     , pointHoverBorderColor: "rgba(255,99,132,1)"
+                    //     , fill: true
+                    //     , tension: 0.4
+                    //     , borderWidth: 2
+                    // }
+                    // ,
+                    {
                         label: "Số bài học"
                         , data: baiData
                         , borderColor: "rgba(255, 159, 64, 1)"
@@ -197,11 +199,13 @@
 
     // Vẽ lại biểu đồ khi chọn năm khác
     document.getElementById('selectNamThongKe').addEventListener('change', function() {
-        const nam = this.value;
-        if (!nam) return;
+        const nam = document.getElementById('selectNamThongKe').value;
+        const maBaiGiang = document.getElementById('MaBaiGiang').value;
 
-        fetch(`#?nam=${nam}`)
-            .then(res => res.json())
+        fetch(`/giang-vien/bieu-do-thong-ke?nam=${nam}&maBaiGiang=${maBaiGiang}`)
+            .then(res => {
+                return res.json();
+            })
             .then(data => {
                 const newData = Array(12).fill(0);
                 for (const [thang, soLuong] of Object.entries(data)) {
@@ -209,7 +213,12 @@
                 }
                 lineChart.data.datasets[0].data = newData;
                 lineChart.update();
+            })
+            .catch(err => {
+                console.error('Lỗi khi fetch dữ liệu biểu đồ:', err);
             });
+
+
     });
 
 </script>

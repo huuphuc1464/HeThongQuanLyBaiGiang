@@ -7,6 +7,7 @@ use App\Models\NguoiDung;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -30,44 +31,64 @@ class HomeController extends Controller
     public function dashboard()
     {
         $maGiangVien = Auth::id();
+        $maBaiGiang = request('MaBaiGiang');
 
         $tongBaiGiang = DB::table('bai_giang')
             ->where('MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('MaBaiGiang', $maBaiGiang))
             ->count();
 
         $tongChuong = DB::table('chuong')
             ->where('MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('MaBaiGiang', $maBaiGiang))
             ->count();
 
         $tongBai = DB::table('bai')
-            ->where('MaGiangVien', $maGiangVien)
+            ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
+            ->join('bai_giang', 'chuong.MaBaiGiang', '=', 'bai_giang.MaBaiGiang')
+            ->where('bai_giang.MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('bai_giang.MaBaiGiang', $maBaiGiang))
             ->distinct()
-            ->count();
+            ->count('bai.MaBai');
+
 
         $tongFile = DB::table('file_bai_giang')
             ->join('bai', 'file_bai_giang.MaBai', '=', 'bai.MaBai')
             ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
             ->join('bai_giang', 'chuong.MaBaiGiang', '=', 'bai_giang.MaBaiGiang')
             ->where('bai_giang.MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('bai_giang.MaBaiGiang', $maBaiGiang))
             ->count();
+
 
         $tongSinhVien = DB::table('danh_sach_lop')
             ->join('lop_hoc_phan', 'danh_sach_lop.MaLopHocPhan', '=', 'lop_hoc_phan.MaLopHocPhan')
             ->where('lop_hoc_phan.MaNguoiTao', $maGiangVien)
+            ->when($maBaiGiang, function ($query) use ($maBaiGiang) {
+                $query->whereIn('lop_hoc_phan.MaLopHocPhan', function ($sub) use ($maBaiGiang) {
+                    $sub->select('MaLopHocPhan')
+                        ->from('lop_hoc_phan')
+                        ->where('MaBaiGiang', $maBaiGiang);
+                });
+            })
             ->distinct()
             ->count('danh_sach_lop.MaSinhVien');
 
+
         $thongKeTheoThang = DB::table('bai_giang')
             ->where('MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('MaBaiGiang', $maBaiGiang))
             ->whereYear('created_at', now()->year)
             ->selectRaw('MONTH(created_at) as thang, COUNT(*) as so_luong')
             ->groupByRaw('MONTH(created_at)')
             ->pluck('so_luong', 'thang');
 
+
         $baiTheoThang = DB::table('bai_giang')
             ->join('chuong', 'bai_giang.MaBaiGiang', '=', 'chuong.MaBaiGiang')
             ->join('bai', 'chuong.MaChuong', '=', 'bai.MaChuong')
             ->where('bai_giang.MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('bai_giang.MaBaiGiang', $maBaiGiang))
             ->whereYear('bai_giang.created_at', now()->year)
             ->selectRaw('MONTH(bai_giang.created_at) as thang, COUNT(DISTINCT bai.MaBai) as so_luong')
             ->groupByRaw('MONTH(bai_giang.created_at)')
@@ -78,6 +99,7 @@ class HomeController extends Controller
             ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
             ->join('bai_giang', 'chuong.MaBaiGiang', '=', 'bai_giang.MaBaiGiang')
             ->where('bai_giang.MaGiangVien', $maGiangVien)
+            ->when($maBaiGiang, fn($q) => $q->where('bai_giang.MaBaiGiang', $maBaiGiang))
             ->pluck('file_bai_giang.DuongDan');
 
         $tongDungLuong = 0;
@@ -108,6 +130,7 @@ class HomeController extends Controller
             ->pluck('nam');
 
         return view('giangvien.dashboard.thongKeBaiGiang', [
+            'maBaiGiang' => $maBaiGiang,
             'tongBaiGiang' => $tongBaiGiang,
             'tongChuong' => $tongChuong,
             'tongBai' => $tongBai,
@@ -120,17 +143,43 @@ class HomeController extends Controller
             'baiTheoThang' => $baiTheoThang,
         ]);
     }
-
-    public function layDuLieuBieuDoThongKe(Request $request, $maHocPhan)
+    public function layDuLieuBieuDoThongKe(Request $request)
     {
         $nam = $request->query('nam');
-        $data = DB::table('bai_giang')
-            ->select(DB::raw('MONTH(created_at) as thang'), DB::raw('count(*) as tong'))
-            ->whereYear('created_at', $nam)
-            ->where('MaHocPhan', $maHocPhan)
-            ->groupBy(DB::raw('MONTH(created_at)'))
-            ->pluck('tong', 'thang');
+        $maBaiGiang = $request->query('maBaiGiang');
 
-        return response()->json($data);
+        if ($nam && !is_numeric($nam)) {
+            return response()->json(['error' => 'Năm không hợp lệ'], 400);
+        }
+
+        try {
+            $query = DB::table('bai_giang')
+                ->join('chuong', 'bai_giang.MaBaiGiang', '=', 'chuong.MaBaiGiang')
+                ->join('bai', 'chuong.MaChuong', '=', 'bai.MaChuong')
+                ->where('bai_giang.MaGiangVien', Auth::id());
+
+            if ($nam) {
+                $query->whereYear('bai_giang.created_at', $nam);
+            }
+
+            if ($maBaiGiang) {
+                $query->where('bai_giang.MaBaiGiang', $maBaiGiang);
+            }
+
+            $data = $query
+                ->selectRaw('MONTH(bai_giang.created_at) as thang, COUNT(DISTINCT bai.MaBai) as tong')
+                ->groupByRaw('MONTH(bai_giang.created_at)')
+                ->pluck('tong', 'thang');
+
+            $ketQua = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $ketQua[$i] = $data[$i] ?? 0;
+            }
+
+            return response()->json($ketQua);
+        } catch (\Exception $e) {
+            Log::error('Lỗi lấy dữ liệu biểu đồ:', ['msg' => $e->getMessage()]);
+            return response()->json(['error' => 'Lỗi server'], 500);
+        }
     }
 }

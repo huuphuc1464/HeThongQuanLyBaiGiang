@@ -83,7 +83,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::clas
 
 Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddleware::class . ':2'])->group(function () {
     Route::get('/', [GiangVienHomeController::class, 'dashboard'])->name('dashboard');
-    Route::get('/bieu-do-thong-ke', [BaiGiangController::class, 'layDuLieuBieuDoThongKe'])->name('bieu-do-thong-ke');
+    Route::get('/bieu-do-thong-ke', [GiangVienHomeController::class, 'layDuLieuBieuDoThongKe'])->name('bieu-do-thong-ke');
     Route::get('/doi-mat-khau', [GiangVienHomeController::class, 'hienFormDoiMatKhau'])->name('doi-mat-khau');
     Route::get('/thay-doi-thong-tin-ca-nhan', [GiangVienHomeController::class, 'hienFormThayDoiThongTin'])->name('doi-thong-tin');
 
