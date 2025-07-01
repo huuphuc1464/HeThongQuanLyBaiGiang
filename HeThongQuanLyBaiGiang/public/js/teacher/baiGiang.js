@@ -124,36 +124,97 @@ function initTinyMCE(csrfToken, maBaiGiang = null, maBai = null) {
             });
 
             editor.on('PastePostProcess', function () {
-                const images = editor.getDoc().querySelectorAll('img');
+                const doc = editor.getDoc();
+                const images = doc.querySelectorAll('img');
+
+                let totalImages = images.length;
+                let processed = 0;
+                let unsupportedCount = 0;
+
+                if (totalImages === 0) return;
+
+                const checkDone = () => {
+                    processed++;
+                    if (processed === totalImages) {
+                        if (unsupportedCount > 0) {
+                            alert(`Có ${unsupportedCount} chỗ không hỗ trợ đã được thay thế bằng "[Định dạng không hỗ trợ]". Vui lòng kiểm tra và cập nhật lại nếu cần.`);
+                        }
+                    }
+                };
+
                 images.forEach(img => {
                     const src = img.getAttribute('src');
-                    if (src.startsWith('blob:')) {
-                        // Convert blob URL to blob object
-                        fetch(src)
-                            .then(res => res.blob())
-                            .then(blob => {
-                                const formData = new FormData();
-                                formData.append('image', blob, 'pasted_image.png');
-                                formData.append('maBaiGiang', maBaiGiang || '');
-                                formData.append('maBai', maBai || '');
 
-                                return fetch('/upload-docx-image', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': window.csrfToken
-                                    },
-                                    body: formData
-                                });
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.url) {
-                                    img.setAttribute('src', data.url);
-                                }
-                            });
+                    // ❌ Không có src hoặc không đúng định dạng blob/data:image
+                    if (!src || (!src.startsWith('blob:') && !src.startsWith('data:image'))) {
+                        const span = document.createElement('span');
+                        span.style.color = 'red';
+                        span.textContent = '[Định dạng không hỗ trợ]';
+                        img.replaceWith(span);
+                        unsupportedCount++;
+                        checkDone();
+                        return;
                     }
+
+                    // ✅ Nếu là blob hoặc base64 ảnh → upload
+                    fetch(src)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            if (!blob.type.startsWith('image/')) {
+                                const span = document.createElement('span');
+                                span.style.color = 'red';
+                                span.textContent = '[Định dạng không hỗ trợ]';
+                                img.replaceWith(span);
+                                unsupportedCount++;
+                                checkDone();
+                                return;
+                            }
+
+                            const formData = new FormData();
+                            formData.append('image', blob, 'pasted_image.png');
+                            formData.append('maBaiGiang', maBaiGiang || '');
+                            formData.append('maBai', maBai || '');
+
+                            return fetch('/upload-docx-image', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': window.csrfToken
+                                },
+                                body: formData
+                            })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.url) {
+                                        img.setAttribute('src', data.url);
+                                    } else {
+                                        const span = document.createElement('span');
+                                        span.style.color = 'red';
+                                        span.textContent = '[Định dạng không hỗ trợ]';
+                                        img.replaceWith(span);
+                                        unsupportedCount++;
+                                    }
+                                    checkDone();
+                                })
+                                .catch(() => {
+                                    const span = document.createElement('span');
+                                    span.style.color = 'red';
+                                    span.textContent = '[Định dạng không hỗ trợ]';
+                                    img.replaceWith(span);
+                                    unsupportedCount++;
+                                    checkDone();
+                                });
+                        })
+                        .catch(() => {
+                            const span = document.createElement('span');
+                            span.style.color = 'red';
+                            span.textContent = '[Định dạng không hỗ trợ]';
+                            img.replaceWith(span);
+                            unsupportedCount++;
+                            checkDone();
+                        });
                 });
             });
+
         }
     });
 }
