@@ -213,10 +213,8 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="d-flex justify-content-center mt-3">
-                {{ $lopHocPhans->appends(request()->query())->links() }}
-            </div>
+            <!-- Phân trang -->
+            <x-phan-trang :data="$lopHocPhans" label="sự kiện" />
         </div>
     </div>
 </div>
