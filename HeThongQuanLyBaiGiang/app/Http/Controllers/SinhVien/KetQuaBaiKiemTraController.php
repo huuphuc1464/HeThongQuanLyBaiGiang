@@ -232,7 +232,7 @@ class KetQuaBaiKiemTraController extends Controller
 
         $lopHocPhanIds = $sinhVien->danhSachLop()->pluck('MaLopHocPhan');
 
-        $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+        $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
             ->whereIn('MaLopHocPhan', $lopHocPhanIds);
 
         // Lọc theo trạng thái
