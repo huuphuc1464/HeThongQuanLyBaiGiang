@@ -258,9 +258,7 @@
             </div>
 
             <!-- Phân trang -->
-            <div class="d-flex justify-content-center mt-3">
-                {{ $baiKiemTras->appends(request()->query())->links('pagination::bootstrap-5') }}
-            </div>
+            <x-phan-trang :data="$baiKiemTras" label="sự kiện" />
         </div>
     </div>
 </div>
