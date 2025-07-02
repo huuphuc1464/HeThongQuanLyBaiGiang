@@ -199,7 +199,7 @@ class KetQuaBaiKiemTraController extends Controller
      */
     public function ketQuaBaiKiemTra($maBaiKiemTra)
     {
-        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
             ->findOrFail($maBaiKiemTra);
 
         $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
