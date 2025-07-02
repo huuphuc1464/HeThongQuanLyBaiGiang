@@ -19,7 +19,7 @@ class KetQuaBaiKiemTraController extends Controller
      */
     public function lamBaiKiemTra($maBaiKiemTra)
     {
-        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
             ->findOrFail($maBaiKiemTra);
 
         // Kiểm tra sinh viên có thuộc lớp học phần không
