@@ -19,7 +19,7 @@ class KhoaController extends Controller
             $query->where('TenKhoa', 'like', '%' . $search . '%');
         }
 
-        $danhSachKhoa = $query->paginate(1);
+        $danhSachKhoa = $query->paginate(10);
 
         return view('admin.quanLyKhoa', compact('danhSachKhoa', 'search'));
     }
