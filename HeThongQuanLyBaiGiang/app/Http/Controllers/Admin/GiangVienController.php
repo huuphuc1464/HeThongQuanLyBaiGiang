@@ -28,7 +28,7 @@ class GiangVienController extends Controller
                 }
             });
         }
-        $query->orderBy('MaNguoiDung');
+        $query->orderBy('MaNguoiDung'); // tăng dầndần
         $query->orderBy('HoTen');
 
         $danhSachGiangVien = $query->paginate(10)->withQueryString();

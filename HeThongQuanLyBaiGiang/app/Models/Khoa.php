@@ -10,8 +10,8 @@ class Khoa extends Model
     protected $table = 'khoa';
     protected $fillable = ['TenKhoa', 'MoTa', 'TrangThai'];
     public $timestamps = true;
-    public function monHocs()
+    public function baiGiangs()
     {
-        return $this->hasMany(MonHoc::class, 'MaKhoa', 'MaKhoa');
+        return $this->hasMany(BaiGiang::class, 'MaKhoa', 'MaKhoa');
     }
 }

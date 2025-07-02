@@ -8,18 +8,19 @@ use Illuminate\Http\Request;
 
 class KhoaController extends Controller
 {
+    // chưa sử dụng logic tìm kiếm
     public function danhSach(Request $request)
     {
         $search = $request->input('search');
-        
+
         $query = Khoa::where('TrangThai', 1);
-        
+
         if ($search) {
             $query->where('TenKhoa', 'like', '%' . $search . '%');
         }
-        
-        $danhSachKhoa = $query->paginate(10);
-        
+
+        $danhSachKhoa = $query->paginate(1);
+
         return view('admin.quanLyKhoa', compact('danhSachKhoa', 'search'));
     }
 
@@ -28,7 +29,7 @@ class KhoaController extends Controller
         $request->validate([
             'TenKhoa' => 'required|string|max:255|unique:khoa,TenKhoa,NULL,MaKhoa,TrangThai,1',
             'MoTa' => 'nullable|string'
-        ],[
+        ], [
             'TenKhoa.unique' => 'Tên khoa đã tồn tại trong hệ thống.'
         ]);
 
@@ -59,19 +60,18 @@ class KhoaController extends Controller
         return redirect()->route('admin.khoa.danh-sach')
             ->with('success', 'Cập nhật khoa thành công');
     }
-    
+
     public function xoa(Khoa $khoa)
     {
-        //  dd($khoa->monHocs);
-        // Kiểm tra xem khoa có môn học nào không
-        if ($khoa->monHocs()->where('TrangThai', 1)->count() > 0) {    
+        // Kiểm tra xem khoa bài giảng nào không
+        if ($khoa->baiGiangs()->where('TrangThai', 1)->count() > 0) {
             return redirect()->route('admin.khoa.danh-sach')
-                ->with('error', 'Không thể xóa khoa này vì đang có môn học thuộc khoa');
+                ->with('error', 'Không thể xóa khoa này vì đang có bài giảng thuộc khoa');
         }
-        
+
         $khoa->update(['TrangThai' => 0]);
 
         return redirect()->route('admin.khoa.danh-sach')
             ->with('success', 'Xóa khoa thành công');
     }
-} 
+}
