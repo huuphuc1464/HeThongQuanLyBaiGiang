@@ -155,9 +155,10 @@ submitBtn.addEventListener('click', function () {
         // Tìm câu hỏi đầu tiên chưa chọn và cuộn đến đó
         const firstInvalid = form.querySelector(':invalid');
         if (firstInvalid) {
-            firstInvalid.closest('.border').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.closest('.question-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
             alert('Vui lòng chọn đáp án cho tất cả câu hỏi trước khi nộp bài!');
         }
+
     }
 });
 

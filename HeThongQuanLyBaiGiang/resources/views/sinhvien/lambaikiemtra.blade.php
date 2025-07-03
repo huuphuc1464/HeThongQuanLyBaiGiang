@@ -4,6 +4,7 @@
 
 @section('style')
 <link rel="stylesheet" href="{{ asset('css/student/baikiemtra.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection
 
 @section('sidebar')
@@ -12,77 +13,98 @@
 
 @section('content')
 <div class="container">
-    <h2 class="text-center mb-4" style="color: #2c3e50;">Làm Bài Kiểm Tra</h2>
+    <h2 class="text-center mb-5" style="color: #1f2937; font-weight: 700; font-size: 2em;">Làm Bài Kiểm Tra</h2>
 
-    <!-- Thông tin bài kiểm tra -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h4 class="card-title">{{ $baiKiemTra->TenBaiKiemTra }}</h4>
-            <p class="card-text"><strong>Giảng viên:</strong> {{ $baiKiemTra->giangVien->HoTen }}</p>
-            <p class="card-text"><strong>Lớp học phần:</strong> {{ $baiKiemTra->lopHocPhan->TenLopHocPhan }}</p>
-            <p class="card-text"><strong>Thời gian bắt đầu:</strong> {{
-                \Carbon\Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('H:i:s d/m/Y') }}</p>
-            <p class="card-text"><strong>Thời gian kết thúc:</strong> {{
-                \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('H:i:s d/m/Y') }}</p>
-            <p class="card-text"><strong>Mô tả:</strong> {{ $baiKiemTra->MoTa ?? 'Không có mô tả' }}</p>
-            <p class="card-text"><strong>Thời gian còn lại:</strong> <span id="timer" style="color: #e74c3c;">{{
-                    gmdate('H:i:s', $thoiGianConLai) }}</span></p>
+    <!-- Exam Information -->
+    <div class="card mb-5">
+        <div class="card-body p-4">
+            <h4 class="card-title mb-4" style="color: #1e40af; font-weight: 600;">{{ $baiKiemTra->TenBaiKiemTra }}</h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <p class="card-text"><i class="bi bi-person-circle me-2"></i><strong>Giảng viên:</strong> {{
+                        $baiKiemTra->giangVien->HoTen }}</p>
+                    <p class="card-text"><i class="bi bi-book me-2"></i><strong>Lớp học phần:</strong> {{
+                        $baiKiemTra->lopHocPhan->TenLopHocPhan }}</p>
+                    <p class="card-text"><i class="bi bi-clock me-2"></i><strong>Thời gian bắt đầu:</strong> {{
+                        \Carbon\Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('H:i:s d/m/Y') }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <p class="card-text"><i class="bi bi-clock-history me-2"></i><strong>Thời gian kết thúc:</strong> {{
+                        \Carbon\Carbon::parse($baiKiemTra->ThoiGianKetThuc)->format('H:i:s d/m/Y') }}</p>
+                    <p class="card-text"><i class="bi bi-info-circle me-2"></i><strong>Mô tả:</strong> {{
+                        $baiKiemTra->MoTa ?? 'Không có mô tả' }}</p>
+                    <p class="card-text"><i class="bi bi-hourglass-split me-2"></i><strong>Thời gian còn lại:</strong>
+                        <span id="timer">{{ gmdate('H:i:s', $thoiGianConLai) }}</span>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Form làm bài -->
+    <!-- Exam Form -->
     <form action="{{ route('nop-bai-kiem-tra', $baiKiemTra->MaBaiKiemTra) }}" method="POST" id="examForm"
         class="needs-validation" novalidate onsubmit="return false;">
         @csrf
         <input type="hidden" name="redirect_url" value="{{ route('danh-sach-bai-kiem-tra') }}">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Danh sách câu hỏi ({{ $baiKiemTra->cauHoiBaiKiemTra->count() }} câu)</h5>
+        <div class="card mb-5">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Danh sách câu hỏi ({{
+                    $baiKiemTra->cauHoiBaiKiemTra->count() }} câu)</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 @foreach($baiKiemTra->cauHoiBaiKiemTra as $index => $cauHoi)
-                <div class="mb-4 p-3 border rounded" style="background-color: #f8f9fa;"
-                    id="question_{{ $cauHoi->MaCauHoi }}">
-                    <h6>Câu {{ $index + 1 }}: {{ $cauHoi->CauHoi }}</h6>
-                    <div class="form-check mb-2">
-                        <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" value="A"
-                            required>
-                        <label class="form-check-label">A) {{ $cauHoi->DapAnA }}</label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" value="B">
-                        <label class="form-check-label">B) {{ $cauHoi->DapAnB }}</label>
-                    </div>
-                    <div class="form-check mb-2">
-                        <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" value="C">
-                        <label class="form-check-label">C) {{ $cauHoi->DapAnC }}</label>
-                    </div>
-                    <div class="form-check">
-                        <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" value="D">
-                        <label class="form-check-label">D) {{ $cauHoi->DapAnD }}</label>
-                    </div>
-                    <div class="invalid-feedback">
-                        Vui lòng chọn một đáp án!
+                <div class="question-container" id="question_{{ $cauHoi->MaCauHoi }}">
+                    <h6 class="mb-4" style="font-weight: 600; color: #1f2937;">Câu {{ $index + 1 }}: {{ $cauHoi->CauHoi
+                        }}</h6>
+                    <div class="answer-options">
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_A" value="A" required>
+                            <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_A">A) {{ $cauHoi->DapAnA
+                                }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_B" value="B">
+                            <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_B">B) {{ $cauHoi->DapAnB
+                                }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_C" value="C">
+                            <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_C">C) {{ $cauHoi->DapAnC
+                                }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_D" value="D">
+                            <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_D">D) {{ $cauHoi->DapAnD
+                                }}</label>
+                        </div>
+                        <div class="invalid-feedback">
+                            Vui lòng chọn một đáp án!
+                        </div>
                     </div>
                 </div>
                 @endforeach
             </div>
         </div>
 
-        <!-- Nút nộp bài -->
-        <div class="text-center">
+        <!-- Submit Button -->
+        <div class="text-center mb-4">
             <button type="button" class="btn btn-success btn-lg" id="submitBtn">
-                <i class="bi bi-check-circle"></i> Nộp bài
+                <i class="bi bi-check-circle me-2"></i>Nộp bài
             </button>
         </div>
     </form>
 
-    <!-- Modal xác nhận nộp bài -->
+    <!-- Confirmation Modal -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
-                    <h5 class="modal-title" id="confirmModalLabel">Xác nhận nộp bài</h5>
+                    <h5 class="modal-title" id="confirmModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>Xác
+                        nhận nộp bài</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -96,16 +118,17 @@
         </div>
     </div>
 
-    <!-- Modal thành công -->
+    <!-- Success Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="successModalLabel">Nộp bài thành công</h5>
+                    <h5 class="modal-title" id="successModalLabel"><i class="bi bi-check-circle-fill me-2"></i>Nộp bài
+                        thành công</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Nộp bài kiểm tra thành công!
+                    Nộp bài kiểm tra thành công! Bạn sẽ được chuyển hướng về danh sách bài kiểm tra.
                 </div>
             </div>
         </div>
@@ -114,12 +137,20 @@
 
 @section('scripts')
 <script>
-    console.log(@json(csrf_token()));
+    window.csrfToken = @json(csrf_token());
 </script>
 <script>
-    window.csrfToken = @json(csrf_token())
+
+    document.querySelectorAll('.form-check').forEach(option => {
+        option.addEventListener('click', () => {
+            const radio = option.querySelector('.form-check-input');
+            radio.checked = true;
+            option.parentElement.querySelectorAll('.form-check').forEach(sibling => {
+                sibling.classList.remove('selected');
+            });
+            option.classList.add('selected');
+        });
+    });
 </script>
-
-
-<script src="{{asset('js/student/lamBaiKiemTra.js')}}"></script>
+<script src="{{ asset('js/student/lamBaiKiemTra.js') }}"></script>
 @endsection
