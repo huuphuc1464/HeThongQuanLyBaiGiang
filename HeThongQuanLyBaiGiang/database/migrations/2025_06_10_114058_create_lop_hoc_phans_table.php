@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('MaLopHocPhan');
             $table->foreignId('MaBaiGiang')->constrained('bai_giang', 'MaBaiGiang');
             $table->foreignId('MaNguoiTao')->constrained('nguoi_dung', 'MaNguoiDung');
-            $table->string('TenLopHocPhan', 100);
+            $table->string('TenLopHocPhan', 100)->unique();
             $table->text('MoTa')->nullable();
             $table->integer('TrangThai')->default(1);
             $table->timestamps();
