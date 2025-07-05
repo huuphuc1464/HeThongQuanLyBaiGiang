@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('vai_tro', function (Blueprint $table) {
             $table->id('MaVaiTro');
-            $table->string('TenVaiTro', 100);
+            $table->string('TenVaiTro', 100)->unique();
             $table->string('MoTa', 255)->nullable();
             $table->integer('TrangThai')->default(1);
             $table->timestamps();
