@@ -283,6 +283,7 @@ class SuKienZoomController extends Controller
                 'NoiDung' => $noiDungThongBao,
                 'ThoiGianTao' => now(),
             ]);
+
             foreach ($danhSachThongTin as $nd) {
                 $studentName = $nd->HoTen;
                 $email = $nd->Email;

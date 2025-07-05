@@ -6,6 +6,7 @@
     <title>
         @yield('title')
     </title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
         rel="stylesheet" />
     <link rel="icon" type="shortcut icon" href=" {{ asset('img/web/favicon.ico') }}">
@@ -46,19 +47,22 @@
                         <ul class="dropdown-menu" aria-labelledby="khoaDropdownBtn">
                             @foreach ($danhSachKhoa as $khoa)
                             <li class="dropdown-submenu dropend">
-                                <a class="dropdown-item dropdown-toggle text-truncate" href="#" data-bs-toggle="dropdown">
+                                <a class="dropdown-item dropdown-toggle text-truncate" href="#"
+                                    data-bs-toggle="dropdown">
                                     {{ $khoa['TenKhoa'] }}
                                 </a>
                                 <ul class="dropdown-menu">
                                     @foreach ($khoa['GiangVien'] as $gv)
                                     <li class="dropdown-submenu dropend">
-                                        <a class="dropdown-item dropdown-toggle text-truncate" href="#" data-bs-toggle="dropdown">
+                                        <a class="dropdown-item dropdown-toggle text-truncate" href="#"
+                                            data-bs-toggle="dropdown">
                                             {{ $gv['TenGiangVien'] }}
                                         </a>
                                         <ul class="dropdown-menu">
                                             @foreach ($gv['BaiGiang'] as $bg)
                                             <li>
-                                                <a class="dropdown-item text-truncate" href="{{ route('trang-chu', ['giang_vien' => $gv['MaGiangVien'], 'bai_giang' => $bg['MaBaiGiang']]) }}">
+                                                <a class="dropdown-item text-truncate"
+                                                    href="{{ route('trang-chu', ['giang_vien' => $gv['MaGiangVien'], 'bai_giang' => $bg['MaBaiGiang']]) }}">
                                                     {{ $bg['TenBaiGiang'] }}
                                                 </a>
                                             </li>
@@ -71,7 +75,7 @@
                             @endforeach
                         </ul>
 
-                        
+
                     </div>
                 </div> --}}
 

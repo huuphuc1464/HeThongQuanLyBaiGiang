@@ -19,7 +19,7 @@ class KetQuaBaiKiemTraController extends Controller
      */
     public function lamBaiKiemTra($maBaiKiemTra)
     {
-        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
             ->findOrFail($maBaiKiemTra);
 
         // Kiểm tra sinh viên có thuộc lớp học phần không
@@ -199,7 +199,7 @@ class KetQuaBaiKiemTraController extends Controller
      */
     public function ketQuaBaiKiemTra($maBaiKiemTra)
     {
-        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+        $baiKiemTra = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
             ->findOrFail($maBaiKiemTra);
 
         $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
@@ -232,7 +232,7 @@ class KetQuaBaiKiemTraController extends Controller
 
         $lopHocPhanIds = $sinhVien->danhSachLop()->pluck('MaLopHocPhan');
 
-        $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.hocPhan', 'cauHoiBaiKiemTra'])
+        $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
             ->whereIn('MaLopHocPhan', $lopHocPhanIds);
 
         // Lọc theo trạng thái

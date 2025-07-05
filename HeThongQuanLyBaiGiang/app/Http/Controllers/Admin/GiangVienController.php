@@ -13,6 +13,7 @@ class GiangVienController extends Controller
 {
     public function danhSachGiangVien(Request $request)
     {
+        //Multi-keyword Search (tách từ khóa để tìm)
         $query = DB::table('nguoi_dung')
             ->where('MaVaiTro', 2); // Giảng viên
 
@@ -28,7 +29,7 @@ class GiangVienController extends Controller
                 }
             });
         }
-        $query->orderBy('MaNguoiDung'); // tăng dầndần
+        $query->orderBy('MaNguoiDung'); // tăng dần
         $query->orderBy('HoTen');
 
         $danhSachGiangVien = $query->paginate(10)->withQueryString();

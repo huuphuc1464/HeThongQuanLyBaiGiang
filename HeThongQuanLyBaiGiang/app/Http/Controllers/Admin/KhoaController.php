@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Khoa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KhoaController extends Controller
 {
-    // chưa sử dụng logic tìm kiếm
+    //Relevance-based Search with Field Weighting (tìm kiếm có sắp xếp theo ưu tiên)
     public function danhSach(Request $request)
     {
         $search = $request->input('search');
@@ -16,10 +17,28 @@ class KhoaController extends Controller
         $query = Khoa::where('TrangThai', 1);
 
         if ($search) {
-            $query->where('TenKhoa', 'like', '%' . $search . '%');
+            $search = trim($search);
+
+            $query->select('*', DB::raw('
+                CASE 
+                    WHEN LOWER(TenKhoa) = LOWER("' . $search . '") THEN 3
+                    WHEN LOWER(TenKhoa) LIKE LOWER("%' . $search . '%") THEN 2
+                    WHEN LOWER(MoTa) LIKE LOWER("%' . $search . '%") THEN 1
+                    ELSE 0
+                END as relevance_score
+            '))
+                ->where(function ($q) use ($search) {
+                    $q->whereRaw('LOWER(TenKhoa) LIKE ?', ["%$search%"])
+                        ->orWhereRaw('LOWER(MoTa) LIKE ?', ["%$search%"]);
+                })
+                ->orderBy('relevance_score', 'desc')
+                ->orderBy('TenKhoa');
+        } else {
+            $query->orderBy('MaKhoa')
+                ->orderBy('TenKhoa');
         }
 
-        $danhSachKhoa = $query->paginate(10);
+        $danhSachKhoa = $query->paginate(10)->withQueryString();
 
         return view('admin.quanLyKhoa', compact('danhSachKhoa', 'search'));
     }

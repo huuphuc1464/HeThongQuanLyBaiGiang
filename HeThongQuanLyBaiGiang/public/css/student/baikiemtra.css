@@ -1,57 +1,154 @@
-/* Đảm bảo nội dung không bị che bởi sidebar */
 .container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px 20px;
+    background: #e8ecef;
+    min-height: 100vh;
 }
 
-/* Style cho form làm bài */
 .card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Style cho timer */
 #timer {
-    font-size: 1.2em;
-    font-weight: bold;
+    font-size: 1.4em;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fee2e2;
+    padding: 8px 16px;
+    border: 1px solid #ef4444;
+    display: inline-block;
 }
 
-/* Style cho câu hỏi */
+.question-container {
+    position: relative;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #1e40af;
+    background: #f8fafc;
+}
+
+
+.answer-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
 .form-check {
-    margin: 10px 0;
-    padding: 10px;
+    position: relative;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.form-check:hover {
+    background: #f1f5f9;
+    border-color: #93c5fd;
+}
+
+.form-check.selected {
+    border-color: #1e40af;
+    background: #e0f2fe;
 }
 
 .form-check-input {
-    margin-right: 10px;
+    /* Ẩn radio button */
+    display: none;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .container {
-        padding: 10px;
-    }
+.form-check-label {
+    font-size: 1em;
+    color: #1f2937;
+    font-weight: 500;
+    width: 100%;
+    margin: 0;
 }
 
-/* Modal styles */
+
+.invalid-feedback {
+    display: none;
+    font-size: 0.85em;
+    color: #b91c1c;
+    margin-top: 8px;
+    grid-column: 1 / -1;
+
+}
+
+.was-validated .form-check:invalid~.invalid-feedback {
+    display: block;
+}
+
+.btn-success {
+    padding: 12px 40px;
+    font-size: 1.1em;
+    background: #15803d;
+    border: none;
+    color: #ffffff;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.btn-success:hover {
+    background: #166534;
+}
+
 .modal-content {
-    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .modal-header {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    background: #1e40af;
+    color: #ffffff;
+    border-bottom: 1px solid #d1d5db;
 }
 
-/* Đảm bảo form không bị overflow */
+.modal-header.bg-warning {
+    background: #d97706;
+}
+
+.modal-header.bg-success {
+    background: #15803d;
+}
+
 #examForm {
     overflow-x: hidden;
 }
 
-/* Style cho nút submit */
-.btn-success {
-    padding: 10px 30px;
-    font-size: 1.1em;
+@media (max-width: 992px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+    .answer-options {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-success {
+        padding: 10px 30px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding: 15px 10px;
+    }
+
+    #timer {
+        font-size: 1.2em;
+    }
+
+    .form-check-label {
+        font-size: 0.95em;
+    }
 }
