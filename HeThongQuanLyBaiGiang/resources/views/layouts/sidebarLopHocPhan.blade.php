@@ -30,7 +30,7 @@
             <li class="nav-item gachDuoi">
                 <a class="nav-link d-flex align-items-center gap-2 text-dark" href="{{ route('bai-giang.bai.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
                     <i class="fas fa-video"></i>
-                    <span>Sự kiện học trực tuyến</span>
+                    <span>Sự kiện Zoom</span>
                 </a>
             </li>
         </ul>

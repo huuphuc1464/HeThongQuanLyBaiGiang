@@ -36,7 +36,7 @@
             {{-- Nội dung navbar --}}
             <div class="collapse navbar-collapse justify-content-between" id="anHienNavbar">
                 {{-- Trái: Dropdown Khoa --}}
-                <div class="d-flex align-items-center">
+                {{-- <div class="d-flex align-items-center">
                     <div class="dropdown">
                         <button class="btn dropdown-toggle text-dark fw-bold text-nowrap"
                             style="border: none; box-shadow: none;" type="button" id="khoaDropdownBtn"
@@ -73,7 +73,7 @@
 
                         
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- Giữa: Search --}}
                 <form action="{{ route('trang-chu') }}" method="GET"

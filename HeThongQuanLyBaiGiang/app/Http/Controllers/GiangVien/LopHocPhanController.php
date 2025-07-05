@@ -43,7 +43,14 @@ class LopHocPhanController extends Controller
             'MoTa' => 'nullable|string|max:255',
             'MaBaiGiang' => 'required|exists:bai_giang,MaBaiGiang',
         ], [
-            'TenLopHocPhan.unique' => 'Tên lớp học phần đã tồn tại.'
+            'MaBaiGiang.exists' => 'Bài giảng không tồn tại.',
+            'MaBaiGiang.required' => 'Mã bài giảng là bắt buộc.',
+            'TenLopHocPhan.required' => 'Tên lớp học phần là bắt buộc.',
+            'TenLopHocPhan.unique' => 'Tên lớp học phần đã tồn tại.',
+            'TenLopHocPhan.string' => 'Tên lớp học phần phải là chuỗi.',
+            'TenLopHocPhan.max' => 'Tên lớp học phần không được vượt quá 255 ký tự.',
+            'MoTa.string' => 'Mô tả phải là chuỗi.',
+            'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự.',
         ]);
 
         LopHocPhan::create([

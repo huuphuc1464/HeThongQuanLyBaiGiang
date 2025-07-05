@@ -165,12 +165,12 @@ class BaiController extends Controller
             'TenBai.required' => 'Tên bài không được để trống.',
             'TenBai.string' => 'Tên bài phải là chuỗi.',
             'TenBai.max' => 'Tên bài không được vượt quá 255 ký tự.',
-            'NoiDung.required' => 'Nội dung bài giảng không được để trống.',
+            'NoiDung.required' => 'Nội dung bài không được để trống.',
             'NoiDung.string' => 'Nội dung phải là chuỗi.',
             'MoTa.string' => 'Mô tả phải là chuỗi.',
             'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự.',
-            'TrangThai.required' => 'Trạng thái bài giảng không được để trống.',
-            'TrangThai.in' => 'Trạng thái bài giảng chỉ chấp nhận giá trị 0 và 1.'
+            'TrangThai.required' => 'Trạng thái bài không được để trống.',
+            'TrangThai.in' => 'Trạng thái bài chỉ chấp nhận giá trị 0 và 1.'
         ]);
 
         $existsBai = DB::table('bai')

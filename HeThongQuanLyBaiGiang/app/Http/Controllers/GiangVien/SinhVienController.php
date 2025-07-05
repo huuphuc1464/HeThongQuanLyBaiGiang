@@ -85,7 +85,17 @@ class SinhVienController extends Controller
         $request->validate([
             'emails' => 'required|string',
         ]);
+        
+        $lopHocPhan = DB::table('lop_hoc_phan')
+            ->where('MaLopHocPhan', $maLopHocPhan)
+            ->where('MaNguoiTao', Auth::id())
+            ->where('TrangThai', 1)
+            ->first();
 
+        if (!$lopHocPhan) {
+            abort(404, 'Lớp học phần không tồn tại hoặc bạn không có quyền truy cập');
+        }
+        
         $emails = array_filter(array_map('trim', explode(';', $request->emails)));
         $emailsHopLe = [];
         $emailsSaiDinhDang = [];
@@ -98,15 +108,6 @@ class SinhVienController extends Controller
         }
         $emailsKhongCoTaiKhoan = [];
         $emailsDaMoiChuaXacNhan = [];
-        $lopHocPhan = DB::table('lop_hoc_phan')
-            ->where('MaLopHocPhan', $maLopHocPhan)
-            ->where('MaNguoiTao', Auth::id())
-            ->where('TrangThai', 1)
-            ->first();
-
-        if (!$lopHocPhan) {
-            abort(404, 'Lớp học phần không tồn tại hoặc bạn không có quyền');
-        }
 
         foreach ($emailsHopLe as $email) {
             $nguoiDung = DB::table('nguoi_dung as nd')
@@ -203,7 +204,13 @@ class SinhVienController extends Controller
     {
         $request->validate([
             'excel_file' => 'required|file|mimes:xlsx',
-        ]);
+        ],
+        [
+            'excel_file.required' => 'Vui lòng chọn file Excel.',
+            'excel_file.file' => 'File không hợp lệ.',
+            'excel_file.mimes' => 'File phải có định dạng .xlsx.'
+        ]
+    );
 
         try {
             $data = Excel::toArray([], $request->file('excel_file'));
