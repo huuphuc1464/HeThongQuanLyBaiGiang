@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('MatKhau', 255);
             $table->string('Email', 100)->unique();
             $table->string('HoTen', 100);
-            $table->string('SoDienThoai', 10)->nullable();
+            $table->string('SoDienThoai', 10)->unique()->nullable();
             $table->string('AnhDaiDien', 255)->nullable();
             $table->string('DiaChi', 255)->nullable();
             $table->date('NgaySinh')->nullable();
