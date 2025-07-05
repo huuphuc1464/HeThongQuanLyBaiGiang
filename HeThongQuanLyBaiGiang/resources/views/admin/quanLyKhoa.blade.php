@@ -12,7 +12,7 @@
         <div class="card-body">
             <form class="row g-3" method="GET" action="{{ route('admin.khoa.danh-sach') }}">
                 <div class="col-md-10">
-                    <input type="text" class="form-control" name="search" placeholder="Nhập tên khoa cần tìm"
+                    <input type="text" class="form-control" name="search" placeholder="Nhập tên, mô tả khoa cần tìm"
                         value="{{ $search ?? '' }}">
                 </div>
                 <div class="col-md-2">

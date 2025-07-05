@@ -14,7 +14,8 @@
         <div class="card-body">
             <form class="row g-3" method="GET" action="{{ route('admin.giang-vien.danh-sach') }}">
                 <div class="col-md-10">
-                    <input type="text" class="form-control" name="search" placeholder="Nhập từ khóa tìm kiếm" value="{{ request('search') }}">
+                    <input type="text" class="form-control" name="search"
+                        placeholder="Nhập từ khóa tìm kiếm (tên, email, sđt)" value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
@@ -67,14 +68,19 @@
                         </td>
                         <td>
                             @if($gv->TrangThai == 1)
-                            <a class="btn btn-warning btn-sm" href="{{ route('admin.giang-vien.form-sua', ['id' => $gv->MaNguoiDung]) }}">
+                            <a class="btn btn-warning btn-sm"
+                                href="{{ route('admin.giang-vien.form-sua', ['id' => $gv->MaNguoiDung]) }}">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalXacNhanXoa" data-id="{{ $gv->MaNguoiDung }}" data-ten="{{ $gv->HoTen }}">
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#modalXacNhanXoa" data-id="{{ $gv->MaNguoiDung }}"
+                                data-ten="{{ $gv->HoTen }}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                             @else
-                            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalXacNhanKhoiPhuc" data-id="{{ $gv->MaNguoiDung }}" data-ten="{{ $gv->HoTen }}">
+                            <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                data-bs-target="#modalXacNhanKhoiPhuc" data-id="{{ $gv->MaNguoiDung }}"
+                                data-ten="{{ $gv->HoTen }}">
                                 <i class="fas fa-undo-alt"></i>
                             </button>
                             @endif
@@ -116,7 +122,8 @@
 </div>
 
 <!-- Modal Xác nhận Khôi phục -->
-<div class="modal fade" id="modalXacNhanKhoiPhuc" tabindex="-1" aria-labelledby="xacNhanKhoiPhucLabel" aria-hidden="true">
+<div class="modal fade" id="modalXacNhanKhoiPhuc" tabindex="-1" aria-labelledby="xacNhanKhoiPhucLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -141,10 +148,10 @@
 @endsection
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const modalXoa = document.getElementById('modalXacNhanXoa');
         if (modalXoa) {
-            modalXoa.addEventListener('show.bs.modal', function(event) {
+            modalXoa.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const maNguoiDung = button.getAttribute('data-id');
                 const tenGiangVien = button.getAttribute('data-ten');
@@ -156,7 +163,7 @@
 
         const modalKhoiPhuc = document.getElementById('modalXacNhanKhoiPhuc');
         if (modalKhoiPhuc) {
-            modalKhoiPhuc.addEventListener('show.bs.modal', function(event) {
+            modalKhoiPhuc.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const maNguoiDung = button.getAttribute('data-id');
                 const tenGiangVien = button.getAttribute('data-ten');
@@ -183,6 +190,5 @@
         border-radius: .357rem;
         object-fit: cover;
     }
-
 </style>
 @endsection
