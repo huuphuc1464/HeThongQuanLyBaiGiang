@@ -72,7 +72,7 @@
                         <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
                         <div class="input-group me-2">
                             <input type="search" name="search" class="form-control" placeholder="Tìm kiếm..."
-                                value="{{ request('search') }}">
+                                value="{{ request('search') }}" title="Tìm kiếm theo tên bài kiểm tra, mô tả, tên lớp học phần">
                             <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                         </div>
                         <select name="filterClass" id="filterClass" class="form-select form-select-sm"

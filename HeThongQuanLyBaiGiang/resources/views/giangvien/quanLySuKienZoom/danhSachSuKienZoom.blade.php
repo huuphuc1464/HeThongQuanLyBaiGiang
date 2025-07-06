@@ -13,9 +13,12 @@
                     </a>
                 </div>
                 <div class="col-12 col-md-8 p-0 d-flex justify-content-end">
-                    <form method="GET" action="{{ route('giangvien.su-kien-zoom.danhsach') }}" class="d-flex input-group" style="max-width: 420px; width: 100%;">
-                        <input type="text" name="search" class="form-control" placeholder="Tìm kiếm tên sự kiện, tên lớp học phần, ..." value="{{ request('search') }}">
-                        <button type="submit" class="btn btn-secondary">Tìm kiếm</button>
+                    <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 ms-auto flex-nowrap" style="min-width: 250px;" title="Tìm kiếm tên sự kiện, tên lớp học phần, mô tả, link sự kiện...">
+                        <label for="search" class="fw-bold mb-0">Tìm kiếm:</label>
+                        <input type="text" name="search" id="search" class="form-control form-control-sm w-auto" value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </form>
                 </div>
             </div>

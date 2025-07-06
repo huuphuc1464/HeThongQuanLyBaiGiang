@@ -13,14 +13,13 @@
                     </button>
                 </div>
                 <div class="col-12 col-md-8 p-0 d-flex justify-content-end">
-                    <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 ms-auto flex-nowrap" style="min-width: 250px;" title="Tìm kiếm sinh viên theo tên, mssv, email">
+                    <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 ms-auto flex-nowrap" style="min-width: 250px;" title="Tìm kiếm theo tên bài giảng, mô tả, tên khoa">
                         <label for="search" class="fw-bold mb-0">Tìm kiếm:</label>
                         <input type="text" name="search" id="search" class="form-control form-control-sm w-auto" value="{{ request('search') }}">
                         <button type="submit" class="btn btn-primary btn-sm">
                             <i class="fas fa-search"></i>
                         </button>
                     </form>
-
                 </div>
             </div>
         </div>

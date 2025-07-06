@@ -1,6 +1,6 @@
 @extends('layouts.teacherLayout')
 @section('title','Giảng viên - Danh sách chương')
-@section('tenTrang', $baiGiang->TenBaiGiang . ' / Danh sách chương')
+@section('tenTrang', $baiGiang->TenBaiGiang . ' / Danh sách chương - bài')
 @section('content')
 <div class="container my-3">
     <div class="card shadow-sm">
@@ -11,7 +11,7 @@
                         <i class="fas fa-plus"></i> Thêm chương mới
                     </button>
                 </div>
-                <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 flex-nowrap" style="min-width: 250px;" title="Tìm kiếm bài giảng theo tên chương, bài, mục, bài giảng, mô tả.">
+                <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 flex-nowrap" style="min-width: 250px;" title="Tìm kiếm theo tên chương, tên bài, mô tả.">
                     <label for="search" class="fw-bold mb-0">Tìm kiếm:</label>
                     <input type="text" name="search" id="search" class="form-control form-control-sm w-auto" value="{{ request('search') }}">
                     <button type="submit" class="btn btn-primary btn-sm">

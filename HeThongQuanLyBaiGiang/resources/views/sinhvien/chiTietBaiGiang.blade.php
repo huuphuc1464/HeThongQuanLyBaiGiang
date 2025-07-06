@@ -41,8 +41,7 @@
                     @if(count($files) > 0)
                     <div class="mb-4">
                         <h5 class="text-primary">Tài liệu đính kèm:</h5>
-                        <div div style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
-
+                        <div style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
                             <ul class="list-group">
                                 @foreach ($files as $file)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">

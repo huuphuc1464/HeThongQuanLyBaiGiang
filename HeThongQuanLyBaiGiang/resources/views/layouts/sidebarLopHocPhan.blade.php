@@ -24,7 +24,7 @@
             <li class="nav-item gachDuoi">
                 <a class="nav-link d-flex align-items-center gap-2 text-dark" href="{{ route('danh-sach-bai-kiem-tra') }}">
                     <i class="fas fa-clipboard-list"></i>
-                    <span>Bài kiểm tra trắc nghiệm</span>
+                    <span>Bài kiểm tra</span>
                 </a>
             </li>
             <li class="nav-item gachDuoi">
@@ -50,17 +50,19 @@
                 </h2>
                 <div id="collapse-{{ $chuongId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $chuongId }}" data-bs-parent="#sidebarAccordion">
                     <div class="accordion-body p-0">
-                        <ul class="list-group list-group-flush">
-                            @foreach ($dsBaiGiang as $baiGiang)
-                            <li class="list-group-item p-0 ps-3">
-                                <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
-                                    <div class="text-truncate w-100 pe-2" style="font-size:14px;" title="{{ $baiGiang->TenBaiGiang }}">
-                                        {{ $baiGiang->TenBaiGiang }}
-                                    </div>
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
+                        <div div style="max-height: calc(3 * 46px); overflow-y: auto;">
+                            <ul class="list-group list-group-flush">
+                                @foreach ($dsBaiGiang as $baiGiang)
+                                <li class="list-group-item p-0 ps-3">
+                                    <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
+                                        <div class="text-truncate w-100 pe-2" style="font-size:14px;" title="{{ $baiGiang->TenBaiGiang }}">
+                                            {{ $baiGiang->TenBaiGiang }}
+                                        </div>
+                                    </a>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,4 +70,3 @@
         </div>
     </div>
 </nav>
-

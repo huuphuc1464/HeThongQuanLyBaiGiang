@@ -103,8 +103,8 @@
                 </select>
             </div>
             <div class="tile">
-                <h3 class="tile-title text-dark text-center mt-0">THỐNG KÊ THỜI GIAN TẠO BÀI GIẢNG TRONG NĂM
-                    2025</h3>
+                <h3 class="tile-title text-dark text-center mt-0" id="namThongKe">THỐNG KÊ THỜI GIAN TẠO BÀI GIẢNG TRONG NĂM {{ $namThongKe->first() }}
+                </h3>
                 <div class="embed-responsive embed-responsive-16by9">
                     <canvas class="embed-responsive-item" id="lineChartDemo"></canvas>
                 </div>
@@ -122,7 +122,6 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const thongKeTheoThang = @json($thongKeTheoThang);
     const baiTheoThang = @json($baiTheoThang);
 
     let lineChart;
@@ -132,10 +131,6 @@
         const ctx = document.getElementById("lineChartDemo").getContext("2d");
         const thongKeData = Array(12).fill(0);
         const baiData = Array(12).fill(0);
-
-        for (const [thang, soLuong] of Object.entries(thongKeTheoThang)) {
-            thongKeData[parseInt(thang) - 1] = soLuong;
-        }
 
         for (const [thang, soLuong] of Object.entries(baiTheoThang)) {
             baiData[parseInt(thang) - 1] = soLuong;
@@ -201,6 +196,9 @@
     document.getElementById('selectNamThongKe').addEventListener('change', function() {
         const nam = document.getElementById('selectNamThongKe').value;
         const maBaiGiang = document.getElementById('MaBaiGiang').value;
+
+        document.getElementById('namThongKe').textContent =
+            `THỐNG KÊ THỜI GIAN TẠO BÀI GIẢNG TRONG NĂM ${nam}`;
 
         fetch(`/giang-vien/bieu-do-thong-ke?nam=${nam}&maBaiGiang=${maBaiGiang}`)
             .then(res => {

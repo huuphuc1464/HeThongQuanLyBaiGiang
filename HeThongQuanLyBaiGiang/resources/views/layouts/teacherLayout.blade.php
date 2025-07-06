@@ -17,8 +17,9 @@
 
     <!-- Sidebar -->
     <div class="sidebar position-fixed">
-        <div class="p-3 text-center border-bottom border-secondary">
-            <h5 class="text-white">Quản trị hệ thống</h5>
+        <div class="px-2 py-3 d-flex align-items-center border-bottom border-secondary">
+            <img width="40" src="{{ asset('/img/web/logo.jpg') }}" alt="UniLecture Logo" class="me-2 rounded-circle">
+            <h5 class="mb-0 fw-bold reload-text text-white" style="cursor: pointer;">UniLecture Teacher</h5>
         </div>
         <a href="{{ route('giangvien.dashboard') }}" class="sidebar-item {{ request()->is('giang-vien') ? 'active' : '' }}">
             <i class="fas fa-home me-2"></i> Dashboard</a>

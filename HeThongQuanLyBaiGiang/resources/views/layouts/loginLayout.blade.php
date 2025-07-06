@@ -2,7 +2,7 @@
 <html lang="vi">
 
 <head>
-    <title>Đăng nhập hệ thống quản lý bài giảng</title>
+    <title>Đăng nhập hệ thống bài giảng trực tuyến</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="{{ asset('/css/login/util.css') }}">
@@ -53,7 +53,7 @@
                 @endif
                 <!--=====FOOTER======-->
                 <div class="text-center p-t-70 txt2">
-                    Hệ thống quản lý bài giảng trực tuyến <i class="far fa-copyright" aria-hidden="true"></i>
+                    Hệ thống bài giảng trực tuyến <i class="far fa-copyright" aria-hidden="true"></i>
                     <script type="text/javascript">
                         document.write(new Date().getFullYear());
 

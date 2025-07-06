@@ -75,13 +75,13 @@ class HomeController extends Controller
             ->count('danh_sach_lop.MaSinhVien');
 
 
-        $thongKeTheoThang = DB::table('bai_giang')
-            ->where('MaGiangVien', $maGiangVien)
-            ->when($maBaiGiang, fn($q) => $q->where('MaBaiGiang', $maBaiGiang))
-            ->whereYear('created_at', now()->year)
-            ->selectRaw('MONTH(created_at) as thang, COUNT(*) as so_luong')
-            ->groupByRaw('MONTH(created_at)')
-            ->pluck('so_luong', 'thang');
+        // $thongKeTheoThang = DB::table('bai_giang')
+        //     ->where('MaGiangVien', $maGiangVien)
+        //     ->when($maBaiGiang, fn($q) => $q->where('MaBaiGiang', $maBaiGiang))
+        //     ->whereYear('created_at', now()->year)
+        //     ->selectRaw('MONTH(created_at) as thang, COUNT(*) as so_luong')
+        //     ->groupByRaw('MONTH(created_at)')
+        //     ->pluck('so_luong', 'thang');
 
 
         $baiTheoThang = DB::table('bai_giang')
@@ -128,7 +128,7 @@ class HomeController extends Controller
             ->distinct()
             ->orderByDesc('nam')
             ->pluck('nam');
-
+            
         return view('giangvien.dashboard.thongKeBaiGiang', [
             'maBaiGiang' => $maBaiGiang,
             'tongBaiGiang' => $tongBaiGiang,
@@ -137,7 +137,7 @@ class HomeController extends Controller
             'tongFile' => $tongFile,
             'tongSinhVien' => $tongSinhVien,
             'tongDungLuong' => $tongDungLuong,
-            'thongKeTheoThang' => $thongKeTheoThang,
+            // 'thongKeTheoThang' => $thongKeTheoThang,
             'namThongKe' => $namThongKe,
             'danhSachBaiGiang' => $danhSachBaiGiang,
             'baiTheoThang' => $baiTheoThang,
