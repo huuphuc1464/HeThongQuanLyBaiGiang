@@ -18,6 +18,7 @@ use App\Http\Controllers\GiangVien\ChuongController;
 use App\Http\Controllers\GiangVien\SinhVienController;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
+use App\Models\BaiKiemTra;
 
 Route::prefix('auth')->group(function () {
     Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
@@ -94,8 +95,6 @@ Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddlew
         Route::put('/sua/{id}', [SuKienZoomController::class, 'capNhatSuKienZoom'])->name('sua');
     });
 
-
-
     // Quản lý bài giảng
     Route::prefix('bai-giang')->name('bai-giang.')->group(function () {
         Route::get('/', [BaiGiangController::class, 'danhSachBaiGiang'])->name('danh-sach');
@@ -158,6 +157,7 @@ Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddlew
         Route::delete('xoa/{id}', [BaiKiemTraController::class, 'xoaBaiKiemTra'])->name('xoa');
         Route::get('xuat-bai-kiem-tra/{id}', [BaiKiemTraController::class, 'xuatBaiKiemTra'])->name('xuat-bai-kiem-tra');
         Route::get('xuat-ket-qua/{id}', [BaiKiemTraController::class, 'xuatKetQuaBaiLam'])->name('xuat-ket-qua');
+        Route::post('/import-cau-hoi', [BaiKiemTraController::class, 'importCauHoi'])->name('import-cau-hoi');
     });
 });
 

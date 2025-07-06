@@ -304,8 +304,8 @@
     // Xử lý tìm kiếm và lọc - chỉ áp dụng cho các form trong phần header của card-body
     document.querySelectorAll('.card-body > .row.justify-content-between form').forEach(form => {
         form.addEventListener('submit', function (e) {
-            const search = form.querySelector('input[name="search"]') ? .value.trim();
-            const filterClass = form.querySelector('select[name="filterClass"]') ? .value;
+            const search = form.querySelector('input[name="search"]')?.value.trim();
+            const filterClass = form.querySelector('select[name="filterClass"]')?.value;
             if (!search && !filterClass && form.querySelector('select[name="per_page"]') === null) {
                 e.preventDefault();
                 window.location.href = "{{ route('giangvien.bai-kiem-tra.danh-sach') }}";

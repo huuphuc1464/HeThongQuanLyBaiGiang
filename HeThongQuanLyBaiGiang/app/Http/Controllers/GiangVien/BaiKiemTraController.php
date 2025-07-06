@@ -827,4 +827,47 @@ class BaiKiemTraController extends Controller
 
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
+
+    public function importCauHoi(Request $request)
+    {
+        if (!$request->hasFile('excel_file')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không có file được gửi lên.'
+            ], 400);
+        }
+
+        try {
+            $file = $request->file('excel_file');
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            $questions = [];
+
+            foreach ($rows as $index => $row) {
+                if ($index < 8) continue; // bỏ dòng tiêu đề
+                if (count($row) < 6) continue;
+
+                $questions[] = [
+                    'cauHoi'    => $row[0] ?? '',
+                    'dapAnA'    => $row[1] ?? '',
+                    'dapAnB'    => $row[2] ?? '',
+                    'dapAnC'    => $row[3] ?? '',
+                    'dapAnD'    => $row[4] ?? '',
+                    'dapAnDung' => strtoupper(trim($row[5] ?? '')),
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'questions' => $questions
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi đọc file: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
