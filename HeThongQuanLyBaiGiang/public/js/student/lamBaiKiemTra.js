@@ -19,7 +19,7 @@
 })();
 
 // Timer
-let time = parseInt('{{ $thoiGianConLai }}');
+let time = typeof window.thoiGianConLai !== 'undefined' ? parseInt(window.thoiGianConLai) : 0;
 const timerElement = document.getElementById('timer');
 const submitBtn = document.getElementById('submitBtn');
 const confirmSubmitBtn = document.getElementById('confirmSubmit');

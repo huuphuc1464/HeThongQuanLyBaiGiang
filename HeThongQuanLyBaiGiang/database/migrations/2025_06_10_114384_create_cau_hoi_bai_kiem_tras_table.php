@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('DapAnB');
             $table->text('DapAnC');
             $table->text('DapAnD');
-            $table->text('DapAnDung');
+            $table->text('DapAnDung')->nullable();
             $table->timestamps();
         });
     }

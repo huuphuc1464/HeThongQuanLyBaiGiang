@@ -138,6 +138,7 @@
 @section('scripts')
 <script>
     window.csrfToken = @json(csrf_token());
+    window.thoiGianConLai = {{ $thoiGianConLai }};
 </script>
 <script>
 
