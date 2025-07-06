@@ -55,7 +55,7 @@
                         @foreach($ketQua->chiTietKetQua as $index => $chiTiet)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
-                            <td>{{ $chiTiet->cauHoi->CauHoi }}</td>
+                            <td><div class="textarea-mock">{{ $chiTiet->cauHoi->CauHoi }}</div></td>
                             <td class="text-center">{{ $chiTiet->DapAnSinhVien }}</td>
                             <td class="text-center">{{ $chiTiet->cauHoi->DapAnDung }}</td>
                             <td class="text-center">

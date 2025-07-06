@@ -135,6 +135,19 @@ function submitExamAndRedirect(csrfToken, formData) {
             });
     }
 }
+function autoResizeTextareas(selector = '.auto-resize') {
+    const textareas = document.querySelectorAll(selector);
+
+    textareas.forEach(textarea => {
+        textarea.style.height = 'auto'; // Reset trước
+        textarea.style.height = textarea.scrollHeight + 'px'; // Set chiều cao đúng nội dung
+    });
+}
+
+// Gọi hàm này khi DOM đã load xong
+document.addEventListener("DOMContentLoaded", function () {
+    autoResizeTextareas();
+});
 
 function beforeUnloadHandler(e) {
     if (!isTimeUp && !isSubmitting) {

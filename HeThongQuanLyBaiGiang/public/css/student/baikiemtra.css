@@ -152,3 +152,22 @@
         font-size: 0.95em;
     }
 }
+
+.auto-resize {
+    overflow: hidden;
+    resize: none;
+    font-weight: 600;
+    color: #1f2937;
+    width: 100%;
+}
+
+.textarea-mock {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    font-family: monospace; 
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    pointer-events: none;
+}
