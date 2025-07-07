@@ -36,8 +36,8 @@ class DashboardController extends Controller
             'tongChuong' => Chuong::where('TrangThai', 1)->count(),
             'tongBai' => Bai::where('TrangThai', 1)->count(),
             'tongLopHocPhan' => LopHocPhan::where('TrangThai', 1)->count(),
-            'topKhoaNhieuBaiGiang' => $this->getTopKhoaNhieuBaiGiang(),
-            'topGiangVienNhieuBaiGiang' => $this->getTopGiangVienNhieuBaiGiang(),
+            'topKhoaNhieuBaiGiang' => $this->getTopKhoaNhieuBaiGiang(5),
+            'topGiangVienNhieuBaiGiang' => $this->getTopGiangVienNhieuBaiGiang(5),
         ];
 
         // Thống kê hoạt động sinh viên
@@ -58,7 +58,7 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('thongKeTongQuan', 'thongKeDaoTao', 'thongKeSinhVien', 'thongKeHeThong'));
     }
 
-    private function getTopKhoaNhieuBaiGiang()
+    private function getTopKhoaNhieuBaiGiang($limit = 5)
     {
         return Khoa::select('khoa.TenKhoa', DB::raw('COUNT(bai_giang.MaBaiGiang) as soBaiGiang'))
             ->leftJoin('bai_giang', function ($join) {
@@ -66,12 +66,13 @@ class DashboardController extends Controller
             })
             ->where('khoa.TrangThai', 1)
             ->groupBy('khoa.MaKhoa', 'khoa.TenKhoa')
+            ->having('soBaiGiang', '>', 0)
             ->orderBy('soBaiGiang', 'desc')
-            ->limit(5)
+            ->limit($limit)
             ->get();
     }
 
-    private function getTopGiangVienNhieuBaiGiang()
+    private function getTopGiangVienNhieuBaiGiang($limit = 5)
     {
         return NguoiDung::select('nguoi_dung.HoTen', DB::raw('COUNT(bai_giang.MaBaiGiang) as soBaiGiang'))
             ->leftJoin('bai_giang', function ($join) {
@@ -80,8 +81,9 @@ class DashboardController extends Controller
             ->where('nguoi_dung.MaVaiTro', 2) // Giảng viên
             ->where('nguoi_dung.TrangThai', 1)
             ->groupBy('nguoi_dung.MaNguoiDung', 'nguoi_dung.HoTen')
+            ->having('soBaiGiang', '>', 0)
             ->orderBy('soBaiGiang', 'desc')
-            ->limit(5)
+            ->limit($limit)
             ->get();
     }
 
@@ -98,10 +100,8 @@ class DashboardController extends Controller
         if ($lopCoSinhVien->count() == 0) {
             return 0;
         }
-
         // Tính tổng số sinh viên trong tất cả các lớp
         $tongSinhVien = DanhSachLop::where('TrangThai', 1)->count();
-
         // Tính trung bình
         return round($tongSinhVien / $lopCoSinhVien->count(), 0);
     }
@@ -143,14 +143,6 @@ class DashboardController extends Controller
             }
         }
         return $data;
-    }
-
-    //Kiểm tra xem có dữ liệu thống kê không
-    private function hasData()
-    {
-        return Khoa::where('TrangThai', 1)->count() > 0 ||
-            BaiGiang::where('TrangThai', 1)->count() > 0 ||
-            NguoiDung::where('TrangThai', 1)->count() > 0;
     }
 
     public function hienFormDoiMatKhau()
