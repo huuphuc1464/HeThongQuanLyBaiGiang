@@ -124,96 +124,108 @@ function initTinyMCE(csrfToken, maBaiGiang = null, maBai = null) {
             });
 
             editor.on('PastePostProcess', function () {
-                const doc = editor.getDoc();
-                const images = doc.querySelectorAll('img');
+                setTimeout(() => {
+                    const doc = editor.getDoc();
 
-                let totalImages = images.length;
-                let processed = 0;
-                let unsupportedCount = 0;
-
-                if (totalImages === 0) return;
-
-                const checkDone = () => {
-                    processed++;
-                    if (processed === totalImages) {
-                        if (unsupportedCount > 0) {
-                            alert(`Có ${unsupportedCount} chỗ không hỗ trợ đã được thay thế bằng "[Định dạng không hỗ trợ]". Vui lòng kiểm tra và cập nhật lại nếu cần.`);
+                    // 1. Xử lý ảnh lỗi hoặc rỗng
+                    const allImages = doc.querySelectorAll('img');
+                    allImages.forEach(img => {
+                        const src = img.getAttribute('src');
+                        if (!src || src.trim() === '' || (!src.startsWith('blob:') && !src.startsWith('data:image') && !src.startsWith('http'))) {
+                            const span = document.createElement('span');
+                            span.style.color = 'red';
+                            span.textContent = '[Hình ảnh không hợp lệ đã bị xóa]';
+                            img.replaceWith(span);
                         }
-                    }
-                };
+                    });
 
-                images.forEach(img => {
-                    const src = img.getAttribute('src');
+                    // 2. Xử lý ảnh dán dạng blob hoặc base64
+                    const images = [...doc.querySelectorAll('img')].filter(img => {
+                        const src = img.getAttribute('src');
+                        return src && (src.startsWith('blob:') || src.startsWith('data:image'));
+                    });
 
-                    // ❌ Không có src hoặc không đúng định dạng blob/data:image
-                    if (!src || (!src.startsWith('blob:') && !src.startsWith('data:image'))) {
-                        const span = document.createElement('span');
-                        span.style.color = 'red';
-                        span.textContent = '[Định dạng không hỗ trợ]';
-                        img.replaceWith(span);
-                        unsupportedCount++;
-                        checkDone();
-                        return;
-                    }
+                    let totalImages = images.length;
+                    let processed = 0;
+                    let unsupportedCount = 0;
+                    if (totalImages === 0) return;
 
-                    // ✅ Nếu là blob hoặc base64 ảnh → upload
-                    fetch(src)
-                        .then(res => res.blob())
-                        .then(blob => {
-                            if (!blob.type.startsWith('image/')) {
-                                const span = document.createElement('span');
-                                span.style.color = 'red';
-                                span.textContent = '[Định dạng không hỗ trợ]';
-                                img.replaceWith(span);
-                                unsupportedCount++;
-                                checkDone();
-                                return;
-                            }
+                    const checkDone = () => {
+                        processed++;
+                        if (processed === totalImages && unsupportedCount > 0) {
+                            alert(`Có ${unsupportedCount} ảnh không hỗ trợ đã được thay thế bằng "[Định dạng không hỗ trợ]".`);
+                        }
+                    };
 
-                            const formData = new FormData();
-                            formData.append('image', blob, 'pasted_image.png');
-                            formData.append('maBaiGiang', maBaiGiang || '');
-                            formData.append('maBai', maBai || '');
+                    images.forEach(img => {
+                        const src = img.getAttribute('src');
 
-                            return fetch('/upload-docx-image', {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': window.csrfToken
-                                },
-                                body: formData
-                            })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.url) {
-                                        img.setAttribute('src', data.url);
-                                    } else {
-                                        const span = document.createElement('span');
-                                        span.style.color = 'red';
-                                        span.textContent = '[Định dạng không hỗ trợ]';
-                                        img.replaceWith(span);
-                                        unsupportedCount++;
-                                    }
-                                    checkDone();
-                                })
-                                .catch(() => {
+                        fetch(src)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                if (!blob.type.startsWith('image/')) {
                                     const span = document.createElement('span');
                                     span.style.color = 'red';
                                     span.textContent = '[Định dạng không hỗ trợ]';
                                     img.replaceWith(span);
                                     unsupportedCount++;
                                     checkDone();
-                                });
-                        })
-                        .catch(() => {
-                            const span = document.createElement('span');
-                            span.style.color = 'red';
-                            span.textContent = '[Định dạng không hỗ trợ]';
-                            img.replaceWith(span);
-                            unsupportedCount++;
-                            checkDone();
-                        });
-                });
+                                    return;
+                                }
+
+                                const formData = new FormData();
+                                formData.append('image', blob, 'pasted_image.png');
+                                formData.append('maBaiGiang', maBaiGiang || '');
+                                formData.append('maBai', maBai || '');
+
+                                return fetch('/upload-docx-image', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrfToken
+                                    },
+                                    body: formData
+                                })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.url) {
+                                            img.setAttribute('src', data.url);
+
+                                            // Đánh dấu nếu có thể là equation
+                                            const alt = img.getAttribute('alt')?.toLowerCase() || '';
+                                            if (alt.includes('equation') || data.url.includes('equation')) {
+                                                img.style.border = '2px dashed orange';
+                                                img.setAttribute('title', 'Ảnh có thể là công thức từ Word');
+                                            }
+                                        } else {
+                                            const span = document.createElement('span');
+                                            span.style.color = 'red';
+                                            span.textContent = '[Định dạng không hỗ trợ]';
+                                            img.replaceWith(span);
+                                            unsupportedCount++;
+                                        }
+                                        checkDone();
+                                    })
+                                    .catch(() => {
+                                        const span = document.createElement('span');
+                                        span.style.color = 'red';
+                                        span.textContent = '[Định dạng không hỗ trợ]';
+                                        img.replaceWith(span);
+                                        unsupportedCount++;
+                                        checkDone();
+                                    });
+                            })
+                            .catch(() => {
+                                const span = document.createElement('span');
+                                span.style.color = 'red';
+                                span.textContent = '[Định dạng không hỗ trợ]';
+                                img.replaceWith(span);
+                                unsupportedCount++;
+                                checkDone();
+                            });
+                    });
+                }, 200);
             });
+
 
         }
     });

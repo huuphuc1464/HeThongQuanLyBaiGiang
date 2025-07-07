@@ -222,6 +222,37 @@ class BaiController extends Controller
                 ->where('MaBai', $bai)
                 ->update(['NoiDung' => $noiDungCapNhat]);
 
+            // Dọn các ảnh không còn được sử dụng trong nội dung
+            $usedImages = [];
+            preg_match_all('/<img[^>]+src="([^">]+)"/i', $noiDungCapNhat, $matches);
+            if (!empty($matches[1])) {
+                $usedImages = array_map(function ($src) {
+                    $srcPath = parse_url($src, PHP_URL_PATH); // loại bỏ domain nếu có
+                    $srcPath = str_replace('\\', '/', $srcPath); // chuyển \ thành /
+                    return ltrim($srcPath, '/'); // loại bỏ dấu / ở đầu
+                }, $matches[1]);
+            }
+
+
+            if (File::exists($newFolder . '/img')) {
+                $allFiles = File::files($newFolder . '/img');
+
+                foreach ($allFiles as $file) {
+                    // Chuẩn hóa đường dẫn tương đối
+                    $relativePath = str_replace(public_path(), '', $file->getPathname());
+                    $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
+
+                    // Kiểm tra nếu không nằm trong mảng ảnh đang sử dụng
+                    if (!in_array($relativePath, $usedImages)) {
+                        File::delete($file->getPathname());
+                        DB::table('file_bai_giang')
+                            ->where('MaBai', $bai)
+                            ->where('DuongDan', $relativePath)
+                            ->delete();
+                    }
+                }
+            }
+
             // Lưu file đính kèm (nếu có)
             if (File::exists($newFolder)) {
                 $files = File::files($newFolder);
@@ -325,6 +356,35 @@ class BaiController extends Controller
             ])->withInput();
         }
 
+        $usedImages = [];
+        preg_match_all('/<img[^>]+src="([^">]+)"/i', $request->NoiDung, $matches);
+        if (!empty($matches[1])) {
+            $usedImages = array_map(function ($src) {
+                $srcPath = parse_url($src, PHP_URL_PATH);
+                $srcPath = str_replace('\\', '/', $srcPath);
+                $srcPath = trim($srcPath, '/');
+                return urldecode(strtolower($srcPath));
+            }, $matches[1]);
+        }
+
+        $imgFolder = $folderPath . '/img';
+        if (File::exists($imgFolder)) {
+            $imgFiles = File::files($imgFolder);
+            foreach ($imgFiles as $file) {
+                $relativePath = str_replace(public_path(), '', $file->getPathname());
+                $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
+                $relativePath = urldecode(strtolower($relativePath));
+                if (!in_array($relativePath, $usedImages)) {
+                    Log::info("🗑️ Đã xóa file không được sử dụng: $relativePath", ['file' => $file->getPathname()]);
+                    File::delete($file->getPathname());
+                    DB::table('file_bai_giang')
+                        ->where('MaBai', $maBai)
+                        ->where('DuongDan', $relativePath)
+                        ->delete();
+                }
+            }
+        }
+
         DB::beginTransaction();
 
         try {
@@ -392,22 +452,23 @@ class BaiController extends Controller
         $maBaiGiang = $request->input('maBaiGiang');
         $maNguoiDung = Auth::id();
 
-        if ($maBai) {
-            // Form cập nhật
-            $folder = "BaiGiang/BaiGiang_{$maBaiGiang}/Bai_{$maBai}";
-        } else {
-            // Form thêm mới
-            $folder = "BaiGiang/BaiGiang_{$maBaiGiang}/temp_{$maNguoiDung}_{$maBaiGiang}";
+        if (!str_starts_with($file->getMimeType(), 'image/')) {
+            return response()->json(['error' => 'File không phải hình ảnh'], 400);
         }
 
-        // Tạo tên file
-        $fileName = uniqid('img_') . '.' . $file->getClientOriginalExtension();
+        // Tạo đường dẫn lưu
+        if ($maBai) {
+            $folder = "BaiGiang/BaiGiang_{$maBaiGiang}/Bai_{$maBai}/img";
+        } else {
+            $folder = "BaiGiang/BaiGiang_{$maBaiGiang}/temp_{$maNguoiDung}_{$maBaiGiang}/img";
+        }
+
         $filePath = public_path($folder);
         if (!file_exists($filePath)) {
             mkdir($filePath, 0755, true);
         }
 
-        // Lưu file
+        $fileName = uniqid('img_') . '.' . $file->getClientOriginalExtension();
         $file->move($filePath, $fileName);
 
         return response()->json([

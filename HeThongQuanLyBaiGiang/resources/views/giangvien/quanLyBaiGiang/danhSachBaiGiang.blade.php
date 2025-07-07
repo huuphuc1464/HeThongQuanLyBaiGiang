@@ -28,6 +28,7 @@
                 <thead class="table-secondary">
                     <tr>
                         <th>Mã</th>
+                        <th>Ảnh bài giảng</th>
                         <th>Tên bài giảng</th>
                         <th>Tên khoa</th>
                         <th>Mô tả</th>
@@ -40,8 +41,10 @@
                     @forelse($danhSachBaiGiang as $baiGiang)
                     <tr style="cursor: pointer;" data-href="{{ route('giangvien.bai-giang.chuong.danh-sach', ['maBaiGiang'=> $baiGiang->MaBaiGiang]) }}">
                         <td>#{{ $baiGiang->MaBaiGiang }}</td>
-                        <td>
-                            <img src="{{ asset($baiGiang->AnhBaiGiang ?? 'img/hocphan/default.png') }}" alt="{{ $baiGiang->TenBaiGiang ?? "Default" }}" width="40" height="40" class="rounded-circle"> {{ $baiGiang->TenBaiGiang }}</td>
+                        <td class="text-center">
+                            <img src="{{ asset($baiGiang->AnhBaiGiang ?? 'img/hocphan/default.png') }}" alt="{{ $baiGiang->TenBaiGiang ?? "Default" }}" width="40" height="40" class="rounded-circle">
+                        </td>
+                        <td>{{ $baiGiang->TenBaiGiang }}</td>
                         <td>{{ $baiGiang->TenKhoa }}</td>
                         <td>{{ $baiGiang->MoTa }}</td>
                         <td>{{ \Carbon\Carbon::parse($baiGiang->created_at)->timezone('Asia/Ho_Chi_Minh')->format('H:i:s d/m/Y') }}</td>
