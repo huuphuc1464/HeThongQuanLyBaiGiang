@@ -48,6 +48,7 @@ class BaiKiemTraController extends Controller
 
         // Phân trang
         $perPage = $request->input('itemsPerPage', 10);
+        $query->orderByDesc('bkt.ThoiGianBatDau');
         $baiKiemTras = $query->paginate($perPage);
 
         $lopHocPhan = DB::table('lop_hoc_phan')
