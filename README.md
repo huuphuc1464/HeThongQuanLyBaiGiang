@@ -8,8 +8,8 @@ Website quản lý bài giảng sử dụng ngôn ngữ PHP Framework Laravel.
 
 ```bash
 git clone https://github.com/huuphuc1464/HeThongQuanLyBaiGiang.git
-cd HeThongQuanLyBaiGiang
-cd HeThongQuanLyBaiGiang
+cd .\HeThongQuanLyBaiGiang\
+cd .\HeThongQuanLyBaiGiang\
 ```
 
 ### 2. Cài đặt các package cần thiết
@@ -32,21 +32,27 @@ composer install
   ```
 - Cập nhật các thông tin kết nối cơ sở dữ liệu trong file `.env` (DB_DATABASE, DB_USERNAME, DB_PASSWORD) cho phù hợp với cấu hình MySQL của bạn.
 - **Cấu hình dịch vụ gửi mail:**  
-  Điền thông tin SMTP ở các biến sau:
+  Điền thông tin SMTP Gmail ở các biến sau:
   ```env
   MAIL_MAILER=smtp
   MAIL_HOST=smtp.gmail.com
   MAIL_PORT=587
   MAIL_USERNAME=your_email@gmail.com
   MAIL_PASSWORD=your_app_password
+  MAIL_ENCRYPTION=tls
   MAIL_FROM_ADDRESS=your_email@gmail.com
   MAIL_FROM_NAME="Hệ Thống Quản Lý Bài Giảng"
   ```
 - **Cấu hình Zoom API:**  
   ```env
-  ZOOM_CLIENT_ID=your_zoom_client_id
-  ZOOM_CLIENT_SECRET=your_zoom_client_secret
-  ZOOM_REDIRECT_URI=https://your-app-url/zoom/callback
+  ZOOM_CLIENT_ID="your_zoom_api_key"
+  ZOOM_CLIENT_SECRET="your_zoom_api_secret"
+  ZOOM_ACCOUNT_ID="your_zoom_account_id"
+  ZOOM_HOST_KEY="your_zoom_host_key"
+  ```
+- **Cấu hình hàng đợi (Queue):**  
+  ```env
+  QUEUE_CONNECTION=database
   ```
 
 - Chạy lệnh tạo key ứng dụng:
@@ -56,9 +62,24 @@ composer install
 
 ### 5. Tạo bảng và cấu trúc cơ sở dữ liệu
 
-```bash
-php artisan migrate
-```
+Để khởi tạo các bảng trong cơ sở dữ liệu, chạy lệnh sau:
+
+  ```bash
+  php artisan migrate
+  ```
+
+- Nếu **chưa tạo database**, hệ thống có thể hỏi bạn có muốn tạo không. Gõ `yes` và nhấn `Enter` (hoặc chỉ cần nhấn `Enter` để tiếp tục nếu mặc định tạo mới).
+- Nếu muốn chạy các Seeder (tạo dữ liệu mẫu), chạy tiếp lệnh:
+
+  ```bash
+  php artisan db:seed
+  ```
+
+> Có thể kết hợp chạy cả `migrate` và `seed` bằng lệnh:
+> ```bash
+> php artisan migrate --seed
+> ```
+
 
 ### 6. Khởi chạy web server ảo
 
