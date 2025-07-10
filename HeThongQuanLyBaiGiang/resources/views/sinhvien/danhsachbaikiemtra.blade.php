@@ -38,6 +38,7 @@
                 </option>
                 <option value="da_ket_thuc" {{ request('trang_thai')=='da_ket_thuc' ? 'selected' : '' }}>Đã kết thúc
                 </option>
+                <option value="da_lam" {{ request('trang_thai') == 'da_lam' ? 'selected' : '' }}>Đã làm</option>
             </select>
         </form>
     </div>

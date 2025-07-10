@@ -34,10 +34,6 @@ class KetQuaBaiKiemTraController extends Controller
             return redirect()->back()->with('error', 'Bạn không thuộc lớp học phần này!');
         }
 
-        // Kiểm tra thời gian làm bài
-        $now = Carbon::now();
-        $thoiGianBatDau = Carbon::parse($baiKiemTra->ThoiGianBatDau);
-        $thoiGianKetThuc = Carbon::parse($baiKiemTra->ThoiGianKetThuc);
 
         // Kiểm tra sinh viên đã làm bài chưa
         $ketQuaBaiLam = KetQuaBaiKiemTra::where('MaBaiKiemTra', $maBaiKiemTra)
@@ -48,6 +44,10 @@ class KetQuaBaiKiemTraController extends Controller
             return redirect()->route('danh-sach-bai-kiem-tra')
                 ->with('error', 'Bạn đã làm bài kiểm tra này rồi!');
         }
+        // Kiểm tra thời gian làm bài
+        $now = Carbon::now();
+        $thoiGianBatDau = Carbon::parse($baiKiemTra->ThoiGianBatDau);
+        $thoiGianKetThuc = Carbon::parse($baiKiemTra->ThoiGianKetThuc);
 
         if ($now < $thoiGianBatDau) {
             return redirect()->back()->with('error', 'Bài kiểm tra chưa bắt đầu!');
@@ -249,6 +249,11 @@ class KetQuaBaiKiemTraController extends Controller
                 break;
             case 'da_ket_thuc':
                 $query->where('ThoiGianKetThuc', '<', $now);
+                break;
+            case 'da_lam':
+                $query->whereHas('ketQuaBaiKiemTra', function ($q) use ($sinhVien) {
+                    $q->where('MaSinhVien', $sinhVien->MaNguoiDung);
+                });
                 break;
         }
 

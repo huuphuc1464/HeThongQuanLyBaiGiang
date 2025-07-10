@@ -165,9 +165,14 @@
     width: 100%;
     min-height: 80px;
     padding: 8px;
-    font-family: monospace; 
+    font-family: monospace;
     font-size: 14px;
     white-space: pre-wrap;
     word-break: break-word;
     pointer-events: none;
+}
+
+.toggle-dapan-dung:hover {
+    cursor: pointer;
+    background-color: #eff;
 }
