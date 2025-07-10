@@ -4,6 +4,7 @@
 
 @section('style')
 <link rel="stylesheet" href="{{ asset('css/student/baikiemtra.css') }}">
+
 @endsection
 
 @section('sidebar')
@@ -55,9 +56,22 @@
                         @foreach($ketQua->chiTietKetQua as $index => $chiTiet)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
-                            <td><div class="textarea-mock">{{ $chiTiet->cauHoi->CauHoi }}</div></td>
+                            <td>
+                                <div class="textarea-mock">{{ $chiTiet->cauHoi->CauHoi }}</div>
+                            </td>
                             <td class="text-center">{{ $chiTiet->DapAnSinhVien }}</td>
-                            <td class="text-center">{{ $chiTiet->cauHoi->DapAnDung }}</td>
+                            <td class="text-center toggle-dapan-dung" title="Đáp án đúng">
+                                <span>
+                                    {{ $chiTiet->cauHoi->DapAnDung }}
+                                </span>
+                                <br>
+                                <span class="text-success small dapan-dung-noidung" style="display:none;">
+                                    @php
+                                    $dapAnDung = $chiTiet->cauHoi['DapAn' . $chiTiet->cauHoi->DapAnDung];
+                                    @endphp
+                                    {{ $dapAnDung }}
+                                </span>
+                            </td>
                             <td class="text-center">
                                 @if($chiTiet->KetQua)
                                 <span class="badge bg-success">Đúng</span>
@@ -80,4 +94,20 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.toggle-dapan-dung').forEach(function (el) {
+            el.addEventListener('click', function () {
+                let content = this.querySelector('.dapan-dung-noidung');
+                console.log(this);
+                if (content) {
+                    content.style.display = (content.style.display === 'none' || content.style.display === '') ? 'inline' : 'none';
+                }
+            });
+        });
+    });
+</script>
 @endsection
