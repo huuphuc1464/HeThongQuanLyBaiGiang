@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function beforeUnloadHandler(e) {
+
     if (!isTimeUp && !isSubmitting) {
         e.preventDefault();
         e.returnValue = '';

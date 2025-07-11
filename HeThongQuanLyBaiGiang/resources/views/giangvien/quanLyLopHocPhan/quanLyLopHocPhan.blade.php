@@ -132,9 +132,17 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Quản lý Lớp học phần</h5>
-            <button type="button" class="btn btn-success" onclick="openLopHocPhanModal()">
-                <i class="fas fa-plus me-1"></i> Thêm mới
-            </button>
+            <div>
+                <a href="?trang_thai=1"
+                    class="btn btn-outline-primary btn-sm @if(request('trang_thai', 1) == 1) active @endif">Đang hoạt
+                    động</a>
+                <a href="?trang_thai=3"
+                    class="btn btn-outline-secondary btn-sm @if(request('trang_thai') == 3) active @endif">Đã lưu
+                    trữ</a>
+                <button type="button" class="btn btn-success ms-2" onclick="openLopHocPhanModal()">
+                    <i class="fas fa-plus me-1"></i> Thêm mới
+                </button>
+            </div>
         </div>
         <div class="card-body">
             <div class="row justify-content-between mb-3">
@@ -202,6 +210,19 @@
                                     <button
                                         onclick="deleteLopHocPhan({{ $lop->MaLopHocPhan }}, '{{ $lop->TenLopHocPhan }}')"
                                         class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                    @if($lop->TrangThai != 3)
+                                    <button
+                                        onclick="showLuuTruModal({{ $lop->MaLopHocPhan }}, '{{ $lop->TenLopHocPhan }}')"
+                                        class="btn btn-sm btn-warning" title="Lưu trữ">
+                                        <i class="fas fa-archive"></i>
+                                    </button>
+                                    @else
+                                    <button
+                                        onclick="showBoLuuTruModal({{ $lop->MaLopHocPhan }}, '{{ $lop->TenLopHocPhan }}')"
+                                        class="btn btn-sm btn-secondary" title="Hủy lưu trữ">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -296,6 +317,50 @@
         </div>
     </div>
 </div>
+<!-- Modal Xác nhận Lưu trữ -->
+<div class="modal fade" id="modalXacNhanLuuTruLopHocPhan" tabindex="-1" aria-labelledby="xacNhanLuuTruLopHocPhanLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="xacNhanLuuTruLopHocPhanLabel">Xác nhận lưu trữ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn lưu trữ lớp học phần: <strong id="tenLopHocPhanLuuTru"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="formLuuTruLopHocPhan" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-warning">Lưu trữ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Xác nhận Hủy lưu trữ -->
+<div class="modal fade" id="modalXacNhanBoLuuTruLopHocPhan" tabindex="-1"
+    aria-labelledby="xacNhanBoLuuTruLopHocPhanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="xacNhanBoLuuTruLopHocPhanLabel">Xác nhận hủy lưu trữ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn hủy lưu trữ lớp học phần: <strong id="tenLopHocPhanBoLuuTru"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="formBoLuuTruLopHocPhan" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-secondary">Hủy lưu trữ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -367,6 +432,18 @@
         document.getElementById('tenLopHocPhanXoa').textContent = tenLopHocPhan;
         document.getElementById('formXoaLopHocPhan').action = `{{ url('giang-vien/lop-hoc-phan') }}/${id}`;
         new bootstrap.Modal(document.getElementById('modalXacNhanXoaLopHocPhan')).show();
+    }
+
+    function showLuuTruModal(id, tenLopHocPhan) {
+        document.getElementById('tenLopHocPhanLuuTru').textContent = tenLopHocPhan;
+        document.getElementById('formLuuTruLopHocPhan').action = `{{ url('giang-vien/lop-hoc-phan') }}/${id}/luu-tru`;
+        new bootstrap.Modal(document.getElementById('modalXacNhanLuuTruLopHocPhan')).show();
+    }
+
+    function showBoLuuTruModal(id, tenLopHocPhan) {
+        document.getElementById('tenLopHocPhanBoLuuTru').textContent = tenLopHocPhan;
+        document.getElementById('formBoLuuTruLopHocPhan').action = `{{ url('giang-vien/lop-hoc-phan') }}/${id}/bo-luu-tru`;
+        new bootstrap.Modal(document.getElementById('modalXacNhanBoLuuTruLopHocPhan')).show();
     }
 
     // Hiển thị lại modal với lỗi nếu có

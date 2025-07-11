@@ -80,4 +80,10 @@ class NguoiDung extends Authenticatable
     {
         return $this->MatKhau;
     }
+
+    // Đảm bảo lấy đúng email khi gọi $nguoiDung->email
+    public function getEmailAttribute()
+    {
+        return $this->attributes['Email'] ?? null;
+    }
 }

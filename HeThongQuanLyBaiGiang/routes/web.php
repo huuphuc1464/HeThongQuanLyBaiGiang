@@ -182,3 +182,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
 
     Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
 });
+
+
+// Lưu trữ lớp học phần
+Route::post('giang-vien/lop-hoc-phan/{id}/luu-tru', [App\Http\Controllers\GiangVien\LopHocPhanController::class, 'luuTru'])->name('giangvien.lophocphan.luutru');
+// Hủy lưu trữ lớp học phần
+Route::post('giang-vien/lop-hoc-phan/{id}/bo-luu-tru', [App\Http\Controllers\GiangVien\LopHocPhanController::class, 'boLuuTru'])->name('giangvien.lophocphan.boluutru');
