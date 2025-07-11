@@ -27,7 +27,8 @@
                 alt="ảnh bài giảng" width="25" height="25" class="rounded-circle" />
         </div>
         <div class="text-group">
-            <p class="title mb-2">{{Str::limit($lop->TenLopHocPhan, 25)}}</p>
+            {{-- <p class="title mb-2">{{Str::limit($lop->TenLopHocPhan, 25)}}</p> --}}
+            <p class="title mb-2">{{$lop->TenLopHocPhan}}</p>
             <p class="desc mb-2">{{Str::limit($lop->MoTa, 35)}}</p>
         </div>
     </a>
