@@ -14,7 +14,7 @@
         <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-2">
                 <img src=" {{ $lopHocPhan->AnhBaiGiang ? asset( $lopHocPhan->AnhBaiGiang) : asset('img/hocphan/default.png') }}" width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
-                <span class="text-truncate d-inline-block" style="max-width: 220px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{{ $lopHocPhan->TenLopHocPhan }}">
+                <span class="text-truncate d-inline-block" style="max-width: 195px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{{ $lopHocPhan->TenLopHocPhan }}">
                     {{ $lopHocPhan->TenLopHocPhan }}
                 </span>
             </div>
