@@ -11,6 +11,8 @@ use App\Models\ChiTietKetQua;
 use App\Models\SinhVien;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+
 
 class KetQuaBaiKiemTraController extends Controller
 {
@@ -182,6 +184,13 @@ class KetQuaBaiKiemTraController extends Controller
             }
 
             session()->forget('exam_start_time_' . $maBaiKiemTra);
+            Log::channel('baikiemtra')->info('Sinh viên nộp bài kiểm tra', [
+                'user_id' => Auth::id(),
+                'ma_bai_kiem_tra' => $maBaiKiemTra,
+                'thoi_gian_nop' => now()->toDateTimeString(),
+                'ip' => $request->ip(),
+                'data' => $request->all(),
+            ]);
             return response()->json([
                 'message' => $isTimeUp ? 'Thời gian làm bài đã hết! Bài làm của bạn đã được nộp tự động.' : 'Nộp bài kiểm tra thành công!',
                 'redirect' => route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
@@ -290,10 +299,15 @@ class KetQuaBaiKiemTraController extends Controller
         if (!session()->has('exam_start_time_' . $maBaiKiemTra)) {
             session(['exam_start_time_' . $maBaiKiemTra => $now->timestamp]);
         }
+        // lấy thời gian bắt đầu làm bài dựa vào seesion
         $thoiGianBatDauLamBai = Carbon::createFromTimestamp(session('exam_start_time_' . $maBaiKiemTra));
+        // Thời gian kết thúc làm bài bằng thời gian bắt đầu + thời gian làm bài kiểm tra
         $thoiGianKetThucLamBai = $thoiGianBatDauLamBai->copy()->addMinutes($baiKiemTra->ThoiGianLamBai);
+        // Thời gian bài làm còn lại = thời gian 
         $thoiGianConLaiLamBai = $now->diffInSeconds($thoiGianKetThucLamBai, false);
         $thoiGianConLaiKetThuc = $now->diffInSeconds($thoiGianKetThuc, false);
+
+        //thời gian còn lại 
         return min($thoiGianConLaiLamBai, $thoiGianConLaiKetThuc);
     }
 }
