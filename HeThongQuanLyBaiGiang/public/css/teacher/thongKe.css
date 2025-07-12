@@ -52,44 +52,30 @@
     padding: 10px;
 }
 
-/*Mục tổng bài giảng*/
-.thongKe.baiGiang .icon {
+/*Mục 1*/
+.thongKe.tk1 .icon {
     background-color: #b9ffd3;
     color: #22ad56;
     border-radius: .375rem;
 }
 
-/*Mục chương*/
-.thongKe.chuong .icon {
+/*Mục 2*/
+.thongKe.tk2 .icon {
     background-color: #adcbf3;
     color: #1d5aab;
     border-radius: .375rem;
 }
 
-/*Mục bài*/
-.thongKe.bai .icon {
+/*Mục 3*/
+.thongKe.tk3 .icon {
     background-color: #fde1c3;
     color: #ff8b07;
     border-radius: .375rem;
 }
 
-/*Mục mục*/
-.thongKe.muc .icon {
-    background-color: #f9baba;
-    color: #de2222;
-    border-radius: .375rem;
-}
-
-/*Mục file*/
-.thongKe.file .icon {
+/*Mục 4*/
+.thongKe.tk4 .icon {
     background-color: #f9ff89;
     color: #708307;
-    border-radius: .375rem;
-}
-
-/*Mục sinh viên*/
-.thongKe.sinhVien .icon {
-    background-color: #daa4f3;
-    color: #7811be;
     border-radius: .375rem;
 }

@@ -24,68 +24,86 @@
             </form>
 
             <div class="col-md-6">
-                <div class="thongKe baiGiang khungIcon d-flex">
-                    <i class="fa-solid fa-chalkboard-user icon"></i>
+                <div class="thongKe tk1 khungIcon d-flex">
+                    <i class="fa-solid fa-book-open icon"></i>
                     <div class="info">
-                        <h4>Tổng bài giảng</h4>
+                        <h4>Bài giảng</h4>
                         <p><b>{{ $tongBaiGiang }} bài giảng</b></p>
                         <p class="info-tong">Tổng số bài giảng bạn đã được tạo.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="thongKe chuong khungIcon">
-                    <i class="fa-solid fa-book-open icon"></i>
+                <div class="thongKe tk2 khungIcon">
+                    <i class="fa-solid fa-folder icon"></i>
                     <div class="info">
-                        <h4>Tổng số chương</h4>
+                        <h4>Chương</h4>
                         <p><b>{{ $tongChuong }} chương</b></p>
                         <p class="info-tong">Tổng số chương bạn đã tạo trong bài giảng.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="thongKe bai khungIcon">
+                <div class="thongKe tk3 khungIcon">
                     <i class="fa-solid fa-note-sticky icon"></i>
                     <div class="info">
-                        <h4>Tổng số bài</h4>
-                        <p><b>{{ $tongBai }} bài</b></p>
+                        <h4>Bài học</h4>
+                        <p><b>{{ $tongBai }} bài học</b></p>
                         <p class="info-tong">Tổng số bài bạn đã tạo trong bài giảng.</p>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="thongKe sinhVien khungIcon">
+                <div class="thongKe tk4 khungIcon">
+                    <i class="fa-solid fa-chalkboard-teacher icon"></i>
+                    <div class="info">
+                        <h4>Lớp học phần</h4>
+                        <p><b>{{ $tongLopHocPhan }} lớp học phần</b></p>
+                        <p class="info-tong">Tổng số lớp học phần đã tạo trong bài giảng.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="thongKe tk1 khungIcon">
                     <i class="fa-solid fa-user-graduate icon"></i>
                     <div class="info">
                         <h4>Sinh viên</h4>
                         <p><b>{{ $tongSinhVien }} sinh viên</b></p>
-                        <p class="info-tong">Tổng số lượng sinh viên đã tham gia.</p>
+                        <p class="info-tong">Tổng số lượng sinh viên đã tham gia lớp học phần.</p>
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
-                <div class="thongKe file khungIcon">
-                    <i class="fa-solid fa-file-lines icon"></i>
+                <div class="thongKe tk2 khungIcon">
+                    <i class="fa-solid fa-video icon"></i>
                     <div class="info">
-                        <h4>Tổng số file</h4>
-                        <p><b>{{ $tongFile }} file</b></p>
-                        <p class="info-tong">Tổng số file bài giảng bạn đã lưu trữ.</p>
+                        <h4>Sự kiện Zoom</h4>
+                        <p><b>{{ $tongSuKienZoom }} sự kiện Zoom</b></p>
+                        <p class="info-tong">Tổng số lượng sự kiện Zoom đã tạo trong các lớp học phần.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="thongKe muc khungIcon">
+                <div class="thongKe tk3 khungIcon">
+                    <i class="fas fa-clipboard-list icon"></i>
+                    <div class="info">
+                        <h4>Bài kiểm tra</h4>
+                        <p><b>{{ $tongBaiKiemTra }} bài kiểm tra</b></p>
+                        <p class="info-tong">Tổng số lượng bài kiểm tra đã tạo trong lớp học phần.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="thongKe tk4 khungIcon">
                     <i class="fa-solid fa-cloud icon"></i>
                     <div class="info">
-                        <h4>Tổng dung lượng lưu trữ</h4>
+                        <h4>Dung lượng lưu trữ</h4>
                         <p><b>{{ $tongDungLuong }} MB</b></p>
                         <p class="info-tong">Tổng dung lượng lưu trữ file bài giảng.</p>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
     {{--End left--}}
@@ -123,17 +141,27 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const baiTheoThang = @json($baiTheoThang);
-
+    const quizTheoThang = @json($quizTheoThang);
+    const zoomTheoThang = @json($zoomTheoThang);
     let lineChart;
 
     // Vẽ biểu đồ
     document.addEventListener('DOMContentLoaded', () => {
         const ctx = document.getElementById("lineChartDemo").getContext("2d");
-        const thongKeData = Array(12).fill(0);
+        const quizData = Array(12).fill(0);
+        const zoomData = Array(12).fill(0);
         const baiData = Array(12).fill(0);
 
         for (const [thang, soLuong] of Object.entries(baiTheoThang)) {
             baiData[parseInt(thang) - 1] = soLuong;
+        }
+
+        for (const [thang, soLuong] of Object.entries(quizTheoThang)) {
+            quizData[parseInt(thang) - 1] = soLuong;
+        }
+
+        for (const [thang, soLuong] of Object.entries(zoomTheoThang)) {
+            zoomData[parseInt(thang) - 1] = soLuong;
         }
 
         lineChart = new Chart(ctx, {
@@ -143,23 +171,8 @@
                     "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6"
                     , "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
                 ]
-                , datasets: [
-                    // {
-                    //     label: "Số bài giảng"
-                    //     , data: thongKeData
-                    //     , borderColor: "rgba(54, 162, 235, 1)"
-                    //     , backgroundColor: "rgba(54, 162, 235, 0.2)"
-                    //     , pointBackgroundColor: "rgba(255, 99, 132, 1)"
-                    //     , pointBorderColor: "#fff"
-                    //     , pointHoverBackgroundColor: "#fff"
-                    //     , pointHoverBorderColor: "rgba(255,99,132,1)"
-                    //     , fill: true
-                    //     , tension: 0.4
-                    //     , borderWidth: 2
-                    // }
-                    // ,
-                    {
-                        label: "Số bài học"
+                , datasets: [{
+                        label: "Bài học"
                         , data: baiData
                         , borderColor: "rgba(255, 159, 64, 1)"
                         , backgroundColor: "rgba(255, 159, 64, 0.2)"
@@ -170,9 +183,34 @@
                         , fill: true
                         , tension: 0.4
                         , borderWidth: 2
+                    }, {
+                        label: "Bài kiểm tra"
+                        , data: quizData
+                        , borderColor: "rgba(54, 162, 235, 1)"
+                        , backgroundColor: "rgba(54, 162, 235, 0.2)"
+                        , pointBackgroundColor: "rgba(54, 162, 235, 1)"
+                        , pointBorderColor: "#fff"
+                        , pointHoverBackgroundColor: "#fff"
+                        , pointHoverBorderColor: "rgba(54, 162, 235, 1)"
+                        , fill: true
+                        , tension: 0.4
+                        , borderWidth: 2
+                    }
+
+                    , {
+                        label: "Sự kiện Zoom"
+                        , data: zoomData
+                        , borderColor: "rgba(75, 192, 192, 1)"
+                        , backgroundColor: "rgba(75, 192, 192, 0.2)"
+                        , pointBackgroundColor: "rgba(75, 192, 192, 1)"
+                        , pointBorderColor: "#fff"
+                        , pointHoverBackgroundColor: "#fff"
+                        , pointHoverBorderColor: "rgba(75, 192, 192, 1)"
+                        , fill: true
+                        , tension: 0.4
+                        , borderWidth: 2
                     }
                 ]
-
             }
             , options: {
                 responsive: true
@@ -201,22 +239,23 @@
             `THỐNG KÊ THỜI GIAN TẠO BÀI GIẢNG TRONG NĂM ${nam}`;
 
         fetch(`/giang-vien/bieu-do-thong-ke?nam=${nam}&maBaiGiang=${maBaiGiang}`)
-            .then(res => {
-                return res.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                const newData = Array(12).fill(0);
-                for (const [thang, soLuong] of Object.entries(data)) {
-                    newData[parseInt(thang) - 1] = soLuong;
-                }
-                lineChart.data.datasets[0].data = newData;
+                const convert = source => {
+                    const result = Array(12).fill(0);
+                    for (const [thang, value] of Object.entries(source || {})) {
+                        result[parseInt(thang) - 1] = value;
+                    }
+                    return result;
+                };
+
+                lineChart.data.datasets[0].data = convert(data.baiGiang);
+                lineChart.data.datasets[1].data = convert(data.baiKiemTra);
+                lineChart.data.datasets[2].data = convert(data.suKienZoom);
+
                 lineChart.update();
             })
-            .catch(err => {
-                console.error('Lỗi khi fetch dữ liệu biểu đồ:', err);
-            });
-
-
+            .catch(error => console.error('Lỗi khi fetch biểu đồ:', error));
     });
 
 </script>

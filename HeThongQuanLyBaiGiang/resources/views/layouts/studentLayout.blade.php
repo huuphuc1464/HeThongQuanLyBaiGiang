@@ -75,18 +75,20 @@
 
         {{-- Giữa: Search --}}
         @php
-        if (Request::is('*bai-giang') || Request::is('*/bai/chi-tiet/*')) {
-        $placeholder = 'Tìm kiếm bài giảng theo tên bài, nội dung, mô tả...';
+        if (Request::is('*bai-giang')
+        || Request::is('*/bai/chi-tiet/*')
+        || Request::is('bai-giang/*') && count(Request::segments()) === 2) {
+            $placeholder = 'Tìm kiếm bài giảng theo tên bài, nội dung, mô tả...';
         } elseif (Request::is('trang-chu')) {
-        $placeholder = 'Tìm kiếm theo lớp học phần, bài giảng, giảng viên, ...';
+            $placeholder = 'Tìm kiếm theo lớp học phần, bài giảng, giảng viên, ...';
         }elseif(Request::is('*bai-kiem-tra')){
-        $placeholder = 'Tìm kiếm theo tên bài kiểm tra,...';
+            $placeholder = 'Tìm kiếm theo tên bài kiểm tra,...';
         }elseif(Request::is('*su-kien-zoom*')){
-        $placeholder = 'Tìm kiếm theo tên sự kiện, mô tả, link sự kiện,...';
+            $placeholder = 'Tìm kiếm theo tên sự kiện, mô tả, link sự kiện,...';
         }elseif(Request::is('*moi-nguoi*')){
-        $placeholder = 'Tìm kiếm theo tên giảng viên, sinh viên';
+            $placeholder = 'Tìm kiếm theo tên giảng viên, sinh viên';
         }else {
-        $placeholder = 'Tìm kiếm...';
+            $placeholder = 'Tìm kiếm...';
         }
         @endphp
 
