@@ -110,8 +110,8 @@
                         @forelse ($baiKiemTras as $index => $baiKiemTra)
                         <tr>
                             <td class="text-center">{{ $baiKiemTras->firstItem() + $index }}</td>
-                            <td>{{ $baiKiemTra->TenBaiKiemTra }}</td>
-                            <td>{{ $baiKiemTra->TenLopHocPhan }}</td>
+                            <td class="highlight-target">{{ $baiKiemTra->TenBaiKiemTra }}</td>
+                            <td class="highlight-target">{{ $baiKiemTra->TenLopHocPhan }}</td>
                             <td class="text-center">{{ \Carbon\Carbon::parse($baiKiemTra->ThoiGianBatDau)->format('H:i:s
                                 d/m/Y') }}</td>
                             <td class="text-center">{{

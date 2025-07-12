@@ -44,9 +44,9 @@
                         <td class="text-center">
                             <img src="{{ asset($baiGiang->AnhBaiGiang ?? 'img/hocphan/default.png') }}" alt="{{ $baiGiang->TenBaiGiang ?? "Default" }}" width="40" height="40" class="rounded-circle">
                         </td>
-                        <td>{{ $baiGiang->TenBaiGiang }}</td>
-                        <td>{{ $baiGiang->TenKhoa }}</td>
-                        <td>{{ $baiGiang->MoTa }}</td>
+                        <td class="highlight-target">{{ $baiGiang->TenBaiGiang }}</td>
+                        <td class="highlight-target">{{ $baiGiang->TenKhoa }}</td>
+                        <td class="highlight-target">{{ $baiGiang->MoTa }}</td>
                         <td>{{ \Carbon\Carbon::parse($baiGiang->created_at)->timezone('Asia/Ho_Chi_Minh')->format('H:i:s d/m/Y') }}</td>
                         <td>
                             @if($baiGiang->TrangThai)

@@ -46,11 +46,11 @@
                     @forelse($sinhViens as $sinhVien)
                     <tr>
                         <td>#{{ $sinhVien->MaDanhSachLop }}</td>
-                        <td>{{ $sinhVien->HoTen  }}</td>
+                        <td class="highlight-target">{{ $sinhVien->HoTen }}</td>
                         <td class="text-center">
                             <img src="{{ asset($sinhVien->AnhDaiDien ?? 'AnhDaiDien/default-avatar.png') }}" alt="Avatar" width="40" height="40" class="rounded-circle"></td>
-                        <td>{{ $sinhVien->MSSV }}</td>
-                        <td>{{ $sinhVien->Email }}</td>
+                        <td class="highlight-target">{{ $sinhVien->MSSV }}</td>
+                        <td class="highlight-target">{{ $sinhVien->Email }}</td>
                         <td>{{ \Carbon\Carbon::parse($sinhVien->NgaySinh)->format('d/m/Y') }}</td>
                         <td>{{ $sinhVien->GioiTinh }}</td>
                         <td>

@@ -34,10 +34,9 @@ class ChuongController extends Controller
             $query->where(function ($q) use ($keywords) {
                 foreach ($keywords as $kw) {
                     $kw = strtolower($kw);
-                    $q->orWhereRaw('LOWER(chuong.TenChuong) LIKE ?', ["%$kw%"])
-                        ->orWhereRaw('LOWER(bai.TenBai) LIKE ?', ["%$kw%"])
-                        ->orWhereRaw('LOWER(bai.MoTa) LIKE ?', ["%$kw%"])
-                        ->orWhereRaw('LOWER(REGEXP_REPLACE(bai.NoiDung, "<[^>]*>", "")) LIKE ?', ["%$kw%"]);
+                    $q->orWhereRaw('LOWER(bai.TenBai) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(bai.MoTa) LIKE ?', ["%$kw%"]);
+                    // ->orWhereRaw('LOWER(REGEXP_REPLACE(bai.NoiDung, "<[^>]*>", "")) LIKE ?', ["%$kw%"]);
                 }
             });
         }

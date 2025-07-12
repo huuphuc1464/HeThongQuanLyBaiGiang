@@ -11,7 +11,7 @@
                         <i class="fas fa-plus"></i> Thêm chương mới
                     </button>
                 </div>
-                <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 flex-nowrap" style="min-width: 250px;" title="Tìm kiếm theo tên chương, tên bài, mô tả.">
+                <form method="GET" class="d-flex align-items-center gap-2 border rounded p-2 flex-nowrap" style="min-width: 250px;" title="Tìm kiếm theo tên bài học, mô tả bài học.">
                     <label for="search" class="fw-bold mb-0">Tìm kiếm:</label>
                     <input type="text" name="search" id="search" class="form-control form-control-sm w-auto" value="{{ request('search') }}">
                     <button type="submit" class="btn btn-primary btn-sm">
@@ -65,7 +65,7 @@
                                 @php $bai = $dsBaiChiTiet->first(); @endphp
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <span>{{ $bai->TenBai }}</span><br>
+                                        <span class="highlight-target">{{ $bai->TenBai }}</span><br>
                                     </div>
                                     <div class="d-flex align-items-center">
                                         <span class="badge {{ $bai->TrangThai ? 'bg-success' : 'bg-secondary' }}">

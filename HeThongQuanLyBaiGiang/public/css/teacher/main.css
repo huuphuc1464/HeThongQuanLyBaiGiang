@@ -82,3 +82,11 @@ main {
     background-color: #495057 !important;
     font-weight: 600;
 }
+
+mark {
+    background: yellow;
+    color: black;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 3px;
+}

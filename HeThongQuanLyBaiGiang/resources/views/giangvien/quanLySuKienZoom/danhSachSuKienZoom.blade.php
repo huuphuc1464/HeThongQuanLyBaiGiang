@@ -44,13 +44,13 @@
                     @forelse($danhSachSuKien as $suKien)
                     <tr style="cursor: pointer;" data-href="{{ route('giangvien.su-kien-zoom.chi-tiet', ['id' => $suKien->MaSuKienZoom]) }}">
                         <td>#{{ $suKien->MaSuKienZoom }}</td>
-                        <td>{{ $suKien->TenLopHocPhan ?? '' }}</td>
-                        <td>{{ $suKien->TenSuKien }}</td>
-                        <td>{{ $suKien->MoTa }}</td>
+                        <td class="highlight-target">{{ $suKien->TenLopHocPhan ?? '' }}</td>
+                        <td class="highlight-target">{{ $suKien->TenSuKien }}</td>
+                        <td class="highlight-target">{{ $suKien->MoTa }}</td>
                         <td>{{ \Carbon\Carbon::parse($suKien->ThoiGianBatDau)->format('H:i:s d/m/Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($suKien->ThoiGianKetThuc)->format('H:i:s d/m/Y') }}</td>
                         <td>{{ $suKien->KhoaChuTri }}</td>
-                        <td style="word-break: break-all;">
+                        <td style="word-break: break-all;" class="highlight-target">
                             <a href="{{ $suKien->LinkSuKien }}" target="_blank">{{ $suKien->LinkSuKien }}</a>
                         </td>
                         <td>{{ $suKien->MatKhauSuKien }}</td>
