@@ -93,7 +93,8 @@
 @endsection
 
 @section('styles')
-<script src="https://cdn.tiny.cloud/1/mhjmnigeq5s0gc1fzivy77ol0lz6rznmxfnxscfzx0twtmin/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/n1ijx6jzdaxublu2kj9hbij8t6amt8tiqyhd8o6injflv8og/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
 <link rel="stylesheet" href="{{ asset('./css/teacher/form.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/jquery-ui.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/elfinder.min.css') }}">
