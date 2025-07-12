@@ -436,3 +436,11 @@ a.text-decoration-none.text-dark:hover {
     object-fit: cover;
     border: 2px solid #e0e4e8;
 }
+
+mark {
+    background: yellow;
+    color: black;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 3px;
+}

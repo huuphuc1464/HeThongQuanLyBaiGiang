@@ -25,38 +25,27 @@
                 @endphp
                 <div class="accordion-item border">
                     <h2 class="accordion-header" id="heading-{{ $chuongId }}">
-                        <button class="accordion-button collapsed fw-bold text-dark bg-light" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#collapse-{{ $chuongId }}" aria-expanded="false"
-                            aria-controls="collapse-{{ $chuongId }}">
+                        <button class="accordion-button collapsed fw-bold text-dark bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $chuongId }}" aria-expanded="false" aria-controls="collapse-{{ $chuongId }}">
                             {{ $tenChuong }}
                         </button>
                     </h2>
-                    <div id="collapse-{{ $chuongId }}" class="accordion-collapse collapse"
-                        aria-labelledby="heading-{{ $chuongId }}" data-bs-parent="#chuong">
+                    <div id="collapse-{{ $chuongId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $chuongId }}" data-bs-parent="#chuong">
                         <div class="accordion-body">
                             <ul class="list-group">
-                                @foreach ($cacBai as $key => $baiGiangs)
-                                @php
-                                $parts = explode('|', $key);
-                                $tenBai = $parts[0];
-                                @endphp
-                                @foreach ($baiGiangs as $baiGiang)
+                                @foreach ($cacBai as $baiGiang)
                                 <li class="list-group-item p-0">
-                                    <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}"
-                                        class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
+                                    <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiGiang->MaBaiGiang]) }}" class="d-flex justify-content-between align-items-center px-3 py-2 text-decoration-none text-dark w-100 h-100">
                                         <div>
-                                            <span>{{ $baiGiang->TenBaiGiang }}</span>
+                                            <span class="highlight-target">{{ $baiGiang->TenBaiGiang }}</span>
                                         </div>
                                         <div class="d-flex align-items-center">
                                             <span class="text-muted">
                                                 <strong>Cập nhật:</strong>
-                                                {{ \Carbon\Carbon::parse($baiGiang->updated_at)->format('H:i:s d/m/Y')
-                                                }}
+                                                {{ \Carbon\Carbon::parse($baiGiang->updated_at)->format('H:i:s d/m/Y') }}
                                             </span>
                                         </div>
                                     </a>
                                 </li>
-                                @endforeach
                                 @endforeach
                             </ul>
                         </div>

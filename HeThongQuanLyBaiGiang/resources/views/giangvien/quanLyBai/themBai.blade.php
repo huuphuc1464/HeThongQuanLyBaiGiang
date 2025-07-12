@@ -118,6 +118,6 @@
     window.cancelRoute = '{{ route('giangvien.bai-giang.chuong.bai.huy', ['maBaiGiang' => $baiHoc->MaBaiGiang, 'maChuong' => $baiHoc->MaChuong]) }}';
 </script>
 
-<script src="{{ asset('./js/teacher/baigiang.js') }}"></script>
+<script src="{{ asset('js/teacher/baigiang.js') }}"></script>
 
 @endsection

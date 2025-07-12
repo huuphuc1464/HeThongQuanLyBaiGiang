@@ -11,7 +11,7 @@
         </ul>
 
         <!-- Tên lớp học phần -->
-        <div class="duongKe my-1 section-title ps-3 nav-link active d-flex align-items-center justify-content-between">
+        <div class="duongKe section-title ps-3 nav-link active d-flex align-items-center justify-content-between m-0">
             <div class="d-flex align-items-center gap-2">
                 <img src=" {{ $lopHocPhan->AnhBaiGiang ? asset( $lopHocPhan->AnhBaiGiang) : asset('img/hocphan/default.png') }}" width="30" height="32" alt="Class icon" style="border-radius: 50%; border: 1.5px solid #3a3a3a;" />
                 <span class="text-truncate d-inline-block" style="max-width: 195px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;" title="{{ $lopHocPhan->TenLopHocPhan }}">
@@ -22,13 +22,13 @@
 
         <ul class="nav flex-column mt-1">
             <li class="nav-item gachDuoi">
-                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="{{ route('danh-sach-bai-kiem-tra') }}">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark m-0" href="{{ route('danh-sach-bai-kiem-tra') }}">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Bài kiểm tra</span>
                 </a>
             </li>
             <li class="nav-item gachDuoi">
-                <a class="nav-link d-flex align-items-center gap-2 text-dark" href="{{ route('bai-giang.bai.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
+                <a class="nav-link d-flex align-items-center gap-2 text-dark m-0" href="{{ route('bai-giang.bai.tab', ['id' => $id, 'tab' => 'su-kien-zoom']) }}">
                     <i class="fas fa-video"></i>
                     <span>Sự kiện Zoom</span>
                 </a>
@@ -42,7 +42,7 @@
             @php $chuongId = Str::slug($tenChuong) . '-' . uniqid(); @endphp
             <div class="accordion-item border-0">
                 <h2 class="accordion-header" id="heading-{{ $chuongId }}">
-                    <button class="accordion-button collapsed bg-white text-dark py-2 px-3 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $chuongId }}" aria-expanded="false" aria-controls="collapse-{{ $chuongId }}">
+                    <button class="accordion-button collapsed bg-white text-dark px-3 fw-bold" style="padding: 0.75rem" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $chuongId }}" aria-expanded="false" aria-controls="collapse-{{ $chuongId }}">
                         <span class="w-100 d-inline-block text-truncate" style="font-size:14px;">
                             {{ $tenChuong }}
                         </span>

@@ -118,7 +118,9 @@ class HomeController extends Controller
             ->where('MaNguoiDung', $lopHocPhan->MaNguoiTao)
             ->first();
 
-        $baiGiangs = DB::table('bai as b')
+        $search = request('search');
+
+        $baiGiangsQuery = DB::table('bai as b')
             ->join('chuong as c', 'b.MaChuong', '=', 'c.MaChuong')
             ->join('bai_giang as bg', 'c.MaBaiGiang', '=', 'bg.MaBaiGiang')
             ->join('lop_hoc_phan as lhp', 'lhp.MaBaiGiang', '=', 'bg.MaBaiGiang')
@@ -128,7 +130,24 @@ class HomeController extends Controller
             ->where('dsl.TrangThai', '=', 1)
             ->where('b.TrangThai', 1)
             ->where('c.TrangThai', 1)
-            ->where('bg.TrangThai', 1)
+            ->where('bg.TrangThai', 1);
+
+        if (!empty($search)) {
+            $keywords = preg_split('/\s+/', trim($search));
+            $baiGiangsQuery->where(function ($query) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $kw = strtolower($kw);
+                    $query->orWhereRaw('LOWER(b.TenBai) LIKE ?', ["%$kw%"])
+                        // ->orWhereRaw('LOWER(c.TenChuong) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(b.NoiDung) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(b.MoTa) LIKE ?', ["%$kw%"]);
+                }
+            });
+        }
+
+        $baiGiangs = $baiGiangsQuery
+            ->orderBy('c.TenChuong')
+            ->orderBy('b.TenBai')
             ->orderBy('b.created_at')
             ->select(
                 'c.TenChuong',
@@ -138,19 +157,18 @@ class HomeController extends Controller
                 'b.updated_at',
                 'b.created_at'
             )
-            ->orderBy('c.TenChuong')
-            ->orderBy('b.TenBai')
-            ->orderBy('b.created_at')
             ->get()
-            ->groupBy('TenChuong')
-            ->map(fn($chuong) => $chuong->groupBy('TenBai'));
+            ->groupBy('TenChuong');
+        // ->map(fn($chuong) => $chuong->groupBy('TenBai'));
 
         return compact('lopHocPhan', 'giangVien', 'baiGiangs');
     }
 
     private function danhSachSuKienZoom($id)
     {
-        $suKiens = DB::table('su_kien_zoom as sk')
+        $search = request('search');
+
+        $query = DB::table('su_kien_zoom as sk')
             ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'sk.MaLopHocPhan')
             ->where('dsl.MaSinhVien', '=', Auth::id())
             ->where('dsl.TrangThai', '=', 1)
@@ -165,7 +183,21 @@ class HomeController extends Controller
                 'sk.MatKhauSuKien',
                 'sk.created_at',
                 'sk.updated_at',
-            )
+            );
+
+        if (!empty($search)) {
+            $keywords = preg_split('/\s+/', trim($search));
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $kw = strtolower($kw);
+                    $q->orWhereRaw('LOWER(sk.TenSuKien) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(sk.MoTa) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(sk.LinkSuKien) LIKE ?', ["%$kw%"]);
+                }
+            });
+        }
+
+        $suKiens = $query
             ->orderBy('sk.ThoiGianBatDau', 'asc')
             ->get();
 
@@ -174,12 +206,14 @@ class HomeController extends Controller
 
     private function danhSachLop($id)
     {
+        $search = request('search');
+
         $giangVien = DB::table('nguoi_dung as nd')
             ->join('lop_hoc_phan as lhp', 'lhp.MaNguoiTao', '=', 'nd.MaNguoiDung')
             ->where('lhp.MaLopHocPhan', $id)
             ->select('nd.HoTen', 'nd.AnhDaiDien')
             ->first();
-
+            
         $daThamGia = DB::table('danh_sach_lop')
             ->where('MaLopHocPhan', $id)
             ->where('MaSinhVien', Auth::id())
@@ -190,12 +224,24 @@ class HomeController extends Controller
             abort(404, 'Bạn không có quyền truy cập vào lớp học phần này');
         }
 
-        $sinhViens = DB::table('nguoi_dung as nd')
+        $sinhVienQuery = DB::table('nguoi_dung as nd')
             ->join('danh_sach_lop as dsl', 'nd.MaNguoiDung', '=', 'dsl.MaSinhVien')
             ->where('dsl.MaLopHocPhan', $id)
             ->where('dsl.TrangThai', 1)
-            ->select('nd.HoTen', 'nd.AnhDaiDien')
-            ->get();
+            ->select('nd.HoTen', 'nd.AnhDaiDien');
+
+        if (!empty($search)) {
+            $keywords = preg_split('/\s+/', trim($search));
+
+            $sinhVienQuery->where(function ($query) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $kw = strtolower($kw);
+                    $query->orWhereRaw('LOWER(nd.HoTen) LIKE ?', ["%$kw%"]);
+                }
+            });
+        }
+
+        $sinhViens = $sinhVienQuery->get();
 
         return ['sinhViens' => $sinhViens, 'giangVien' => $giangVien];
     }

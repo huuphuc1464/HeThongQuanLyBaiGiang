@@ -11,7 +11,7 @@
             <hr class="my-2">
             <div class="d-flex align-items-center py-2">
                 <img src="{{ asset($giangVien->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="me-3 rounded-circle border" width="40" height="40" alt="{{ $giangVien->HoTen }}">
-                <div class="fw-semibold">{{ $giangVien->HoTen ?? 'Tên giảng viên' }}</div>
+                <div class="fw-semibold highlight-target">{{ $giangVien->HoTen ?? 'Tên giảng viên' }}</div>
             </div>
 
             <!-- Sinh viên -->
@@ -23,7 +23,7 @@
             @foreach ($sinhViens as $sv)
             <div class="d-flex align-items-center py-2 border-bottom">
                 <img src="{{ asset($sv->AnhDaiDien ?? '/AnhDaiDien/default-avatar.png') }}" class="me-3 rounded-circle border" width="36" height="36" alt="{{ $sv->HoTen }}">
-                <div class="fw-semibold">{{ $sv->HoTen }}</div>
+                <div class="fw-semibold highlight-target">{{ $sv->HoTen }}</div>
             </div>
             @endforeach
         </div>

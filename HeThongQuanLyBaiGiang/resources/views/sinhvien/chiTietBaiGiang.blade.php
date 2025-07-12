@@ -32,7 +32,7 @@
                     {{-- Nội dung --}}
                     <div class="mb3">
                         <h5 class="text-primary">Nội dung bài giảng:</h5>
-                        <div class="p-3 bg-light rounded" style="min-height: 150px;">
+                        <div class="p-3 bg-light rounded highlight-content" style="min-height: 150px;">
                             {!! $bai->NoiDung !!}
                         </div>
                     </div>

@@ -26,7 +26,8 @@
                 <i class="fas fa-video fs-5 {{ $daKetThuc ? 'text-secondary' : 'text-info' }}"></i>
             </div>
         </div>
-        <div class="flex-grow-1 fw-semibold fs-6">
+        <div class="flex-grow-1 fw-semibold fs-6 highlight-target">
+
             {{ $suKien->TenSuKien }}
         </div>
         <div class="d-flex align-items-center text-end" style="z-index: 1;">

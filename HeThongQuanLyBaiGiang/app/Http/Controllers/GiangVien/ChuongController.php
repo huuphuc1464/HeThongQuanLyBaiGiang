@@ -36,7 +36,8 @@ class ChuongController extends Controller
                     $kw = strtolower($kw);
                     $q->orWhereRaw('LOWER(chuong.TenChuong) LIKE ?', ["%$kw%"])
                         ->orWhereRaw('LOWER(bai.TenBai) LIKE ?', ["%$kw%"])
-                        ->orWhereRaw('LOWER(bai.MoTa) LIKE ?', ["%$kw%"]);
+                        ->orWhereRaw('LOWER(bai.MoTa) LIKE ?', ["%$kw%"])
+                        ->orWhereRaw('LOWER(REGEXP_REPLACE(bai.NoiDung, "<[^>]*>", "")) LIKE ?', ["%$kw%"]);
                 }
             });
         }
