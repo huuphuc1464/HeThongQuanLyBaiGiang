@@ -189,7 +189,8 @@ function initTinyMCE(csrfToken, maBaiGiang = null, maBai = null) {
                                     .then(data => {
                                         if (data.url) {
                                             img.setAttribute('src', data.url);
-
+                                            console.log(data.url);
+                                            
                                             // Đánh dấu nếu có thể là equation
                                             const alt = img.getAttribute('alt')?.toLowerCase() || '';
                                             if (alt.includes('equation') || data.url.includes('equation')) {

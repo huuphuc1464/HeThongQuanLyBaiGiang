@@ -134,7 +134,9 @@ Route::prefix('giang-vien')->name('giangvien.')->middleware(['auth', RoleMiddlew
         Route::get('/{id}/chinh-sua', [LopHocPhanController::class, 'chinhSua'])->name('chinh-sua');
         Route::put('/{id}', [LopHocPhanController::class, 'capNhat'])->name('cap-nhat');
         Route::delete('/{id}', [LopHocPhanController::class, 'xoa'])->name('xoa');
-
+        Route::post('/{id}/luu-tru', [LopHocPhanController::class, 'luuTru'])->name('giangvien.lophocphan.luutru');
+        Route::post('/{id}/bo-luu-tru', [LopHocPhanController::class, 'boLuuTru'])->name('giangvien.lophocphan.boluutru');
+        
         // Quản lý sinh viên
         Route::prefix('{maLopHocPhan}/sinh-vien')->name('sinhvien.')->group(function () {
             Route::get('/', [SinhVienController::class, 'danhSachSinhVien'])->name('danhsach');
@@ -182,9 +184,3 @@ Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
 
     Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
 });
-
-
-// Lưu trữ lớp học phần
-Route::post('giang-vien/lop-hoc-phan/{id}/luu-tru', [App\Http\Controllers\GiangVien\LopHocPhanController::class, 'luuTru'])->name('giangvien.lophocphan.luutru');
-// Hủy lưu trữ lớp học phần
-Route::post('giang-vien/lop-hoc-phan/{id}/bo-luu-tru', [App\Http\Controllers\GiangVien\LopHocPhanController::class, 'boLuuTru'])->name('giangvien.lophocphan.boluutru');

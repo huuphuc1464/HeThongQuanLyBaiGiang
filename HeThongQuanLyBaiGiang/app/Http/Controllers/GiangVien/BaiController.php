@@ -124,19 +124,18 @@ class BaiController extends Controller
         if ($maBai) {
             // Form cập nhật
             $folderPath = public_path("BaiGiang/BaiGiang_{$maBaiGiang}/Bai_{$maBai}");
-            $duongDanDB = FileBaiGiang::where('MaBai', $maBai)->pluck('DuongDan')->map(function ($path) {
-                return preg_replace('#/+#', '/', str_replace('\\', '/', $path));
-            })->toArray();
+            $duongDanDB = FileBaiGiang::where('MaBai', $maBai)
+                ->pluck('DuongDan')
+                ->map(fn($path) => preg_replace('#/+#', '/', str_replace('\\', '/', $path)))
+                ->toArray();
         } else {
             // Form thêm
             $folderPath = public_path("BaiGiang/BaiGiang_{$maBaiGiang}/temp_{$maNguoiDung}_{$maBaiGiang}");
             $duongDanDB = [];
         }
 
-        Log::info($duongDanDB);
-
         if (File::exists($folderPath)) {
-            foreach (File::files($folderPath) as $file) {
+            foreach (File::allFiles($folderPath) as $file) {
                 $relativePath = str_replace(public_path(), '', $file->getPathname());
                 $relativePath = preg_replace('#/+#', '/', str_replace('\\', '/', $relativePath));
                 $relativePath = ltrim($relativePath, '/');
@@ -150,6 +149,7 @@ class BaiController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
 
     public function themBai(Request $request, $maBaiGiang, $maChuong)
     {
@@ -472,7 +472,7 @@ class BaiController extends Controller
         $file->move($filePath, $fileName);
 
         return response()->json([
-            'url' => asset("{$folder}/{$fileName}")
+            'url' => "{$folder}/{$fileName}"
         ]);
     }
 }
