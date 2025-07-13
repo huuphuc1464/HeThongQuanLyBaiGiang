@@ -1,5 +1,4 @@
 // Component Vue.js cho bình luận realtime
-console.log('object');
 const BinhLuanRealtime = {
     template: `
     <div class="binh-luan-container">
@@ -134,8 +133,8 @@ const BinhLuanRealtime = {
                         </div>
 
                         <!-- Bình luận con -->
-                        <div v-if="binhLuan.binhLuanCon && binhLuan.binhLuanCon.length > 0" class="binh-luan-con mt-3">
-                            <div v-for="traLoi in binhLuan.binhLuanCon" :key="traLoi.MaBinhLuan"
+                        <div v-if="binhLuan.binh_luan_con && binhLuan.binh_luan_con.length > 0" class="binh-luan-con mt-3">
+                            <div v-for="traLoi in binhLuan.binh_luan_con" :key="traLoi.MaBinhLuan"
                                 class="tra-loi-item ms-4 mb-3">
                                 <div class="card border-light">
                                     <div class="card-body py-2">
@@ -271,10 +270,12 @@ const BinhLuanRealtime = {
                     this.binhLuans = data.binhLuans.data;
                     this.trangHienTai = data.binhLuans.current_page;
 
-                    // Debug: Kiểm tra dữ liệu người dùng
+                    // Debug: Kiểm tra dữ liệu người dùng và bình luận con
                     if (this.binhLuans.length > 0) {
                         console.log('[DEBUG] Bình luận đầu tiên:', this.binhLuans[0]);
                         console.log('[DEBUG] NguoiGui của bình luận đầu tiên:', this.binhLuans[0].nguoi_gui);
+                        console.log('[DEBUG] Bình luận con của bình luận đầu tiên:', this.binhLuans[0].binh_luan_con);
+                        console.log('[DEBUG] Số lượng bình luận con:', this.binhLuans[0].binh_luan_con ? this.binhLuans[0].binh_luan_con.length : 0);
                     }
                 }
             } catch (error) {
@@ -410,10 +411,10 @@ const BinhLuanRealtime = {
                     if (data.binhLuan) {
                         const binhLuanCha = this.binhLuans.find(bl => bl.MaBinhLuan === this.binhLuanDangTraLoi.MaBinhLuan);
                         if (binhLuanCha) {
-                            if (!binhLuanCha.binhLuanCon) {
-                                binhLuanCha.binhLuanCon = [];
+                            if (!binhLuanCha.binh_luan_con) {
+                                binhLuanCha.binh_luan_con = [];
                             }
-                            binhLuanCha.binhLuanCon.push(data.binhLuan);
+                            binhLuanCha.binh_luan_con.push(data.binhLuan);
                         }
                     } else {
                         await this.taiBinhLuans();
@@ -476,7 +477,6 @@ const BinhLuanRealtime = {
             if (!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) {
                 return;
             }
-
             try {
                 const response = await fetch(`/binh-luan/xoa/${maBinhLuan}`, {
                     method: 'DELETE',
@@ -529,8 +529,8 @@ const BinhLuanRealtime = {
                     } else {
                         // Tìm trong bình luận con
                         for (let bl of this.binhLuans) {
-                            if (bl.binhLuanCon) {
-                                const binhLuanCon = bl.binhLuanCon.find(bc => bc.MaBinhLuan === maBinhLuan);
+                            if (bl.binh_luan_con) {
+                                const binhLuanCon = bl.binh_luan_con.find(bc => bc.MaBinhLuan === maBinhLuan);
                                 if (binhLuanCon) {
                                     binhLuanCon.SoUpvote = data.soUpvote;
                                     binhLuanCon.SoDownvote = data.soDownvote;

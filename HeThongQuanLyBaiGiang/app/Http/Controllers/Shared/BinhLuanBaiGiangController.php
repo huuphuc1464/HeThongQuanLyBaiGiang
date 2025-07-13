@@ -8,7 +8,6 @@ use App\Models\BinhLuanUpvote;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class BinhLuanBaiGiangController extends Controller
 {
@@ -31,7 +30,7 @@ class BinhLuanBaiGiangController extends Controller
         ]);
 
         // Broadcast event cho realtime
-        // broadcast(new \App\Events\BinhLuanMoi($binhLuan->load('nguoiGui')))->toOthers();
+        broadcast(new \App\Events\BinhLuanMoi($binhLuan->load('nguoiGui')))->toOthers();
 
         if ($request->expectsJson()) {
             // Thêm thông tin vote cho bình luận mới
@@ -67,7 +66,7 @@ class BinhLuanBaiGiangController extends Controller
         ]);
 
         // Broadcast event cho realtime
-        // broadcast(new \App\Events\BinhLuanMoi($binhLuan->load('nguoiGui')))->toOthers();
+        broadcast(new \App\Events\BinhLuanMoi($binhLuan->load('nguoiGui')))->toOthers();
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -139,7 +138,7 @@ class BinhLuanBaiGiangController extends Controller
         // Xóa bình luận chính
         $binhLuan->delete();
         // Broadcast event cho realtime
-        // broadcast(new \App\Events\BinhLuanDeleted($maBinhLuan, $maBai))->toOthers();
+        broadcast(new \App\Events\BinhLuanDeleted($maBinhLuan, $maBai))->toOthers();
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -220,7 +219,7 @@ class BinhLuanBaiGiangController extends Controller
             }
         }
 
-        // broadcast(new \App\Events\BinhLuanVoted($binhLuan->MaBinhLuan, $binhLuan->SoUpvote, $binhLuan->SoDownvote))->toOthers();
+        broadcast(new \App\Events\BinhLuanVoted($binhLuan->MaBinhLuan, $binhLuan->SoUpvote, $binhLuan->SoDownvote))->toOthers();
 
         return response()->json([
             'success' => true,

@@ -128,8 +128,8 @@
                     </div>
 
                     <!-- Bình luận con -->
-                    <div v-if="binhLuan.binhLuanCon && binhLuan.binhLuanCon.length > 0" class="binh-luan-con mt-3">
-                        <div v-for="traLoi in binhLuan.binhLuanCon" :key="traLoi.MaBinhLuan"
+                    <div v-if="binhLuan.binh_luan_con && binhLuan.binh_luan_con.length > 0" class="binh-luan-con mt-3">
+                        <div v-for="traLoi in binhLuan.binh_luan_con" :key="traLoi.MaBinhLuan"
                             class="tra-loi-item ms-4 mb-3">
                             <div class="card border-light">
                                 <div class="card-body py-2">
