@@ -294,6 +294,31 @@ const BinhLuanRealtime = {
                     .listen('BinhLuanDeleted', (e) => {
                         this.xoaBinhLuanRealtime(e.maBinhLuan);
                     });
+                window.Echo.channel('binh-luan-vote')
+                    .listen('BinhLuanVoted', (e) => {
+                        this.capNhatVoteRealtime(e.maBinhLuan, e.soUpvote, e.soDownvote);
+                    });
+            }
+        },
+
+        capNhatVoteRealtime(maBinhLuan, soUpvote, soDownvote) {
+            // Cập nhật số upvote/downvote cho bình luận chính
+            let binhLuan = this.binhLuans.find(bl => bl.MaBinhLuan === maBinhLuan);
+            if (binhLuan) {
+                binhLuan.SoUpvote = soUpvote;
+                binhLuan.SoDownvote = soDownvote;
+                return;
+            }
+            // Nếu không phải bình luận chính, tìm trong bình luận con
+            for (let bl of this.binhLuans) {
+                if (bl.binhLuanCon) {
+                    const binhLuanCon = bl.binhLuanCon.find(bc => bc.MaBinhLuan === maBinhLuan);
+                    if (binhLuanCon) {
+                        binhLuanCon.SoUpvote = soUpvote;
+                        binhLuanCon.SoDownvote = soDownvote;
+                        break;
+                    }
+                }
             }
         },
 
@@ -306,7 +331,7 @@ const BinhLuanRealtime = {
             // Xóa bình luận khỏi danh sách khi nhận được sự kiện realtime
             this.binhLuans = this.binhLuans.filter(bl => bl.MaBinhLuan !== maBinhLuan);
 
-            // Cũng xóa bình luận con nếu có
+            //  xóa bình luận con nếu có
             for (let bl of this.binhLuans) {
                 if (bl.binhLuanCon) {
                     bl.binhLuanCon = bl.binhLuanCon.filter(bc => bc.MaBinhLuan !== maBinhLuan);
@@ -315,11 +340,15 @@ const BinhLuanRealtime = {
         },
 
         async guiBinhLuan() {
-            if (!this.noiDung.trim()) {
+            // Lấy nội dung thực tế từ TinyMCE 
+            let noiDungThucTe = this.noiDung;
+            if (window.tinymce && window.tinymce.get('noiDung')) {
+                noiDungThucTe = window.tinymce.get('noiDung').getContent({ format: 'html' }).trim();
+            }
+            if (!noiDungThucTe) {
                 alert('Vui lòng nhập nội dung bình luận');
                 return;
             }
-
             try {
                 const response = await fetch('/binh-luan/gui-binh-luan', {
                     method: 'POST',
@@ -330,23 +359,17 @@ const BinhLuanRealtime = {
                     },
                     body: JSON.stringify({
                         MaBai: this.maBai,
-                        NoiDung: this.noiDung
+                        NoiDung: noiDungThucTe
                     })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    // Thêm bình luận mới vào đầu danh sách ngay lập tức
                     if (data.binhLuan) {
                         this.binhLuans.unshift(data.binhLuan);
                     } else {
-                        // Nếu không có dữ liệu bình luận trả về, reload lại danh sách
                         await this.taiBinhLuans();
                     }
-
                     this.noiDung = '';
-                    // TinyMCE sẽ tự động cập nhật
                     if (window.tinymce.get('noiDung')) {
                         window.tinymce.get('noiDung').setContent('');
                     }
@@ -359,11 +382,15 @@ const BinhLuanRealtime = {
         },
 
         async traLoiBinhLuan() {
-            if (!this.noiDungTraLoi.trim()) {
+            // Lấy nội dung thực tế từ TinyMCE 
+            let noiDungThucTe = this.noiDungTraLoi;
+            if (window.tinymce && window.tinymce.get('noiDungTraLoi')) {
+                noiDungThucTe = window.tinymce.get('noiDungTraLoi').getContent({ format: 'html' }).trim();
+            }
+            if (!noiDungThucTe) {
                 alert('Vui lòng nhập nội dung phản hồi');
                 return;
             }
-
             try {
                 const response = await fetch('/binh-luan/tra-loi-binh-luan', {
                     method: 'POST',
@@ -375,14 +402,11 @@ const BinhLuanRealtime = {
                     body: JSON.stringify({
                         MaBinhLuan: this.binhLuanDangTraLoi.MaBinhLuan,
                         MaBai: this.maBai,
-                        NoiDung: this.noiDungTraLoi
+                        NoiDung: noiDungThucTe
                     })
                 });
-
                 const data = await response.json();
-
                 if (data.success) {
-                    // Thêm phản hồi mới vào bình luận cha
                     if (data.binhLuan) {
                         const binhLuanCha = this.binhLuans.find(bl => bl.MaBinhLuan === this.binhLuanDangTraLoi.MaBinhLuan);
                         if (binhLuanCha) {
@@ -392,10 +416,8 @@ const BinhLuanRealtime = {
                             binhLuanCha.binhLuanCon.push(data.binhLuan);
                         }
                     } else {
-                        // Nếu không có dữ liệu trả về, reload lại danh sách
                         await this.taiBinhLuans();
                     }
-
                     this.noiDungTraLoi = '';
                     this.binhLuanDangTraLoi = null;
                     if (window.tinymce.get('noiDungTraLoi')) {
@@ -534,8 +556,12 @@ const BinhLuanRealtime = {
             this.noiDungTraLoi = '';
             this.$nextTick(() => {
                 if (window.tinymce.get('noiDungTraLoi')) {
-                    window.tinymce.get('noiDungTraLoi').setContent('');
+                    window.tinymce.get('noiDungTraLoi').remove();
                 }
+                window.tinymce.init({
+                    selector: '#noiDungTraLoi',
+                    ...this.tinymceConfig
+                });
             });
         },
 
@@ -552,6 +578,9 @@ const BinhLuanRealtime = {
         },
 
         huyTraLoi() {
+            if (window.tinymce.get('noiDungTraLoi')) {
+                window.tinymce.get('noiDungTraLoi').remove();
+            }
             this.binhLuanDangTraLoi = null;
             this.noiDungTraLoi = '';
         },
@@ -561,7 +590,6 @@ const BinhLuanRealtime = {
             this.binhLuanDangChinhSua = null;
             this.noiDungChinhSua = '';
             this.lyDoChinhSua = '';
-            // Xóa backdrop nếu còn
             const backdrop = document.querySelector('.modal-backdrop');
             if (backdrop) backdrop.remove();
         },
