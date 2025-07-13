@@ -58,12 +58,14 @@ const BinhLuanRealtime = {
                         <!-- Header bình luận -->
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="d-flex align-items-center">
-                                <img :src="binhLuan.nguoiGui && binhLuan.nguoiGui.AnhDaiDien ? binhLuan.nguoiGui.AnhDaiDien : '/AnhDaiDien/default-avatar.png'"
-                                    :alt="binhLuan.nguoiGui ? binhLuan.nguoiGui.HoTen : 'Người dùng'" class="rounded-circle me-2"
-                                    style="width: 40px; height: 40px; object-fit: cover;">
+                               <img
+                                    :src="getAvatarUrl(binhLuan.nguoi_gui)"
+                                    :alt="binhLuan.nguoi_gui ? binhLuan.nguoi_gui.HoTen : 'Người dùng'"
+                                    class="rounded-circle me-2"
+                                    style="width: 40px; height: 40px; object-fit: cover;"
+                                    >
                                 <div>
-                                    <h6 class="mb-0">{{ binhLuan.nguoiGui ? binhLuan.nguoiGui.HoTen : 'Người dùng' }}</h6>
-                                    <small class="text-muted">ID: {{ binhLuan.MaNguoiGui }} - {{ binhLuan.nguoiGui ? 'Có dữ liệu' : 'Không có dữ liệu' }}</small>
+                                    <h6 class="mb-0">{{ binhLuan.nguoi_gui ? binhLuan.nguoi_gui.HoTen : 'Người dùng' }}</h6>
                                     <small class="text-muted">{{ formatThoiGian(binhLuan.created_at) }}</small>
                                     <span v-if="binhLuan.DaChinhSua" class="badge bg-secondary ms-2">Đã chỉnh sửa</span>
                                 </div>
@@ -139,11 +141,11 @@ const BinhLuanRealtime = {
                                     <div class="card-body py-2">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div class="d-flex align-items-center">
-                                                <img :src="traLoi.nguoiGui && traLoi.nguoiGui.AnhDaiDien ? traLoi.nguoiGui.AnhDaiDien : '/AnhDaiDien/default-avatar.png'"
-                                                    :alt="traLoi.nguoiGui ? traLoi.nguoiGui.HoTen : 'Người dùng'" class="rounded-circle me-2"
+                                                <img :src="getAvatarUrl(traLoi.nguoi_gui)"
+                                                    :alt="traLoi.nguoi_gui ? traLoi.nguoi_gui.HoTen : 'Người dùng'" class="rounded-circle me-2"
                                                     style="width: 30px; height: 30px; object-fit: cover;">
                                                 <div>
-                                                    <h6 class="mb-0 small">{{ traLoi.nguoiGui ? traLoi.nguoiGui.HoTen : 'Người dùng' }}</h6>
+                                                    <h6 class="mb-0 small">{{ traLoi.nguoi_gui ? traLoi.nguoi_gui.HoTen : 'Người dùng' }}</h6>
                                                     <small class="text-muted">{{ formatThoiGian(traLoi.created_at) }}</small>
                                                 </div>
                                             </div>
@@ -272,7 +274,7 @@ const BinhLuanRealtime = {
                     // Debug: Kiểm tra dữ liệu người dùng
                     if (this.binhLuans.length > 0) {
                         console.log('[DEBUG] Bình luận đầu tiên:', this.binhLuans[0]);
-                        console.log('[DEBUG] NguoiGui của bình luận đầu tiên:', this.binhLuans[0].nguoiGui);
+                        console.log('[DEBUG] NguoiGui của bình luận đầu tiên:', this.binhLuans[0].nguoi_gui);
                     }
                 }
             } catch (error) {
@@ -595,6 +597,16 @@ const BinhLuanRealtime = {
 
         kiemTraQuyenChinhSua(binhLuan) {
             return binhLuan.MaNguoiGui === this.maNguoiDung;
+        },
+
+        getAvatarUrl(nguoi) {
+            if (!nguoi || !nguoi.AnhDaiDien) {
+                return '/AnhDaiDien/default-avatar.png';
+            }
+            if (nguoi.AnhDaiDien.startsWith('http')) {
+                return nguoi.AnhDaiDien;
+            }
+            return window.location.origin.replace(/\/$/, '') + '/' + nguoi.AnhDaiDien.replace(/^\//, '');
         }
     },
 

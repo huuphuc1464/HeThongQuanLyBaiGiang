@@ -44,7 +44,8 @@ class BinhLuanDeleted implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'binhLuan' => $this->binhLuan->load('nguoiGui')
+            'maBinhLuan' => $this->maBinhLuan,
+            'maBai' => $this->maBai,
         ];
     }
 }
