@@ -48,10 +48,8 @@ Route::prefix('binh-luan')->name('binhluan.')->middleware(['auth', RoleMiddlewar
     Route::post('/tra-loi-binh-luan', [BinhLuanBaiGiangController::class, 'traLoiBinhLuan'])->name('traloi');
     Route::delete('/xoa/{id}', [BinhLuanBaiGiangController::class, 'xoa'])->name('xoa');
     Route::put('/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat'])->name('capnhat');
-
     // Upvote/Downvote
     Route::post('/vote', [BinhLuanBaiGiangController::class, 'vote'])->name('vote');
-
     // Lấy danh sách bình luận với sắp xếp
     Route::get('/danh-sach', [BinhLuanBaiGiangController::class, 'layDanhSach'])->name('danh-sach');
 });
@@ -191,4 +189,4 @@ Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
     Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
 });
 
-Route::get('/lop-hoc-phan/luu-tru', [App\Http\Controllers\SinhVien\HomeController::class, 'lopHocPhanLuuTru'])->name('lop-hoc-phan.luu-tru');
+Route::get('/lop-hoc-phan/luu-tru', [SinhVienHomeController::class, 'lopHocPhanLuuTru'])->name('lop-hoc-phan.luu-tru');

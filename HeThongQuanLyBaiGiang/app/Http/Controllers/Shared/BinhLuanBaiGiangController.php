@@ -45,8 +45,6 @@ class BinhLuanBaiGiangController extends Controller
                 'binhLuan' => $binhLuan->load('nguoiGui')
             ]);
         }
-
-        return back()->with('success', 'Đã gửi bình luận thành công.');
     }
 
     public function traLoiBinhLuan(Request $request)
@@ -78,8 +76,6 @@ class BinhLuanBaiGiangController extends Controller
                 'binhLuan' => $binhLuan->load('nguoiGui')
             ]);
         }
-
-        return redirect()->back()->with('success', 'Phản hồi của bạn đã được gửi.');
     }
 
     public function capNhat(Request $request)
@@ -118,8 +114,6 @@ class BinhLuanBaiGiangController extends Controller
                 'binhLuan' => $binhLuan->load('nguoiGui')
             ]);
         }
-
-        return back()->with('success', 'Đã cập nhật bình luận thành công.');
     }
 
     public function xoa($maBinhLuan)
@@ -135,20 +129,15 @@ class BinhLuanBaiGiangController extends Controller
                     'message' => 'Bạn không có quyền xóa bình luận này.'
                 ], 403);
             }
-            return back()->with('error', 'Bạn không có quyền xóa bình luận này.');
         }
 
         $maBai = $binhLuan->MaBai;
-
         // Xóa tất cả upvotes trước
         $binhLuan->upvotes()->delete();
-
         // Xóa tất cả bình luận con trước
         $binhLuan->binhLuanCon()->delete();
-
         // Xóa bình luận chính
         $binhLuan->delete();
-
         // Broadcast event cho realtime
         // broadcast(new \App\Events\BinhLuanDeleted($maBinhLuan, $maBai))->toOthers();
 
@@ -159,8 +148,6 @@ class BinhLuanBaiGiangController extends Controller
                 'maBinhLuan' => $maBinhLuan
             ]);
         }
-
-        return back()->with('success', 'Đã xóa bình luận thành công.');
     }
 
     /**
@@ -178,7 +165,6 @@ class BinhLuanBaiGiangController extends Controller
         $loaiVote = $request->LoaiVote;
 
         $binhLuan = BinhLuanBaiGiang::findOrFail($maBinhLuan);
-
         // Kiểm tra xem người dùng đã vote chưa
         $existingVote = BinhLuanUpvote::where('MaBinhLuan', $maBinhLuan)
             ->where('MaNguoiDung', $maNguoiDung)
