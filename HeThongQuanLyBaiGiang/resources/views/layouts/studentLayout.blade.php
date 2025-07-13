@@ -224,25 +224,20 @@
             cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}',
             forceTLS: true
         });
+
+        // Debug kết nối Pusher
+        console.log('[DEBUG] Pusher key:', '{{ config('broadcasting.connections.pusher.key') }}');
+        console.log('[DEBUG] Pusher cluster:', '{{ config('broadcasting.connections.pusher.options.cluster') }}');
+
+        // Kiểm tra kết nối
+        if (window.Echo) {
+            console.log('[DEBUG] Echo đã được khởi tạo');
+        } else {
+            console.error('[DEBUG] Echo chưa được khởi tạo!');
+        }
     </script>
 
     @yield('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const el = document.getElementById('binh-luan-realtime');
-            if (window.BinhLuanRealtime && el) {
-                const maBai = Number(el.dataset.maBai);
-                const maNguoiDung = Number(el.dataset.maNguoiDung);
-                Vue.createApp(window.BinhLuanRealtime, {
-                    maBai: maBai,
-                    maNguoiDung: maNguoiDung
-                }).mount('#binh-luan-realtime');
-                console.log('[DEBUG] Đã mount Vue 3 cho BinhLuanRealtime với props:', maBai, maNguoiDung);
-            } else {
-                console.warn('[DEBUG] Không tìm thấy BinhLuanRealtime hoặc #binh-luan-realtime');
-            }
-        });
-    </script>
 </body>
 
 </html>

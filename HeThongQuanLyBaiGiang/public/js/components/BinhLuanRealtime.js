@@ -219,63 +219,40 @@ const BinhLuanRealtime = {
     data() {
         return {
             binhLuans: [],
+            dangTai: false,
+            sapXep: 'moi_nhat',
+            trangHienTai: 1,
             noiDung: '',
             noiDungTraLoi: '',
             binhLuanDangTraLoi: null,
             binhLuanDangChinhSua: null,
             noiDungChinhSua: '',
             lyDoChinhSua: '',
-            sapXep: 'moi_nhat',
-            trangHienTai: 1,
-            dangTai: false,
-            tinymceConfig: {
-                height: 200,
-                menubar: false,
-                plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                ],
-                toolbar: 'undo redo | blocks | ' +
-                    'bold italic forecolor | alignleft aligncenter ' +
-                    'alignright alignjustify | bullist numlist outdent indent | ' +
-                    'removeformat | help',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                language: 'vi',
-                language_url: '/js/tinymce/langs/vi.js'
-            }
-        }
+        };
     },
-
+    props: {
+        maBai: { type: Number, required: true },
+        maNguoiDung: { type: Number, required: true }
+    },
     mounted() {
-        console.log('1');
         this.taiBinhLuans();
-        this.khoiTaoEcho();
+        this.khoiTaoRealtime();
         console.log('[DEBUG] Khi mount, binhLuanDangChinhSua:', this.binhLuanDangChinhSua);
     },
-
     methods: {
         async taiBinhLuans() {
             this.dangTai = true;
             try {
                 const response = await fetch(`/binh-luan/danh-sach?MaBai=${this.maBai}&SapXep=${this.sapXep}&page=${this.trangHienTai}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 const data = await response.json();
-                console.log('[DEBUG] Kết quả API bình luận:', data);
-
                 if (data.success) {
                     this.binhLuans = data.binhLuans.data;
                     this.trangHienTai = data.binhLuans.current_page;
-
-                    // Debug: Kiểm tra dữ liệu người dùng và bình luận con
                     if (this.binhLuans.length > 0) {
                         console.log('[DEBUG] Bình luận đầu tiên:', this.binhLuans[0]);
-                        console.log('[DEBUG] NguoiGui của bình luận đầu tiên:', this.binhLuans[0].nguoi_gui);
-                        console.log('[DEBUG] Bình luận con của bình luận đầu tiên:', this.binhLuans[0].binh_luan_con);
-                        console.log('[DEBUG] Số lượng bình luận con:', this.binhLuans[0].binh_luan_con ? this.binhLuans[0].binh_luan_con.length : 0);
+                        console.log('[DEBUG] Bình luận con:', this.binhLuans[0].binh_luan_con);
                     }
                 }
             } catch (error) {
@@ -284,62 +261,56 @@ const BinhLuanRealtime = {
                 this.dangTai = false;
             }
         },
-
-        khoiTaoEcho() {
-            // Khởi tạo Echo cho realtime (cần cài đặt Laravel Echo)
-            if (window.Echo) {
-                window.Echo.channel(`binh-luan-bai-${this.maBai}`)
-                    .listen('BinhLuanMoi', (e) => {
-                        this.themBinhLuanMoi(e.binhLuan);
-                    })
-                    .listen('BinhLuanDeleted', (e) => {
-                        this.xoaBinhLuanRealtime(e.maBinhLuan);
-                    });
-                window.Echo.channel('binh-luan-vote')
-                    .listen('BinhLuanVoted', (e) => {
-                        this.capNhatVoteRealtime(e.maBinhLuan, e.soUpvote, e.soDownvote);
-                    });
-            }
-        },
-
-        capNhatVoteRealtime(maBinhLuan, soUpvote, soDownvote) {
-            // Cập nhật số upvote/downvote cho bình luận chính
-            let binhLuan = this.binhLuans.find(bl => bl.MaBinhLuan === maBinhLuan);
-            if (binhLuan) {
-                binhLuan.SoUpvote = soUpvote;
-                binhLuan.SoDownvote = soDownvote;
+        khoiTaoRealtime() {
+            if (!window.Echo) {
+                console.error('Echo chưa được khởi tạo!');
                 return;
             }
-            // Nếu không phải bình luận chính, tìm trong bình luận con
-            for (let bl of this.binhLuans) {
-                if (bl.binhLuanCon) {
-                    const binhLuanCon = bl.binhLuanCon.find(bc => bc.MaBinhLuan === maBinhLuan);
-                    if (binhLuanCon) {
-                        binhLuanCon.SoUpvote = soUpvote;
-                        binhLuanCon.SoDownvote = soDownvote;
-                        break;
+
+            console.log('[DEBUG] Khởi tạo realtime cho bài:', this.maBai);
+            console.log('[DEBUG] Echo object:', window.Echo);
+
+            // Lắng nghe bình luận mới
+            const channel = window.Echo.channel(`binh-luan-bai-${this.maBai}`);
+            console.log('[DEBUG] Channel created:', channel);
+
+            channel.listen('.binh-luan-moi', (e) => {
+                console.log('[REALTIME] Nhận bình luận mới:', e);
+                if (e.binhLuan) {
+                    this.binhLuans.unshift(e.binhLuan);
+                }
+            });
+
+            channel.listen('.binh-luan-deleted', (e) => {
+                console.log('[REALTIME] Bình luận bị xóa:', e);
+                this.binhLuans = this.binhLuans.filter(bl => bl.MaBinhLuan !== e.maBinhLuan);
+            });
+
+            // Lắng nghe vote
+            const voteChannel = window.Echo.channel('binh-luan-vote');
+            console.log('[DEBUG] Vote channel created:', voteChannel);
+
+            voteChannel.listen('.binh-luan-voted', (e) => {
+                console.log('[REALTIME] Bình luận được vote:', e);
+                let bl = this.binhLuans.find(bl => bl.MaBinhLuan === e.maBinhLuan);
+                if (bl) {
+                    bl.SoUpvote = e.soUpvote;
+                    bl.SoDownvote = e.soDownvote;
+                } else {
+                    for (let parent of this.binhLuans) {
+                        if (parent.binh_luan_con) {
+                            let reply = parent.binh_luan_con.find(r => r.MaBinhLuan === e.maBinhLuan);
+                            if (reply) {
+                                reply.SoUpvote = e.soUpvote;
+                                reply.SoDownvote = e.soDownvote;
+                            }
+                        }
                     }
                 }
-            }
+            });
+
+            console.log('[DEBUG] Đã khởi tạo realtime listeners');
         },
-
-        themBinhLuanMoi(binhLuan) {
-            // Thêm bình luận mới vào đầu danh sách
-            this.binhLuans.unshift(binhLuan);
-        },
-
-        xoaBinhLuanRealtime(maBinhLuan) {
-            // Xóa bình luận khỏi danh sách khi nhận được sự kiện realtime
-            this.binhLuans = this.binhLuans.filter(bl => bl.MaBinhLuan !== maBinhLuan);
-
-            //  xóa bình luận con nếu có
-            for (let bl of this.binhLuans) {
-                if (bl.binhLuanCon) {
-                    bl.binhLuanCon = bl.binhLuanCon.filter(bc => bc.MaBinhLuan !== maBinhLuan);
-                }
-            }
-        },
-
         async guiBinhLuan() {
             // Lấy nội dung thực tế từ TinyMCE 
             let noiDungThucTe = this.noiDung;
@@ -490,7 +461,7 @@ const BinhLuanRealtime = {
 
                 if (data.success) {
                     // Xóa bình luận khỏi danh sách ngay lập tức
-                    this.xoaBinhLuanRealtime(maBinhLuan);
+                    this.binhLuans = this.binhLuans.filter(bl => bl.MaBinhLuan !== maBinhLuan);
                     this.hienThongBao('Đã xóa bình luận thành công', 'success');
                 } else {
                     this.hienThongBao(data.message || 'Có lỗi xảy ra khi xóa bình luận', 'error');

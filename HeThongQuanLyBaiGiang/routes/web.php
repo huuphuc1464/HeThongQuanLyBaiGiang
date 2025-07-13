@@ -52,6 +52,12 @@ Route::prefix('binh-luan')->name('binhluan.')->middleware(['auth', RoleMiddlewar
     Route::post('/vote', [BinhLuanBaiGiangController::class, 'vote'])->name('vote');
     // Lấy danh sách bình luận với sắp xếp
     Route::get('/danh-sach', [BinhLuanBaiGiangController::class, 'layDanhSach'])->name('danh-sach');
+
+    // Test broadcast event
+    Route::get('/test-broadcast/{maBai}', function ($maBai) {
+        broadcast(new \App\Events\BinhLuanMoi(\App\Models\BinhLuanBaiGiang::first()));
+        return response()->json(['message' => 'Test broadcast sent']);
+    })->name('test-broadcast');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::class . ':1'])->group(function () {

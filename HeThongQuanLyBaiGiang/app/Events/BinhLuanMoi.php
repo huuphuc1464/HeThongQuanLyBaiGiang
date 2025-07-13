@@ -17,19 +17,11 @@ class BinhLuanMoi implements ShouldBroadcast
 
     public $binhLuan;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(BinhLuanBaiGiang $binhLuan)
     {
         $this->binhLuan = $binhLuan;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
@@ -37,17 +29,12 @@ class BinhLuanMoi implements ShouldBroadcast
         ];
     }
 
-    /**
-     * The event's broadcast name.
-     */
     public function broadcastAs(): string
     {
         return 'binh-luan-moi';
     }
 
-    /**
-     * Get the data to broadcast.
-     */
+
     public function broadcastWith(): array
     {
         return [
