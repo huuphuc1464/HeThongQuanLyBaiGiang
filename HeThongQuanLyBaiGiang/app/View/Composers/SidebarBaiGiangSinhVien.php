@@ -22,7 +22,6 @@ class SidebarBaiGiangSinhVien
                 ->select('lhp.TenLopHocPhan', 'lhp.MoTa', 'bg.AnhBaiGiang', 'lhp.MaBaiGiang')
                 ->join('bai_giang as bg', 'lhp.MaBaiGiang', '=', 'bg.MaBaiGiang')
                 ->join('danh_sach_lop as dsl', 'dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
-                ->where('lhp.TrangThai', 1)
                 ->where('bg.TrangThai', 1)
                 ->where('dsl.MaSinhVien', $sinhVien->MaNguoiDung)
                 ->where('lhp.MaLopHocPhan', $maLopHocPhan)
