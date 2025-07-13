@@ -41,7 +41,8 @@
                     @if(count($files) > 0)
                     <div class="mb-4">
                         <h5 class="text-primary">Tài liệu đính kèm:</h5>
-                        <div style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
+                        <div
+                            style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
                             <ul class="list-group">
                                 @foreach ($files as $file)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -58,7 +59,8 @@
 
                     <div class="d-flex justify-content-between my-3">
                         @if($baiTruoc)
-                        <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiTruoc->MaBai]) }}" class="btn btn-outline-primary" title="{{ $baiTruoc->TenBai }}">
+                        <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiTruoc->MaBai]) }}"
+                            class="btn btn-outline-primary" title="{{ $baiTruoc->TenBai }}">
                             ← {{ Str::limit($baiTruoc->TenBai, 20) }}
                         </a>
                         @else
@@ -66,7 +68,8 @@
                         @endif
 
                         @if($baiSau)
-                        <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiSau->MaBai]) }}" class="btn btn-outline-primary" title="{{ $baiSau->TenBai }}">
+                        <a href="{{ route('bai.chi-tiet', ['id' => $id, 'maBaiGiang' => $baiSau->MaBai]) }}"
+                            class="btn btn-outline-primary" title="{{ $baiSau->TenBai }}">
                             {{ Str::limit($baiSau->TenBai, 20) }} →
                         </a>
                         @endif
@@ -77,25 +80,26 @@
     </div>
 </div>
 <div id="binhLuanSection">
-    <x-binh-luan :bai-giang="$bai" />
+    <div id="binh-luan-realtime" data-ma-bai="{{ $bai->MaBai }}" data-ma-nguoi-dung="{{ auth()->id() }}">
+    </div>
 </div>
 <!-- Nút chuyển -->
-<button id="scrollToggleBtn" class="btn btn-primary rounded-circle" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px;">
+<button id="scrollToggleBtn" class="btn btn-primary rounded-circle"
+    style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px;">
     <i id="scrollToggleIcon" class="fas fa-comment"></i>
 </button>
 @endsection
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const btn = document.getElementById('scrollToggleBtn');
         const icon = document.getElementById('scrollToggleIcon');
         const commentSection = document.getElementById('binhLuanSection');
         if (!btn || !icon || !commentSection) return;
-
         let isAtComment = false;
 
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             if (!isAtComment) {
                 commentSection.scrollIntoView({
                     behavior: 'smooth'
@@ -122,8 +126,8 @@
                     }
                 });
             }, {
-                threshold: 0.5
-            }
+            threshold: 0.5
+        }
         );
 
         observer.observe(commentSection);

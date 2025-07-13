@@ -48,6 +48,12 @@ Route::prefix('binh-luan')->name('binhluan.')->middleware(['auth', RoleMiddlewar
     Route::post('/tra-loi-binh-luan', [BinhLuanBaiGiangController::class, 'traLoiBinhLuan'])->name('traloi');
     Route::delete('/xoa/{id}', [BinhLuanBaiGiangController::class, 'xoa'])->name('xoa');
     Route::put('/cap-nhat', [BinhLuanBaiGiangController::class, 'capNhat'])->name('capnhat');
+
+    // Upvote/Downvote
+    Route::post('/vote', [BinhLuanBaiGiangController::class, 'vote'])->name('vote');
+
+    // Lấy danh sách bình luận với sắp xếp
+    Route::get('/danh-sach', [BinhLuanBaiGiangController::class, 'layDanhSach'])->name('danh-sach');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', RoleMiddleware::class . ':1'])->group(function () {

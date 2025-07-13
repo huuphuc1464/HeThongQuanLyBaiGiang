@@ -27,10 +27,12 @@
                         @endif
                     </div>
                     <div class="col-md-6 mb-2">
-                        <strong>Ngày tạo:</strong> {{ \Carbon\Carbon::parse($baiHoc->created_at)->format('d/m/Y H:i:s') }}
+                        <strong>Ngày tạo:</strong> {{ \Carbon\Carbon::parse($baiHoc->created_at)->format('d/m/Y H:i:s')
+                        }}
                     </div>
                     <div class="col-md-6 mb-2">
-                        <strong>Ngày cập nhật:</strong> {{ \Carbon\Carbon::parse($baiHoc->updated_at)->format('d/m/Y H:i:s') }}
+                        <strong>Ngày cập nhật:</strong> {{ \Carbon\Carbon::parse($baiHoc->updated_at)->format('d/m/Y
+                        H:i:s') }}
                     </div>
                 </div>
 
@@ -46,11 +48,14 @@
                 @if(count($files) > 0)
                 <div class="mb-4">
                     <h5 class="text-primary">Tài liệu đính kèm:</h5>
-                    <div style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
+                    <div
+                        style="max-height: calc(5 * 48px); overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
                         <ul class="list-group mb-0">
                             @foreach ($files as $file)
-                            <li class="list-group-item d-flex justify-content-between align-items-center" style="height: 48px;">
-                                <span class="text-truncate" style="max-width: 70%">{{ basename($file->DuongDan) }}</span>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"
+                                style="height: 48px;">
+                                <span class="text-truncate" style="max-width: 70%">{{ basename($file->DuongDan)
+                                    }}</span>
                                 <a href="{{ asset($file->DuongDan) }}" download class="btn btn-sm btn-info">
                                     <i class="fas fa-download"></i> Tải xuống
                                 </a>
@@ -63,10 +68,12 @@
 
                 <!-- Hành động -->
                 <div class="mt-4">
-                    <a href="{{ route('giangvien.bai-giang.chuong.danh-sach', ['maBaiGiang' => $baiHoc->MaBaiGiang]) }}" class="btn btn-secondary me-2">
+                    <a href="{{ route('giangvien.bai-giang.chuong.danh-sach', ['maBaiGiang' => $baiHoc->MaBaiGiang]) }}"
+                        class="btn btn-secondary me-2">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
-                    <a href="{{ route('giangvien.bai-giang.chuong.bai.form-sua', ['maBaiGiang' => $baiHoc->MaBaiGiang, 'maChuong' => $baiHoc->MaChuong, 'maBai' => $baiHoc->MaBai]) }}" class="btn btn-primary">
+                    <a href="{{ route('giangvien.bai-giang.chuong.bai.form-sua', ['maBaiGiang' => $baiHoc->MaBaiGiang, 'maChuong' => $baiHoc->MaChuong, 'maBai' => $baiHoc->MaBai]) }}"
+                        class="btn btn-primary">
                         <i class="fas fa-edit"></i> Chỉnh sửa
                     </a>
                 </div>
@@ -75,19 +82,21 @@
         </div>
     </div>
     <div id="binhLuanSection">
-        <x-binh-luan :bai-giang="$baiHoc" />
+        <div id="binh-luan-realtime" data-ma-bai="{{ $baiHoc->MaBai }}" data-ma-nguoi-dung="{{ auth()->id() }}">
+        </div>
     </div>
 </div>
 
 <!-- Nút chuyển -->
-<button id="scrollToggleBtn" class="btn btn-primary rounded-circle" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px;">
+<button id="scrollToggleBtn" class="btn btn-primary rounded-circle"
+    style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px;">
     <i id="scrollToggleIcon" class="fas fa-comment"></i>
 </button>
 @endsection
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const btn = document.getElementById('scrollToggleBtn');
         const icon = document.getElementById('scrollToggleIcon');
         const commentSection = document.getElementById('binhLuanSection');
@@ -95,7 +104,7 @@
 
         let isAtComment = false;
 
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             if (!isAtComment) {
                 commentSection.scrollIntoView({
                     behavior: 'smooth'
@@ -122,8 +131,8 @@
                     }
                 });
             }, {
-                threshold: 0.5
-            }
+            threshold: 0.5
+        }
         );
 
         observer.observe(commentSection);

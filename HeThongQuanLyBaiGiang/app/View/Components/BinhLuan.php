@@ -6,36 +6,45 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\Component;
+use App\Models\BinhLuanBaiGiang;
 
 class BinhLuan extends Component
 {
     public $baiGiang;
     public $binhLuans;
+    public $useRealtime;
 
-    public function __construct($baiGiang)
+    public function __construct($baiGiang, $useRealtime = false)
     {
         $this->baiGiang = $baiGiang;
+        $this->useRealtime = $useRealtime;
 
-        $this->binhLuans = DB::table('binh_luan_bai_giang as bl')
-            ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'bl.MaNguoiGui')
-            ->where('bl.MaBai', $baiGiang->MaBai)
-            ->whereNull('bl.MaBinhLuanCha')
-            ->select('bl.*', 'nd.HoTen', 'nd.AnhDaiDien')
-            ->orderBy('bl.created_at', 'desc')
-            ->get()
-            ->map(function ($bl) {
-                $bl->traLoi = DB::table('binh_luan_bai_giang as tl')
-                    ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'tl.MaNguoiGui')
-                    ->where('tl.MaBinhLuanCha', $bl->MaBinhLuan)
-                    ->select('tl.*', 'nd.HoTen', 'nd.AnhDaiDien')
-                    ->orderBy('tl.created_at')
-                    ->get();
-                return $bl;
-            });
+        if (!$useRealtime) {
+            // Sử dụng logic cũ cho backward compatibility
+            $this->binhLuans = DB::table('binh_luan_bai_giang as bl')
+                ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'bl.MaNguoiGui')
+                ->where('bl.MaBai', $baiGiang->MaBai)
+                ->whereNull('bl.MaBinhLuanCha')
+                ->where('bl.DaAn', false)
+                ->select('bl.*', 'nd.HoTen', 'nd.AnhDaiDien')
+                ->orderBy('bl.SoUpvote', 'desc')
+                ->orderBy('bl.created_at', 'desc')
+                ->get()
+                ->map(function ($bl) {
+                    $bl->traLoi = DB::table('binh_luan_bai_giang as tl')
+                        ->join('nguoi_dung as nd', 'nd.MaNguoiDung', '=', 'tl.MaNguoiGui')
+                        ->where('tl.MaBinhLuanCha', $bl->MaBinhLuan)
+                        ->where('tl.DaAn', false)
+                        ->select('tl.*', 'nd.HoTen', 'nd.AnhDaiDien')
+                        ->orderBy('tl.created_at')
+                        ->get();
+                    return $bl;
+                });
+        }
     }
 
     public function render()
     {
-        return view('components.binh-luan');
+        return view('components.binh-luan-realtime');
     }
 }
