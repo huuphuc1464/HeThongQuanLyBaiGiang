@@ -17,20 +17,12 @@ class BinhLuanDeleted implements ShouldBroadcast
     public $maBinhLuan;
     public $maBai;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct($maBinhLuan, $maBai)
     {
         $this->maBinhLuan = $maBinhLuan;
         $this->maBai = $maBai;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
@@ -38,9 +30,6 @@ class BinhLuanDeleted implements ShouldBroadcast
         ];
     }
 
-    /**
-     * Get the data to broadcast.
-     */
     public function broadcastWith()
     {
         return [
