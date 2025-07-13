@@ -6,9 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\BaiGiang;
 use App\Models\LopHocPhan;
 use App\Models\NguoiDung;
-use App\Models\BaiKiemTra;
-use App\Models\SinhVien;
-use App\Models\KetQuaBaiKiemTra;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +22,7 @@ class HomeController extends Controller
                 $join->on('dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
                     ->where('dsl.TrangThai', '=', 1);
             })
+            ->where('lhp.TrangThai', 1)
             ->whereExists(function ($query) use ($maSinhVien) {
                 $query->select(DB::raw(1))
                     ->from('danh_sach_lop')
@@ -213,7 +211,7 @@ class HomeController extends Controller
             ->where('lhp.MaLopHocPhan', $id)
             ->select('nd.HoTen', 'nd.AnhDaiDien')
             ->first();
-            
+
         $daThamGia = DB::table('danh_sach_lop')
             ->where('MaLopHocPhan', $id)
             ->where('MaSinhVien', Auth::id())
@@ -244,6 +242,50 @@ class HomeController extends Controller
         $sinhViens = $sinhVienQuery->get();
 
         return ['sinhViens' => $sinhViens, 'giangVien' => $giangVien];
+    }
+
+    /**
+     * Hiển thị danh sách lớp học phần lưu trữ cho sinh viên
+     */
+    public function lopHocPhanLuuTru()
+    {
+        $maSinhVien = Auth::user()->MaNguoiDung;
+        $danhSachLopLuuTru = DB::table('lop_hoc_phan as lhp')
+            ->join('bai_giang as bg', 'lhp.MaBaiGiang', '=', 'bg.MaBaiGiang')
+            ->join('nguoi_dung as nd', 'lhp.MaNguoiTao', '=', 'nd.MaNguoiDung')
+            ->join('danh_sach_lop as dsl', function ($join) {
+                $join->on('dsl.MaLopHocPhan', '=', 'lhp.MaLopHocPhan')
+                    ->where('dsl.TrangThai', '=', 1);
+            })
+            ->where('lhp.TrangThai', 3) // 3: lưu trữ
+            ->whereExists(function ($query) use ($maSinhVien) {
+                $query->select(DB::raw(1))
+                    ->from('danh_sach_lop')
+                    ->whereColumn('MaLopHocPhan', 'lhp.MaLopHocPhan')
+                    ->where('MaSinhVien', $maSinhVien)
+                    ->where('TrangThai', 1);
+            })
+            ->select(
+                'lhp.MaLopHocPhan',
+                'lhp.TenLopHocPhan',
+                'bg.TenBaiGiang',
+                'lhp.MoTa',
+                'nd.HoTen as TenGiangVien',
+                'nd.AnhDaiDien as AnhGiangVien',
+                'bg.AnhBaiGiang',
+                DB::raw('COUNT(DISTINCT dsl.MaSinhVien) as SoLuongSinhVien')
+            )
+            ->groupBy(
+                'lhp.MaLopHocPhan',
+                'lhp.TenLopHocPhan',
+                'bg.TenBaiGiang',
+                'lhp.MoTa',
+                'nd.HoTen',
+                'nd.AnhDaiDien',
+                'bg.AnhBaiGiang'
+            )
+            ->get();
+        return view('sinhvien.lopHocPhanLuuTru', compact('danhSachLopLuuTru'));
     }
 
 
