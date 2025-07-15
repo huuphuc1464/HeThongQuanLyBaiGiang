@@ -72,10 +72,11 @@
                         <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
                         <div class="input-group me-2">
                             <input type="search" name="search" class="form-control" placeholder="Tìm kiếm..."
-                                value="{{ request('search') }}" title="Tìm kiếm theo tên bài kiểm tra, mô tả, tên lớp học phần">
+                                value="{{ request('search') }}"
+                                title="Tìm kiếm theo tên bài kiểm tra, mô tả, tên lớp học phần">
                             <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                         </div>
-                        <select name="filterClass" id="filterClass" class="form-select form-select-sm"
+                        <select name="filterClass" id="filterClass" class="form-select form-select-sm me-2"
                             onchange="this.form.submit()">
                             <option value="">Tất cả lớp học phần</option>
                             @foreach ($lopHocPhan as $lop)
@@ -84,6 +85,13 @@
                                 {{ $lop->TenLopHocPhan }}
                             </option>
                             @endforeach
+                        </select>
+                        <select name="filterStatus" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="done" {{ request('filterStatus')=='done' ? 'selected' : '' }}>Đã có sinh viên
+                                làm</option>
+                            <option value="not_done" {{ request('filterStatus')=='not_done' ? 'selected' : '' }}>Chưa có
+                                sinh viên làm</option>
                         </select>
                     </form>
                 </div>
@@ -160,6 +168,18 @@
                                         title="Nhân bản">
                                         <i class="fas fa-copy"></i>
                                     </button>
+                                    @php
+                                    $soLuongLam = DB::table('ket_qua_bai_kiem_tra')
+                                    ->where('MaBaiKiemTra', $baiKiemTra->MaBaiKiemTra)
+                                    ->distinct('MaSinhVien')
+                                    ->count('MaSinhVien');
+                                    @endphp
+                                    @if($soLuongLam > 0)
+                                    <a href="{{ route('giangvien.bai-kiem-tra.thong-ke', $baiKiemTra->MaBaiKiemTra) }}"
+                                        class="btn btn-sm btn-success" title="Thống kê">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -306,7 +326,8 @@
         form.addEventListener('submit', function (e) {
             const search = form.querySelector('input[name="search"]')?.value.trim();
             const filterClass = form.querySelector('select[name="filterClass"]')?.value;
-            if (!search && !filterClass && form.querySelector('select[name="per_page"]') === null) {
+            const filterStatus = form.querySelector('select[name="filterStatus"]')?.value;
+            if (!search && !filterClass && !filterStatus && form.querySelector('select[name="per_page"]') === null) {
                 e.preventDefault();
                 window.location.href = "{{ route('giangvien.bai-kiem-tra.danh-sach') }}";
             }

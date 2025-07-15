@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\BaiKiemTra;
 use App\Models\CauHoiBaiKiemTra;
+use App\Models\ChiTietKetQua;
+use App\Models\DanhSachLop;
+use App\Models\KetQuaBaiKiemTra;
 use App\Models\ThongBao;
 use App\Services\EmailService;
 use Carbon\Carbon;
@@ -44,6 +47,23 @@ class BaiKiemTraController extends Controller
         // Lọc theo lớp học phần
         if ($maLopHocPhan = $request->input('filterClass')) {
             $query->where('bkt.MaLopHocPhan', $maLopHocPhan);
+        }
+
+        // Lọc theo trạng thái đã làm/chưa làm
+        if ($request->filled('filterStatus')) {
+            if ($request->input('filterStatus') == 'done') {
+                $query->whereExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('ket_qua_bai_kiem_tra as kq')
+                        ->whereRaw('kq.MaBaiKiemTra = bkt.MaBaiKiemTra');
+                });
+            } elseif ($request->input('filterStatus') == 'not_done') {
+                $query->whereNotExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('ket_qua_bai_kiem_tra as kq')
+                        ->whereRaw('kq.MaBaiKiemTra = bkt.MaBaiKiemTra');
+                });
+            }
         }
 
         // Phân trang
@@ -870,5 +890,130 @@ class BaiKiemTraController extends Controller
                 'message' => 'Lỗi khi đọc file: ' . $e->getMessage()
             ], 500);
         }
+    }
+    public function thongKeBaiKiemTra($id)
+    {
+        $baiKiemTra = BaiKiemTra::with('lopHocPhan')->findOrFail($id);
+        $tongSinhVienLop = DanhSachLop::where('MaLopHocPhan', $baiKiemTra->MaLopHocPhan)->count();
+        $ketQua = KetQuaBaiKiemTra::where('MaBaiKiemTra', $id)->with(['sinhVien.nguoiDung'])->get();
+        $tongSinhVienLam = $ketQua->count();
+        $tyLeHoanThanh = $tongSinhVienLop > 0 ? round($tongSinhVienLam / $tongSinhVienLop * 100, 2) : 0;
+        $soCauHoi = $baiKiemTra->cauHoiBaiKiemTra()->count();
+        $diemArr = $ketQua->map(function ($kq) use ($soCauHoi) {
+            return $soCauHoi > 0 ? round($kq->TongCauDung / $soCauHoi * 10, 2) : 0;
+        });
+        $diemTrungBinh = $diemArr->count() ? round($diemArr->avg(), 2) : 0;
+        $diemCaoNhat = $diemArr->count() ? $diemArr->max() : 0;
+        $diemThapNhat = $diemArr->count() ? $diemArr->min() : 0;
+        $danhSachSinhVienLam = $ketQua->map(function ($kq) use ($soCauHoi) {
+            return [
+                'MSSV' => $kq->sinhVien->MSSV ?? '',
+                'HoTen' => $kq->sinhVien->nguoiDung->HoTen ?? '',
+                'Email' => $kq->sinhVien->nguoiDung->Email ?? '',
+                'NgayNop' => $kq->NgayNop,
+                'TongCauDung' => $kq->TongCauDung,
+                'TongSoCauHoi' => $kq->TongSoCauHoi,
+                'Diem' => $soCauHoi > 0 ? round($kq->TongCauDung / $soCauHoi * 10, 2) : 0,
+            ];
+        });
+        $cauHois = $baiKiemTra->cauHoiBaiKiemTra;
+        $thongKeCauHoi = [];
+        foreach ($cauHois as $cauHoi) {
+            $soDung = ChiTietKetQua::where('MaCauHoi', $cauHoi->MaCauHoi)->where('KetQua', 1)->count();
+            $soSai = ChiTietKetQua::where('MaCauHoi', $cauHoi->MaCauHoi)->where('KetQua', 0)->count();
+            $tong = $soDung + $soSai;
+            $tyLeDung = $tong > 0 ? round($soDung / $tong * 100, 2) : 0;
+            $thongKeCauHoi[] = [
+                'CauHoi' => $cauHoi->CauHoi,
+                'SoDung' => $soDung,
+                'SoSai' => $soSai,
+                'TyLeDung' => $tyLeDung,
+            ];
+        }
+        // Lấy danh sách sinh viên chưa làm bài
+        $maSinhVienDaLam = $ketQua->pluck('MaSinhVien')->toArray();
+        $danhSachSinhVienChuaLam = DanhSachLop::where('MaLopHocPhan', $baiKiemTra->MaLopHocPhan)
+            ->whereNotIn('MaSinhVien', $maSinhVienDaLam)
+            ->with(['sinhVien.nguoiDung'])
+            ->get()
+            ->map(function ($ds) {
+                return [
+                    'MSSV' => $ds->sinhVien->MSSV ?? '',
+                    'HoTen' => $ds->sinhVien->nguoiDung->HoTen ?? '',
+                    'Email' => $ds->sinhVien->nguoiDung->Email ?? '',
+                ];
+            });
+        return view('giangvien.quanLyBaiKiemTra.thongKeBaiKiemTra', compact(
+            'baiKiemTra',
+            'tongSinhVienLam',
+            'tyLeHoanThanh',
+            'diemTrungBinh',
+            'diemCaoNhat',
+            'diemThapNhat',
+            'danhSachSinhVienLam',
+            'thongKeCauHoi',
+            'danhSachSinhVienChuaLam'
+        ));
+    }
+
+    public function apiThongKeTongQuan($id)
+    {
+        $baiKiemTra = BaiKiemTra::with('lopHocPhan')->findOrFail($id);
+        $tongSinhVienLop = DanhSachLop::where('MaLopHocPhan', $baiKiemTra->MaLopHocPhan)->count();
+        $ketQua = KetQuaBaiKiemTra::where('MaBaiKiemTra', $id)->get();
+        $tongSinhVienLam = $ketQua->count();
+        $tyLeHoanThanh = $tongSinhVienLop > 0 ? round($tongSinhVienLam / $tongSinhVienLop * 100, 2) : 0;
+        $soCauHoi = $baiKiemTra->cauHoiBaiKiemTra()->count();
+        $diemArr = $ketQua->map(function ($kq) use ($soCauHoi) {
+            return $soCauHoi > 0 ? round($kq->TongCauDung / $soCauHoi * 10, 2) : 0;
+        });
+        $diemTrungBinh = $diemArr->count() ? round($diemArr->avg(), 2) : 0;
+        $diemCaoNhat = $diemArr->count() ? $diemArr->max() : 0;
+        $diemThapNhat = $diemArr->count() ? $diemArr->min() : 0;
+        return response()->json([
+            'tongSinhVienLam' => $tongSinhVienLam,
+            'tyLeHoanThanh' => $tyLeHoanThanh,
+            'diemTrungBinh' => $diemTrungBinh,
+            'diemCaoNhat' => $diemCaoNhat,
+            'diemThapNhat' => $diemThapNhat,
+        ]);
+    }
+
+    public function apiThongKeCauHoi($id)
+    {
+        $baiKiemTra = BaiKiemTra::findOrFail($id);
+        $cauHois = $baiKiemTra->cauHoiBaiKiemTra;
+        $data = [];
+        foreach ($cauHois as $cauHoi) {
+            $soDung = ChiTietKetQua::where('MaCauHoi', $cauHoi->MaCauHoi)->where('KetQua', 1)->count();
+            $soSai = ChiTietKetQua::where('MaCauHoi', $cauHoi->MaCauHoi)->where('KetQua', 0)->count();
+            $data[] = [
+                'cauHoi' => $cauHoi->CauHoi,
+                'soDung' => $soDung,
+                'soSai' => $soSai,
+            ];
+        }
+        return response()->json($data);
+    }
+
+    public function apiThongKePhanBoDiem($id)
+    {
+        $baiKiemTra = BaiKiemTra::findOrFail($id);
+        $soCauHoi = $baiKiemTra->cauHoiBaiKiemTra()->count();
+        $ketQua = KetQuaBaiKiemTra::where('MaBaiKiemTra', $id)->get();
+        $diemArr = $ketQua->map(function ($kq) use ($soCauHoi) {
+            return $soCauHoi > 0 ? round($kq->TongCauDung / $soCauHoi * 10, 1) : 0;
+        });
+        $phanBo = [];
+        for ($i = 0; $i <= 10; $i++) {
+            $phanBo[(string)$i] = 0;
+        }
+        foreach ($diemArr as $diem) {
+            $diemInt = (string)round($diem);
+            if (isset($phanBo[$diemInt])) {
+                $phanBo[$diemInt]++;
+            }
+        }
+        return response()->json($phanBo);
     }
 }

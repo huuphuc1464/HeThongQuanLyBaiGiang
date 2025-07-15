@@ -18,7 +18,6 @@ use App\Http\Controllers\GiangVien\ChuongController;
 use App\Http\Controllers\GiangVien\SinhVienController;
 use App\Http\Controllers\GiangVien\LopHocPhanController;
 use App\Http\Controllers\SinhVien\KetQuaBaiKiemTraController;
-use App\Models\BaiKiemTra;
 
 Route::prefix('auth')->group(function () {
     Route::get('/dang-nhap', [AuthController::class, 'hienThiFormLogin'])->name('login');
@@ -185,4 +184,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
     Route::get('/xac-nhan-tham-gia-lop/{maLopHocPhan}/{maXacNhan}', [SinhVienController::class, 'xacNhanThamGiaLop'])->name('xac-nhan-tham-gia-lop');
 });
 
-Route::get('/lop-hoc-phan/luu-tru', [App\Http\Controllers\SinhVien\HomeController::class, 'lopHocPhanLuuTru'])->name('lop-hoc-phan.luu-tru');
+//
+Route::get('/lop-hoc-phan/luu-tru', [SinhVienHomeController::class, 'lopHocPhanLuuTru'])->name('lop-hoc-phan.luu-tru');
+Route::get('giangvien/bai-kiem-tra/{id}/thong-ke', [BaiKiemTraController::class, 'thongKeBaiKiemTra'])->name('giangvien.bai-kiem-tra.thong-ke');
+Route::get('api/bai-kiem-tra/{id}/thong-ke/tong-quan', [BaiKiemTraController::class, 'apiThongKeTongQuan']);
+Route::get('api/bai-kiem-tra/{id}/thong-ke/cau-hoi', [BaiKiemTraController::class, 'apiThongKeCauHoi']);
+Route::get('api/bai-kiem-tra/{id}/thong-ke/phan-bo-diem', [BaiKiemTraController::class, 'apiThongKePhanBoDiem']);
