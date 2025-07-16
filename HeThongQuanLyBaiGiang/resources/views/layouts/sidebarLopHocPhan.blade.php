@@ -26,7 +26,7 @@
         <ul class="nav flex-column mt-1">
             <li class="nav-item gachDuoi">
                 <a class="nav-link d-flex align-items-center gap-2 text-dark m-0"
-                    href="{{ route('danh-sach-bai-kiem-tra') }}">
+                    href="{{ route('danh-sach-bai-kiem-tra', $id ?? $maLopHocPhan) }}">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Bài kiểm tra</span>
                 </a>

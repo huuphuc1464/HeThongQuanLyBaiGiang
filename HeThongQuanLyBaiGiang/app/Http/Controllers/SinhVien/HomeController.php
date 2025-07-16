@@ -298,7 +298,7 @@ class HomeController extends Controller
             ->first();
         switch ($tab) {
             case 'bai-kiem-tra':
-                return redirect()->route('danh-sach-bai-kiem-tra');
+                return redirect()->route('danh-sach-bai-kiem-tra', $id);
 
             case 'su-kien-zoom':
                 return view('sinhvien.danhSachSuKienZoom', [

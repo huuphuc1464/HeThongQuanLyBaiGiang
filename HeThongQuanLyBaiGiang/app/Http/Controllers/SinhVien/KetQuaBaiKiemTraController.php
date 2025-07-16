@@ -43,7 +43,7 @@ class KetQuaBaiKiemTraController extends Controller
             ->first();
 
         if ($ketQuaBaiLam) {
-            return redirect()->route('danh-sach-bai-kiem-tra')
+            return redirect()->route('danh-sach-bai-kiem-tra', $baiKiemTra->MaLopHocPhan)
                 ->with('error', 'Bạn đã làm bài kiểm tra này rồi!');
         }
         // Kiểm tra thời gian làm bài
@@ -91,7 +91,7 @@ class KetQuaBaiKiemTraController extends Controller
         if (!$thuocLop) {
             return response()->json([
                 'message' => 'Bạn không thuộc lớp học phần này!',
-                'redirect' => route('danh-sach-bai-kiem-tra')
+                'redirect' => route('danh-sach-bai-kiem-tra', $baiKiemTra->MaLopHocPhan)
             ], 403);
         }
 
@@ -101,7 +101,7 @@ class KetQuaBaiKiemTraController extends Controller
         if ($now > $thoiGianKetThuc) {
             return response()->json([
                 'message' => 'Bài kiểm tra đã kết thúc!',
-                'redirect' => route('danh-sach-bai-kiem-tra')
+                'redirect' => route('danh-sach-bai-kiem-tra', $baiKiemTra->MaLopHocPhan)
             ], 422);
         }
 
@@ -198,7 +198,7 @@ class KetQuaBaiKiemTraController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Lỗi khi lưu kết quả bài kiểm tra!',
-                'redirect' => route('danh-sach-bai-kiem-tra')
+                'redirect' => route('danh-sach-bai-kiem-tra', $baiKiemTra->MaLopHocPhan)
             ], 500);
         }
     }
@@ -221,33 +221,39 @@ class KetQuaBaiKiemTraController extends Controller
             return redirect()->back()->with('error', 'Bạn chưa làm bài kiểm tra này!');
         }
 
+        $maLopHocPhan = $baiKiemTra->MaLopHocPhan;
+
         if (!$baiKiemTra->ChoPhepXemKetQua) {
             return view('sinhvien.ketquabaikiemtra', [
                 'baiKiemTra' => $baiKiemTra,
                 'ketQua' => $ketQua,
-                'khongChoXemKetQua' => true
+                'khongChoXemKetQua' => true,
+                'maLopHocPhan' => $maLopHocPhan
             ]);
         }
 
-        return view('sinhvien.ketquabaikiemtra', compact('baiKiemTra', 'ketQua'));
+        return view('sinhvien.ketquabaikiemtra', compact('baiKiemTra', 'ketQua', 'maLopHocPhan'));
     }
 
     /**
-     * Danh sách bài kiểm tra của sinh viên
+     * Danh sách bài kiểm tra của sinh viên theo lớp
      */
-    public function danhSachBaiKiemTra(Request $request)
+    public function danhSachBaiKiemTra(Request $request, $maLopHocPhan)
     {
         $sinhVien = SinhVien::where('MaNguoiDung', Auth::id())->first();
-
-        $lopHocPhanIds = $sinhVien->danhSachLop()->pluck('MaLopHocPhan');
-
+        // Kiểm tra sinh viên có thuộc lớp không
+        $daThamGia = $sinhVien->danhSachLop()
+            ->where('MaLopHocPhan', $maLopHocPhan)
+            ->where('TrangThai', 1)
+            ->exists();
+        if (!$daThamGia) {
+            return redirect()->back()->with('error', 'Bạn không thuộc lớp học phần này!');
+        }
         $query = BaiKiemTra::with(['giangVien', 'lopHocPhan.BaiGiang', 'cauHoiBaiKiemTra'])
-            ->whereIn('MaLopHocPhan', $lopHocPhanIds);
-
+            ->where('MaLopHocPhan', $maLopHocPhan);
         // Lọc theo trạng thái
         $trangThai = $request->input('trang_thai');
         $now = Carbon::now('Asia/Ho_Chi_Minh');
-
         switch ($trangThai) {
             case 'sap_dien_ra':
                 $query->where('ThoiGianBatDau', '>', $now);
@@ -265,17 +271,13 @@ class KetQuaBaiKiemTraController extends Controller
                 });
                 break;
         }
-
         $baiKiemTra = $query->orderBy('ThoiGianBatDau', 'desc')->get();
-
         foreach ($baiKiemTra as $bai) {
             $bai->daLam = KetQuaBaiKiemTra::where('MaBaiKiemTra', $bai->MaBaiKiemTra)
                 ->where('MaSinhVien', $sinhVien->MaNguoiDung)
                 ->exists();
-
             $thoiGianBatDau = Carbon::parse($bai->ThoiGianBatDau, 'Asia/Ho_Chi_Minh');
             $thoiGianKetThuc = Carbon::parse($bai->ThoiGianKetThuc, 'Asia/Ho_Chi_Minh');
-
             if ($thoiGianBatDau > $now) {
                 $bai->trangThai = 'Sắp diễn ra';
             } elseif ($thoiGianBatDau <= $now && $thoiGianKetThuc >= $now) {
@@ -284,8 +286,7 @@ class KetQuaBaiKiemTraController extends Controller
                 $bai->trangThai = 'Đã kết thúc';
             }
         }
-
-        return view('sinhvien.danhsachbaikiemtra', compact('baiKiemTra'));
+        return view('sinhvien.danhsachbaikiemtra', compact('baiKiemTra', 'maLopHocPhan'));
     }
 
 

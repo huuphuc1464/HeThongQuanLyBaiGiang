@@ -42,9 +42,11 @@
     </div>
 
     <!-- Exam Form -->
-    <form action="{{ route('nop-bai-kiem-tra', $baiKiemTra->MaBaiKiemTra) }}" method="POST" id="examForm" class="needs-validation" novalidate onsubmit="return false;">
+    <form action="{{ route('nop-bai-kiem-tra', $baiKiemTra->MaBaiKiemTra) }}" method="POST" id="examForm"
+        class="needs-validation" novalidate onsubmit="return false;">
         @csrf
-        <input type="hidden" name="redirect_url" value="{{ route('danh-sach-bai-kiem-tra') }}">
+        <input type="hidden" name="redirect_url"
+            value="{{ route('danh-sach-bai-kiem-tra', $baiKiemTra->MaLopHocPhan) }}">
         <div class="card mb-5">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Danh sách câu hỏi ({{
@@ -53,26 +55,31 @@
             <div class="card-body p-4">
                 @foreach($baiKiemTra->cauHoiBaiKiemTra as $index => $cauHoi)
                 <div class="question-container" id="question_{{ $cauHoi->MaCauHoi }}">
-                    <textarea class="mb-4 p-2 w-100 auto-resize" disabled readonly style="font-weight: 600; color: #1f2937;">Câu {{ $index + 1 }}: {{ $cauHoi->CauHoi
+                    <textarea class="mb-4 p-2 w-100 auto-resize" disabled readonly
+                        style="font-weight: 600; color: #1f2937;">Câu {{ $index + 1 }}: {{ $cauHoi->CauHoi
                         }}</textarea>
                     <div class="answer-options">
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" id="cauhoi_{{ $cauHoi->MaCauHoi }}_A" value="A" required>
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_A" value="A" required>
                             <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_A">A) {{ $cauHoi->DapAnA
                                 }}</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" id="cauhoi_{{ $cauHoi->MaCauHoi }}_B" value="B">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_B" value="B">
                             <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_B">B) {{ $cauHoi->DapAnB
                                 }}</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" id="cauhoi_{{ $cauHoi->MaCauHoi }}_C" value="C">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_C" value="C">
                             <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_C">C) {{ $cauHoi->DapAnC
                                 }}</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}" id="cauhoi_{{ $cauHoi->MaCauHoi }}_D" value="D">
+                            <input type="radio" class="form-check-input" name="cauhoi_{{ $cauHoi->MaCauHoi }}"
+                                id="cauhoi_{{ $cauHoi->MaCauHoi }}_D" value="D">
                             <label class="form-check-label" for="cauhoi_{{ $cauHoi->MaCauHoi }}_D">D) {{ $cauHoi->DapAnD
                                 }}</label>
                         </div>

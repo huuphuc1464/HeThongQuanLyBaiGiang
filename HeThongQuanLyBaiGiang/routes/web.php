@@ -169,7 +169,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':3'])->group(function () {
 
     // Routes cho sinh viên làm bài kiểm tra
     Route::prefix('bai-kiem-tra')->group(function () {
-        Route::get('/', [KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
+        Route::get('/{maLopHocPhan}', [KetQuaBaiKiemTraController::class, 'danhSachBaiKiemTra'])->name('danh-sach-bai-kiem-tra');
         Route::get('/{maBaiKiemTra}/lam-bai', [KetQuaBaiKiemTraController::class, 'lamBaiKiemTra'])->name('lam-bai-kiem-tra');
         Route::post('/{maBaiKiemTra}/nop-bai', [KetQuaBaiKiemTraController::class, 'nopBaiKiemTra'])->name('nop-bai-kiem-tra');
         Route::get('/{maBaiKiemTra}/ket-qua', [KetQuaBaiKiemTraController::class, 'ketQuaBaiKiemTra'])->name('ket-qua-bai-kiem-tra');

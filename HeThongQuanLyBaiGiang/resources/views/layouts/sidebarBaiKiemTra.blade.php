@@ -24,7 +24,7 @@
         <ul class="nav flex-column mt-1">
             <li class="nav-item gachDuoi">
                 <a class="nav-link d-flex align-items-center gap-2 text-dark {{ request()->routeIs('danh-sach-bai-kiem-tra') ? 'active' : '' }}"
-                    href="{{ route('danh-sach-bai-kiem-tra') }}">
+                    href="{{ route('danh-sach-bai-kiem-tra', $id ?? $maLopHocPhan) }}">
                     <i class="fas fa-list"></i>
                     <span>Danh sách bài kiểm tra</span>
                 </a>
