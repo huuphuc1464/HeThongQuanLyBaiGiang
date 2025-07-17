@@ -161,8 +161,7 @@ class BaiController extends Controller
     {
         $request->validate([
             'MaChuong' => 'required|exists:chuong,MaChuong',
-            // 'TenBai' => 'required|string|max:255',
-            'TenBai' => 'required|string|max:255|regex:/^[\p{L}0-9\s]+$/u', // Chỉ cho phép chữ cái, số và khoảng trắng
+            'TenBai' => 'required|string|max:255|regex:/^[\p{L}\p{N}\p{P}][\p{L}\p{N}\p{P}\p{Zs}\t]*$/u',
             'NoiDung' => 'required|string',
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',
@@ -307,7 +306,7 @@ class BaiController extends Controller
             ->where('chuong.MaChuong', $maChuong)
             ->where('bai.MaGiangVien', Auth::id())
             ->where('chuong.MaGiangVien', Auth::id())
-            ->ưhere('bai_giang.MaGiangVien', Auth::id())
+            ->where('bai_giang.MaGiangVien', Auth::id())
             ->select(
                 'bai_giang.MaBaiGiang',
                 'bai_giang.TenBaiGiang',
@@ -325,8 +324,7 @@ class BaiController extends Controller
     {
         $request->validate([
             'MaChuong' => 'required|exists:chuong,MaChuong',
-            // 'TenBai' => 'required|string|max:255',
-            'TenBai' => 'required|string|max:255|regex:/^[\p{L}0-9\s]+$/u', // Chỉ cho phép chữ cái, số và khoảng trắng
+            'TenBai' => 'required|string|max:255|regex:/^[\p{L}\p{N}\p{P}][\p{L}\p{N}\p{P}\p{Zs}\t]*$/u',
             'NoiDung' => 'required|string',
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',

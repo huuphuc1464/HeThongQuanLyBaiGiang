@@ -97,7 +97,7 @@ class ChuongController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+                'regex:/^[\p{L}\p{N}\p{P}][\p{L}\p{N}\p{P}\p{Zs}\t]*$/u'
             ],
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',
@@ -156,7 +156,7 @@ class ChuongController extends Controller
                     'required',
                     'string',
                     'max:255',
-                    'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+                    'regex:/^[\p{L}\p{N}\p{P}][\p{L}\p{N}\p{P}\p{Zs}\t]*$/u'
                 ],
                 'MoTa' => 'nullable|string|max:255',
                 'TrangThai' => 'required|in:0,1',

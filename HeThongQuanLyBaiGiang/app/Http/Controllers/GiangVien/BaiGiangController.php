@@ -44,7 +44,7 @@ class BaiGiangController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+                'regex:/^[\p{L}\p{N}\p{P}][\p{L}\p{N}\p{P}\p{Zs}\t]*$/u'
             ],
             'MaKhoa' => 'required|exists:khoa,MaKhoa',
             'MoTa' => 'nullable|string|max:255',
@@ -129,7 +129,7 @@ class BaiGiangController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+                'regex:/^[\p{L}\p{N}\p{P}][\p{L}\p{N}\p{P}\p{Zs}\t]*$/u'
             ],
             'MaKhoa' => 'required|exists:khoa,MaKhoa',
             'MoTa' => 'nullable|string|max:255',
