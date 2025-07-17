@@ -265,7 +265,7 @@ class BaiKiemTraController extends Controller
                 empty($tenBaiKiemTra) ||
                 empty($thoiGianBatDau) ||
                 empty($thoiGianKetThuc) ||
-                empty($moTa) ||
+                empty($thoiGianLamBai) ||
                 empty($trangThai)
             ) {
                 return redirect()->back()->with('warning', 'Thông tin bài kiểm tra không được bỏ trống.');
