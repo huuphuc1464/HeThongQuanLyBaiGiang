@@ -12,6 +12,15 @@ class ChuongController extends Controller
 {
     public function danhSach(Request $request, $maBaiGiang)
     {
+        // Kiểm tra xem bài giảng có tồn tại và thuộc về giảng viên hiện tại
+        $existsBaiGiang = DB::table('bai_giang')
+            ->where('MaBaiGiang', $maBaiGiang)
+            ->where('MaGiangVien', Auth::id())
+            ->exists();
+
+        if (!$existsBaiGiang) {
+            return redirect()->back()->withErrors(['errorSystem' => 'Bài giảng không tồn tại hoặc bạn không có quyền truy cập']);
+        }
         $query = DB::table('chuong')
             ->leftJoin('bai', 'bai.MaChuong', '=', 'chuong.MaChuong')
             ->where('chuong.MaGiangVien', Auth::id())
@@ -84,13 +93,19 @@ class ChuongController extends Controller
     public function themChuong(Request $request, $maBaiGiang)
     {
         $request->validate([
-            'TenChuong' => 'required|string|max:255',
+            'TenChuong' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+            ],
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',
         ], [
             'TenChuong.required' => 'Tên chương là bắt buộc',
             'TenChuong.string' => 'Tên chương phải là chuỗi ký tự',
             'TenChuong.max' => 'Tên chương không được vượt quá 255 ký tự',
+            'TenChuong.regex' => 'Tên chương chỉ được chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt hợp lệ',
             'MoTa.string' => 'Mô tả phải là chuỗi ký tự',
             'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự',
             'TrangThai.required' => 'Trạng thái là bắt buộc',
@@ -135,11 +150,28 @@ class ChuongController extends Controller
 
     public function capNhatChuong(Request $request, $maBaiGiang, $maChuong)
     {
-        $request->validate([
-            'TenChuong' => 'required|string|max:255',
-            'MoTa' => 'nullable|string|max:255',
-            'TrangThai' => 'required|in:0,1',
-        ]);
+        $request->validate(
+            [
+                'TenChuong' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+                ],
+                'MoTa' => 'nullable|string|max:255',
+                'TrangThai' => 'required|in:0,1',
+            ],
+            [
+                'TenChuong.required' => 'Tên chương là bắt buộc',
+                'TenChuong.string' => 'Tên chương phải là chuỗi ký tự',
+                'TenChuong.max' => 'Tên chương không được vượt quá 255 ký tự',
+                'TenChuong.regex' => 'Tên chương chỉ được chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt hợp lệ',
+                'MoTa.string' => 'Mô tả phải là chuỗi ký tự',
+                'MoTa.max' => 'Mô tả không được vượt quá 255 ký tự',
+                'TrangThai.required' => 'Trạng thái là bắt buộc',
+                'TrangThai.in' => 'Trạng thái không hợp lệ',
+            ]
+        );
 
         $baiGiang = DB::table('bai_giang')
             ->where('MaBaiGiang', $maBaiGiang)
@@ -207,6 +239,7 @@ class ChuongController extends Controller
                 ->where('chuong.MaBaiGiang', $maBaiGiang)
                 ->where('chuong.MaChuong', $maChuong)
                 ->where('chuong.MaGiangVien', Auth::id())
+                ->where('bai.MaGiangVien', Auth::id())
                 ->update([
                     'file_bai_giang.TrangThai' => $request->TrangThai,
                     'file_bai_giang.updated_at' => now('Asia/Ho_Chi_Minh'),
@@ -263,6 +296,7 @@ class ChuongController extends Controller
             ->where('chuong.MaBaiGiang', $maBaiGiang)
             ->where('chuong.MaChuong', $maChuong)
             ->where('chuong.MaGiangVien', Auth::id())
+            ->where('bai.MaGiangVien', Auth::id())
             ->where('file_bai_giang.TrangThai', '!=', $trangThai)
             ->update([
                 'file_bai_giang.TrangThai' => $trangThai,

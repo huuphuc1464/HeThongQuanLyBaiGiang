@@ -88,7 +88,12 @@ class SuKienZoomController extends Controller
     {
         $validated = $request->validate([
             'MaLopHocPhan' => 'required|exists:lop_hoc_phan,MaLopHocPhan',
-            'TenSuKien' => 'required|string|max:100',
+            'TenSuKien' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+            ],
             'MoTa' => 'nullable|string|max:255',
             'ThoiGianBatDau' => [
                 'required',
@@ -106,6 +111,8 @@ class SuKienZoomController extends Controller
             'MaLopHocPhan.exists' => 'Lớp học phần không tồn tại.',
             'TenSuKien.required' => 'Vui lòng nhập tên sự kiện.',
             'TenSuKien.max' => 'Tên sự kiện không được vượt quá 100 ký tự.',
+            'TenSuKien.regex' => 'Tên sự kiện chỉ được chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt.',
+            'MoTa.string' => 'Mô tả sự kiện phải là chuỗi.',
             'MoTa.max' => 'Mô tả sự kiện không được vượt quá 255 ký tự.',
             'ThoiGianBatDau.required' => 'Vui lòng chọn thời gian bắt đầu.',
             'ThoiGianBatDau.date_format' => 'Thời gian bắt đầu không đúng định dạng.',
@@ -125,7 +132,7 @@ class SuKienZoomController extends Controller
 
         $zoomData = [
             'topic' => $validated['TenSuKien'],
-            'start_time' => $startTime->toIso8601String(),
+            'start_time' => $startTime->toIso8601String(), // YYYY-MM-DDTHH:MM:SS+00:00
             'duration' => $duration,
             'password' => $validated['MatKhauSuKien'],
             'agenda' => $validated['MoTa'],
@@ -161,7 +168,14 @@ class SuKienZoomController extends Controller
 
     public function xoaSuKienZoom($id)
     {
-        $suKien = SuKienZoom::findOrFail($id);
+        $suKien = SuKienZoom::where('MaSuKienZoom', $id)
+            ->where('MaGiangVien', Auth::id())
+            ->firstOrFail();
+
+        if (!$suKien) {
+            return redirect()->back()->with('errorSystem', 'Sự kiện Zoom không tồn tại hoặc bạn không có quyền xóa.');
+        }
+
         try {
             $this->zoom->xoaSuKienZoom($this->layZoomId($suKien->LinkSuKien));
         } catch (\Exception $e) {
@@ -185,7 +199,12 @@ class SuKienZoomController extends Controller
         $suKien = SuKienZoom::findOrFail($id);
 
         $validated = $request->validate([
-            'TenSuKien' => 'required|string|max:100',
+            'TenSuKien' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+            ],
             'MoTa' => 'nullable|string|max:255',
             'ThoiGianBatDau' => [
                 'required',
@@ -197,10 +216,19 @@ class SuKienZoomController extends Controller
                 'date_format:Y-m-d\TH:i',
                 'after:ThoiGianBatDau',
             ],
-            'MatKhauSuKien' => 'required|string|min:6|max:10',
+            'MatKhauSuKien' => [
+                'required',
+                'string',
+                'min:6',
+                'max:10',
+                'regex:/^[\p{L}\p{N}]*$/u' // Chỉ cho phép chữ cái và số
+            ],
         ], [
             'TenSuKien.required' => 'Vui lòng nhập tên sự kiện.',
+            'TenSuKien.string' => 'Tên sự kiện phải là chuỗi.',
             'TenSuKien.max' => 'Tên sự kiện không được vượt quá 100 ký tự.',
+            'TenSuKien.regex' => 'Tên sự kiện chỉ được chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt.',
+            'MoTa.string' => 'Mô tả sự kiện phải là chuỗi.',
             'MoTa.max' => 'Mô tả sự kiện không được vượt quá 255 ký tự.',
             'ThoiGianBatDau.required' => 'Vui lòng chọn thời gian bắt đầu.',
             'ThoiGianBatDau.date_format' => 'Thời gian bắt đầu không đúng định dạng.',
@@ -211,6 +239,7 @@ class SuKienZoomController extends Controller
             'MatKhauSuKien.required' => 'Vui lòng nhập mật khẩu sự kiện.',
             'MatKhauSuKien.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
             'MatKhauSuKien.max' => 'Mật khẩu không được vượt quá 10 ký tự.',
+            'MatKhauSuKien.regex' => 'Mật khẩu chỉ được chứa chữ cái và số.',
         ]);
 
         try {
@@ -284,31 +313,52 @@ class SuKienZoomController extends Controller
                 'ThoiGianTao' => now(),
             ]);
 
+            // Lấy danh sách email và tên người dùng
+            $emailsBCC = [];
+            $emailGiangVien = null;
+
             foreach ($danhSachThongTin as $nd) {
-                $studentName = $nd->HoTen;
-                $email = $nd->Email;
-                $isTeacher = ($nd->MaNguoiDung == $maNguoiTao);
-
-                $body = "Chào {$studentName},<br><br>";
-                $body .= "{$noiDungThongBao}<br><br>";
-                $body .= "📄 Tên sự kiện: {$suKien->TenSuKien}<br>";
-                $body .= "📄 Nội dung sự kiện: {$suKien->MoTa}<br>";
-                $body .= "🔗 Link tham gia: {$suKien->LinkSuKien}<br>";
-                $body .= "⌚ Bắt đầu: {$start}<br>";
-                $body .= "⏳ Kết thúc: {$end}<br>";
-                $body .= "🔑 Mật khẩu: {$suKien->MatKhauSuKien}<br>";
-
-                if ($isTeacher && !empty($suKien->KhoaChuTri)) {
-                    $body .= "🔑 Mã Host Key: {$suKien->KhoaChuTri}<br>";
-                    $body .= "Lưu ý: không chia sẻ mã này với bất kỳ ai.<br>";
+                if ($nd->MaNguoiDung == $maNguoiTao) {
+                    $emailGiangVien = $nd->Email;
+                } else {
+                    $emailsBCC[] = $nd->Email;
                 }
+            }
 
-                $body .= "<br>Trân trọng,<br>Hệ thống quản lý bài giảng trực tuyến.";
+            // Nội dung email không có Host Key (cho sinh viên) 
+            $bodySinhVien = "Chào thầy/cô và các bạn,<br><br>";
+            $bodySinhVien .= "{$noiDungThongBao}<br><br>";
+            $bodySinhVien .= "📄 Tên sự kiện: {$suKien->TenSuKien}<br>";
+            $bodySinhVien .= "📄 Nội dung sự kiện: {$suKien->MoTa}<br>";
+            $bodySinhVien .= "🔗 Link tham gia: {$suKien->LinkSuKien}<br>";
+            $bodySinhVien .= "⌚ Bắt đầu: {$start}<br>";
+            $bodySinhVien .= "⏳ Kết thúc: {$end}<br>";
+            $bodySinhVien .= "🔑 Mật khẩu: {$suKien->MatKhauSuKien}<br>";
+            $bodySinhVien .= "<br>Trân trọng,<br>Hệ thống bài giảng trực tuyến.";
 
+            // Nội dung email có Host Key (cho giảng viên) 
+            $bodyGiangVien = $bodySinhVien;
+
+            if (!empty($suKien->KhoaChuTri)) {
+                $bodyGiangVien .= "<br><br>🔑 Mã Host Key: {$suKien->KhoaChuTri}<br>";
+                $bodyGiangVien .= "Lưu ý: không chia sẻ mã này với bất kỳ ai.<br>";
+            }
+
+            // Gửi email BCC cho sinh viên 
+            if (!empty($emailsBCC)) {
                 try {
-                    $this->email->sendEmail($email, $tieuDeEmail, $body);
+                    $this->email->sendEmailBcc($emailsBCC, $tieuDeEmail, $bodySinhVien);
                 } catch (\Throwable $e) {
-                    Log::error("Không thể gửi email đến {$email}: " . $e->getMessage());
+                    Log::error("Không thể gửi email BCC đến sinh viên: " . $e->getMessage());
+                }
+            }
+
+            //  Gửi email riêng cho giảng viên 
+            if (!empty($emailGiangVien)) {
+                try {
+                    $this->email->sendEmail($emailGiangVien, $tieuDeEmail, $bodyGiangVien);
+                } catch (\Throwable $e) {
+                    Log::error("Không thể gửi email cho giảng viên: " . $e->getMessage());
                 }
             }
         } catch (\Throwable $e) {

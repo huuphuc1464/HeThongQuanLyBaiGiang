@@ -25,7 +25,7 @@ class SinhVienController extends Controller
             ->first();
 
         if (!$lopHocPhan) {
-            abort(404, 'Lớp học phần không tồn tại');
+            abort(404, 'Lớp học phần không tồn tại hoặc bạn không có quyền truy cập');
         }
 
         $query = DB::table('danh_sach_lop as dsl')
@@ -67,12 +67,13 @@ class SinhVienController extends Controller
         $sinhVien = DB::table('danh_sach_lop')
             ->where('MaDanhSachLop', $maDanhSachLop)
             ->where('MaLopHocPhan', $maLopHocPhan)
+            ->where('MaNguoiTao', Auth::id())
             ->first();
 
         if (!$sinhVien) {
-            return redirect()->back()->with('error', 'Không tìm thấy sinh viên trong lớp này.');
+            abort(404, 'Sinh viên không tồn tại hoặc bạn không có quyền truy cập');
         }
-
+        
         DB::table('danh_sach_lop')
             ->where('MaDanhSachLop', $maDanhSachLop)
             ->delete();
@@ -131,10 +132,30 @@ class SinhVienController extends Controller
 
             if ($daTonTai) {
                 if ($daTonTai->TrangThai == 0) {
+                    $maXacNhanMoi = Str::uuid()->toString();
+
+                    DB::table('danh_sach_lop')
+                        ->where('MaLopHocPhan', $maLopHocPhan)
+                        ->where('MaSinhVien', $maNguoiDung)
+                        ->update([
+                            'MaXacNhan' => $maXacNhanMoi,
+                            'updated_at' => now('Asia/Ho_Chi_Minh'),
+                        ]);
+
+                    $this->guiEmailMoiThamGiaLop(
+                        $emailService,
+                        $email,
+                        $nguoiDung,
+                        $maLopHocPhan,
+                        $maXacNhanMoi,
+                        $lopHocPhan->TenLopHocPhan
+                    );
+
                     $emailsDaMoiChuaXacNhan[] = $email;
                 }
                 continue;
             }
+
 
             $maXacNhan = Str::uuid()->toString();
             DB::table('danh_sach_lop')->insert([
