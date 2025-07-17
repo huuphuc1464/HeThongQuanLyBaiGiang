@@ -13,7 +13,6 @@ class GiangVienController extends Controller
 {
     public function danhSachGiangVien(Request $request)
     {
-        //Multi-keyword Search (tách từ khóa để tìm)
         $query = DB::table('nguoi_dung')
             ->where('MaVaiTro', 2); // Giảng viên
 
@@ -75,7 +74,7 @@ class GiangVienController extends Controller
     public function themGiangVien(Request $request, EmailService $emailService)
     {
         $validated = $request->validate([
-            'HoTen' => 'required|string|max:100',
+            'HoTen' => 'required|string|max:100|regex:/^[\p{L} ]+$/u', // Chỉ cho phép chữ cái và khoảng trắng
             'Email' => 'required|email|max:100|unique:nguoi_dung,Email',
             'DiaChi' => 'required|string|max:255',
             'SoDienThoai' => 'required|regex:/^0\d{9}$/|unique:nguoi_dung,SoDienThoai',
@@ -90,6 +89,7 @@ class GiangVienController extends Controller
         ], [
             'HoTen.required' => 'Vui lòng nhập họ và tên.',
             'HoTen.max' => 'Họ tên không được vượt quá 100 ký tự.',
+            'HoTen.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
             'Email.required' => 'Vui lòng nhập email.',
             'Email.max' => 'Email không được vượt quá 100 ký tự.',
             'Email.email' => 'Email không đúng định dạng.',
@@ -171,7 +171,8 @@ class GiangVienController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'HoTen' => 'required|string|max:100',
+            // 'HoTen' => 'required|string|max:100',
+            'HoTen' => 'required|string|max:100|regex:/^[\p{L} ]+$/u', // Chỉ cho phép chữ cái và khoảng trắng
             'DiaChi' => 'required|string|max:255',
             'NgaySinh' => [
                 'required',
@@ -184,6 +185,7 @@ class GiangVienController extends Controller
         ], [
             'HoTen.required' => 'Vui lòng nhập họ và tên.',
             'HoTen.max' => 'Họ tên không được vượt quá 100 ký tự.',
+            'HoTen.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
             'DiaChi.required' => 'Vui lòng nhập địa chỉ thường trú.',
             'DiaChi.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
             'NgaySinh.required' => 'Vui lòng chọn ngày sinh.',

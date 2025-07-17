@@ -40,7 +40,12 @@ class BaiGiangController extends Controller
     public function themBaiGiang(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'TenBaiGiang' => 'required|string|max:255',
+            'TenBaiGiang' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+            ],
             'MaKhoa' => 'required|exists:khoa,MaKhoa',
             'MoTa' => 'nullable|string|max:255',
             'AnhBaiGiang' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -48,6 +53,8 @@ class BaiGiangController extends Controller
         ], [
             'TenBaiGiang.required' => 'Vui lòng nhập tên bài giảng.',
             'TenBaiGiang.max' => 'Tên bài giảng không được vượt quá 255 ký tự.',
+            'TenBaiGiang.string' => 'Tên bài giảng phải là chuỗi.',
+            'TenBaiGiang.regex' => 'Tên bài giảng chỉ được chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt.',
             'MaKhoa.required' => 'Vui lòng chọn khoa.',
             'MaKhoa.exists' => 'Khoa được chọn không hợp lệ.',
             'MoTa.string' => 'Mô tả phải là chuỗi.',
@@ -108,10 +115,22 @@ class BaiGiangController extends Controller
 
     public function capNhatBaiGiang(Request $request, $id)
     {
-        $baiGiang = BaiGiang::findOrFail($id);
+        $maGiangVien = Auth::id();
+        $baiGiang = BaiGiang::where('MaBaiGiang', $id)
+            ->where('MaGiangVien', $maGiangVien)
+            ->firstOrFail();
+
+        if ($baiGiang == null) {
+            return back()->withErrors(['error' => 'Bài giảng không tồn tại hoặc bạn không có quyền sửa.']);
+        }
 
         $validator = Validator::make($request->all(), [
-            'TenBaiGiang' => 'required|string|max:255',
+            'TenBaiGiang' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}\p{N}\p{Zs}\p{P}]*$/u'
+            ],
             'MaKhoa' => 'required|exists:khoa,MaKhoa',
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',
@@ -119,6 +138,8 @@ class BaiGiangController extends Controller
         ], [
             'TenBaiGiang.required' => 'Vui lòng nhập tên bài giảng.',
             'TenBaiGiang.max' => 'Tên bài giảng không được vượt quá 255 ký tự.',
+            'TenBaiGiang.string' => 'Tên bài giảng phải là chuỗi.',
+            'TenBaiGiang.regex' => 'Tên bài giảng chỉ được chứa chữ cái, số, khoảng trắng và các ký tự đặc biệt.',
             'MaKhoa.required' => 'Vui lòng chọn khoa.',
             'MaKhoa.exists' => 'Khoa được chọn không hợp lệ.',
             'MoTa.string' => 'Mô tả phải là chuỗi.',
@@ -176,7 +197,7 @@ class BaiGiangController extends Controller
         DB::table('chuong')
             ->where('MaBaiGiang', $baiGiang->MaBaiGiang)
             ->where('MaGiangVien', Auth::id())
-            ->update(['TrangThai' => $baiGiang->TrangThai, 'updated_at' => now('Asia/Ho_Chi_Minh')]);
+            ->update(['TrangThai' => $baiGiang->TrangThai, 'updated_at' => now()]);
 
         DB::table('bai')
             ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
@@ -196,14 +217,23 @@ class BaiGiangController extends Controller
 
     public function xoaBaiGiang($id)
     {
-        $baiGiang = BaiGiang::findOrFail($id);
+        $maGiangVien = Auth::id();
+        $baiGiang = BaiGiang::where('MaBaiGiang', $id)
+            ->where('MaGiangVien', $maGiangVien)
+            ->firstOrFail();
+        if ($baiGiang == null) {
+            return back()->withErrors(['error' => 'Bài giảng không tồn tại hoặc bạn không có quyền xóa.']);
+        }
+        if ($baiGiang->TrangThai == 0) {
+            return back()->withErrors(['error' => 'Bài giảng đã được xóa trước đó.']);
+        }
         $baiGiang->TrangThai = 0;
         $baiGiang->save();
 
         DB::table('chuong')
             ->where('MaBaiGiang', $baiGiang->MaBaiGiang)
             ->where('MaGiangVien', Auth::id())
-            ->update(['TrangThai' => 0, 'updated_at' => now('Asia/Ho_Chi_Minh')]);
+            ->update(['TrangThai' => 0, 'updated_at' => now()]);
 
         DB::table('bai')
             ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
@@ -222,13 +252,24 @@ class BaiGiangController extends Controller
 
     public function khoiPhucBaiGiang($id)
     {
-        $baiGiang = BaiGiang::findOrFail($id);
+        $maGiangVien = Auth::id();
+        $baiGiang = BaiGiang::where('MaBaiGiang', $id)
+            ->where('MaGiangVien', $maGiangVien)
+            ->firstOrFail();
+
+        if ($baiGiang == null) {
+            return back()->withErrors(['error' => 'Bài giảng không tồn tại hoặc bạn không có quyền khôi phục.']);
+        }
+
+        if ($baiGiang->TrangThai == 1) {
+            return back()->withErrors(['error' => 'Bài giảng đã được khôi phục trước đó.']);
+        }
         $baiGiang->TrangThai = 1;
         $baiGiang->save();
         DB::table('chuong')
             ->where('MaBaiGiang', $baiGiang->MaBaiGiang)
             ->where('MaGiangVien', Auth::id())
-            ->update(['TrangThai' => 1, 'updated_at' => now('Asia/Ho_Chi_Minh')]);
+            ->update(['TrangThai' => 1, 'updated_at' => now()]);
 
         DB::table('bai')
             ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')

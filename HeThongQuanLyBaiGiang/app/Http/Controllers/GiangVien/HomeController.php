@@ -25,6 +25,9 @@ class HomeController extends Controller
             ->where('MaNguoiDung', $userId)
             ->where('TrangThai', 1)
             ->first();
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['errorSystem' => 'Người dùng không tồn tại hoặc đã bị khóa.']);
+        }
         return view('giangvien.thayDoiThongTinCaNhan', compact('user'));
     }
 
@@ -225,7 +228,6 @@ class HomeController extends Controller
             }
             return response()->json($result);
         } catch (\Exception $e) {
-            Log::error('Lỗi lấy dữ liệu biểu đồ:', ['msg' => $e->getMessage()]);
             return response()->json(['error' => 'Lỗi server'], 500);
         }
     }

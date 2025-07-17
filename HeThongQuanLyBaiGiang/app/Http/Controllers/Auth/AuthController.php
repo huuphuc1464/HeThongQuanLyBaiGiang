@@ -298,7 +298,8 @@ class AuthController extends Controller
         }
 
         $request->validate([
-            'HoTen' => 'required|string|max:100',
+            // 'HoTen' => 'required|string|max:100',
+            'HoTen' => 'required|string|max:100|regex:/^[\p{L} ]+$/u', // Chỉ cho phép chữ cái và khoảng trắng
             'DiaChi' => 'required|string|max:255',
             'SoDienThoai' => [
                 'required',
@@ -316,6 +317,7 @@ class AuthController extends Controller
         ], [
             'HoTen.required' => 'Vui lòng nhập họ và tên.',
             'HoTen.max' => 'Họ tên không được vượt quá 100 ký tự.',
+            'HoTen.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng.',
             'DiaChi.required' => 'Vui lòng nhập địa chỉ thường trú.',
             'DiaChi.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
             'SoDienThoai.required' => 'Vui lòng nhập số điện thoại.',

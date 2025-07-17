@@ -24,6 +24,8 @@ class BaiController extends Controller
             ->where('chuong.MaChuong', $maChuong)
             ->where('bai_giang.MaBaiGiang', $maBaiGiang)
             ->where('chuong.MaGiangVien', Auth::id())
+            ->where('bai.MaGiangVien', Auth::id())
+            ->where('bai_giang.MaGiangVien', Auth::id())
             ->select(
                 'bai.TrangThai as TrangThaiBai',
                 'chuong.TrangThai as TrangThaiChuong',
@@ -49,13 +51,15 @@ class BaiController extends Controller
             ->where('MaBai', $maBai)
             ->update([
                 'TrangThai' => $newStatus,
-                'updated_at' => now()
+                'updated_at' => now('Asia/Ho_Chi_Minh')
             ]);
 
         DB::table('file_bai_giang')
             ->join('bai', 'file_bai_giang.MaBai', '=', 'bai.MaBai')
             ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
             ->where('chuong.MaGiangVien', Auth::id())
+            ->where('bai_giang.MaGiangVien', Auth::id())
+            ->where('bai.MaGiangVien', Auth::id())
             ->where('chuong.MaBaiGiang', $maBaiGiang)
             ->where('chuong.MaChuong', $maChuong)
             ->where('bai.MaBai', $maBai)
@@ -75,6 +79,8 @@ class BaiController extends Controller
             ->where('chuong.MaChuong', $maChuong)
             ->where('bai_giang.MaBaiGiang', $maBaiGiang)
             ->where('chuong.MaGiangVien', Auth::id())
+            ->where('bai.MaGiangVien', Auth::id())
+            ->where('bai_giang.MaGiangVien', Auth::id())
             ->select(
                 'bai.*',
                 'chuong.TenChuong',
@@ -102,6 +108,7 @@ class BaiController extends Controller
             ->where('bai_giang.MaBaiGiang', $maBaiGiang)
             ->where('chuong.MaChuong', $maChuong)
             ->where('bai_giang.MaGiangVien', Auth::id())
+            ->where('chuong.MaGiangVien', Auth::id())
             ->select(
                 'bai_giang.MaBaiGiang',
                 'bai_giang.TenBaiGiang',
@@ -142,7 +149,6 @@ class BaiController extends Controller
 
                 if (!in_array($relativePath, $duongDanDB)) {
                     unlink($file->getPathname());
-                    Log::info("Đã xóa file chưa lưu DB: $relativePath");
                 }
             }
         }
@@ -155,7 +161,8 @@ class BaiController extends Controller
     {
         $request->validate([
             'MaChuong' => 'required|exists:chuong,MaChuong',
-            'TenBai' => 'required|string|max:255',
+            // 'TenBai' => 'required|string|max:255',
+            'TenBai' => 'required|string|max:255|regex:/^[\p{L}0-9\s]+$/u', // Chỉ cho phép chữ cái, số và khoảng trắng
             'NoiDung' => 'required|string',
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',
@@ -165,6 +172,7 @@ class BaiController extends Controller
             'TenBai.required' => 'Tên bài không được để trống.',
             'TenBai.string' => 'Tên bài phải là chuỗi.',
             'TenBai.max' => 'Tên bài không được vượt quá 255 ký tự.',
+            'TenBai.regex' => 'Tên bài chỉ được chứa chữ cái, số và khoảng trắng.',
             'NoiDung.required' => 'Nội dung bài không được để trống.',
             'NoiDung.string' => 'Nội dung phải là chuỗi.',
             'MoTa.string' => 'Mô tả phải là chuỗi.',
@@ -285,7 +293,6 @@ class BaiController extends Controller
                 File::deleteDirectory($newFolder);
             }
 
-            Log::error('Lỗi khi lưu bài', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Lỗi khi lưu bài: ' . $e->getMessage());
         }
     }
@@ -299,6 +306,8 @@ class BaiController extends Controller
             ->where('bai_giang.MaBaiGiang', $maBaiGiang)
             ->where('chuong.MaChuong', $maChuong)
             ->where('bai.MaGiangVien', Auth::id())
+            ->where('chuong.MaGiangVien', Auth::id())
+            ->ưhere('bai_giang.MaGiangVien', Auth::id())
             ->select(
                 'bai_giang.MaBaiGiang',
                 'bai_giang.TenBaiGiang',
@@ -316,7 +325,8 @@ class BaiController extends Controller
     {
         $request->validate([
             'MaChuong' => 'required|exists:chuong,MaChuong',
-            'TenBai' => 'required|string|max:255',
+            // 'TenBai' => 'required|string|max:255',
+            'TenBai' => 'required|string|max:255|regex:/^[\p{L}0-9\s]+$/u', // Chỉ cho phép chữ cái, số và khoảng trắng
             'NoiDung' => 'required|string',
             'MoTa' => 'nullable|string|max:255',
             'TrangThai' => 'required|in:0,1',
@@ -326,6 +336,7 @@ class BaiController extends Controller
             'TenBai.required' => 'Tên bài không được để trống.',
             'TenBai.string' => 'Tên bài phải là chuỗi.',
             'TenBai.max' => 'Tên bài không được vượt quá 255 ký tự.',
+            'TenBai.regex' => 'Tên bài chỉ được chứa chữ cái, số và khoảng trắng.',
             'NoiDung.required' => 'Nội dung bài giảng không được để trống.',
             'NoiDung.string' => 'Nội dung phải là chuỗi.',
             'MoTa.string' => 'Mô tả phải là chuỗi.',
@@ -335,6 +346,21 @@ class BaiController extends Controller
         ]);
 
         $maNguoiDung = Auth::id();
+        $quyenTruyCap = DB::table('bai')
+            ->join('chuong', 'bai.MaChuong', '=', 'chuong.MaChuong')
+            ->join('bai_giang', 'bai_giang.MaBaiGiang', '=', 'chuong.MaBaiGiang')
+            ->where('bai.MaBai', $maBai)
+            ->where('chuong.MaChuong', $maChuong)
+            ->where('bai_giang.MaBaiGiang', $maBaiGiang)
+            ->where('bai.MaGiangVien', $maNguoiDung)
+            ->where('chuong.MaGiangVien', $maNguoiDung)
+            ->where('bai_giang.MaGiangVien', $maNguoiDung)
+            ->exists();
+
+        if (!$quyenTruyCap) {
+            return redirect()->back()->with('errorSystem', 'Bạn không có quyền cập nhật bài này.');
+        }
+
         $newPath = "BaiGiang/BaiGiang_{$maBaiGiang}/Bai_{$maBai}";
         $folderPath = public_path($newPath);
 
@@ -375,7 +401,6 @@ class BaiController extends Controller
                 $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
                 $relativePath = urldecode(strtolower($relativePath));
                 if (!in_array($relativePath, $usedImages)) {
-                    Log::info("🗑️ Đã xóa file không được sử dụng: $relativePath", ['file' => $file->getPathname()]);
                     File::delete($file->getPathname());
                     DB::table('file_bai_giang')
                         ->where('MaBai', $maBai)
@@ -412,7 +437,6 @@ class BaiController extends Controller
                 foreach ($filePathsInDb as $dbPath) {
                     if (!in_array($dbPath, $filePathsOnDisk)) {
                         DB::table('file_bai_giang')->where('MaBai', $maBai)->where('DuongDan', $dbPath)->delete();
-                        Log::info("Đã xóa bản ghi file không tồn tại trên ổ đĩa: $dbPath");
                     }
                 }
 
@@ -436,7 +460,6 @@ class BaiController extends Controller
                 ->with('success', 'Cập nhật bài thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Lỗi khi cập nhật bài', ['message' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Lỗi khi cập nhật bài: ' . $e->getMessage());
         }
     }
