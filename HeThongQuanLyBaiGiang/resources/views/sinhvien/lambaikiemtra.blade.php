@@ -3,6 +3,7 @@
 @section('title', 'Làm Bài Kiểm Tra')
 
 @section('style')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <link rel="stylesheet" href="{{ asset('css/student/baikiemtra.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 @endsection
@@ -131,6 +132,28 @@
                 </div>
                 <div class="modal-body">
                     Nộp bài kiểm tra thành công! Bạn sẽ được chuyển hướng về danh sách bài kiểm tra.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận rời trang -->
+    <div class="modal fade" id="leaveConfirmModal" tabindex="-1" aria-labelledby="leaveConfirmModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="leaveConfirmModalLabel"><i
+                            class="bi bi-exclamation-triangle me-2"></i>Xác nhận rời trang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn đang làm bài kiểm tra. Nếu rời trang, bài kiểm tra sẽ được nộp ngay lập tức. Bạn có chắc chắn
+                    muốn tiếp tục?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelLeaveBtn">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Xác nhận</button>
                 </div>
             </div>
         </div>

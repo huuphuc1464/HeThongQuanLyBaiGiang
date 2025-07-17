@@ -149,14 +149,86 @@ document.addEventListener("DOMContentLoaded", function () {
     autoResizeTextareas();
 });
 
-function beforeUnloadHandler(e) {
+// --- CẢNH BÁO VÀ TỰ ĐỘNG NỘP BÀI KHI THOÁT TRANG ---
 
-    if (!isTimeUp && !isSubmitting) {
+// Biến kiểm soát trạng thái đã nộp bài
+let isExamSubmitted = false;
+
+// Modal xác nhận rời trang
+let pendingUnloadEvent = null;
+
+function showLeaveConfirmModal(callback) {
+    var modal = document.getElementById('leaveConfirmModal');
+    if (!modal) {
+        // Tạo modal nếu chưa có
+        var modalHtml = `
+        <div class="modal fade" id="leaveConfirmModal" tabindex="-1" aria-labelledby="leaveConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title" id="leaveConfirmModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>Xác nhận rời trang</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn đang làm bài kiểm tra. Nếu rời trang, bài kiểm tra sẽ được nộp ngay lập tức. Bạn có chắc chắn muốn tiếp tục?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="cancelLeaveBtn">Hủy</button>
+                        <button type="button" class="btn btn-primary" id="confirmLeaveBtn">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    var leaveModal = new bootstrap.Modal(document.getElementById('leaveConfirmModal'));
+    leaveModal.show();
+    document.getElementById('cancelLeaveBtn').onclick = function () {
+        leaveModal.hide();
+        if (callback) callback(false);
+    };
+    document.getElementById('confirmLeaveBtn').onclick = function () {
+        leaveModal.hide();
+        if (callback) callback(true);
+    };
+}
+
+window.addEventListener('beforeunload', function (e) {
+    if (!isExamSubmitted && !isTimeUp && !isSubmitting) {
         e.preventDefault();
         e.returnValue = '';
+        // Chỉ cảnh báo mặc định, không hiện modal
+    }
+});
+
+// Hàm tự động nộp bài kiểm tra khi thoát trang
+function autoSubmitExam() {
+    if (!isExamSubmitted && !isTimeUp && !isSubmitting) {
+        isExamSubmitted = true;
+        isSubmitting = true;
+        const form = document.getElementById('examForm');
+        if (form) {
+            const formData = new FormData(form);
+            // Gửi request nộp bài kiểm tra (AJAX)
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                keepalive: true // Đảm bảo gửi khi tab đóng
+            });
+        }
     }
 }
-window.addEventListener('beforeunload', beforeUnloadHandler);
+
+// Khi đóng tab hoặc reload, tự động nộp bài
+window.addEventListener('unload', autoSubmitExam);
+
+// Nếu sinh viên bấm nút nộp bài, không cần tự động nữa
+document.getElementById('examForm').addEventListener('submit', function () {
+    isExamSubmitted = true;
+});
 
 submitBtn.addEventListener('click', function () {
     const form = document.getElementById('examForm');
@@ -177,13 +249,6 @@ submitBtn.addEventListener('click', function () {
 });
 
 
-
-document.addEventListener('visibilitychange', function () {
-    if (document.hidden && !isTimeUp && !isSubmitting) {
-        console.log('Sinh viên đã chuyển tab!');
-    }
-});
-
 confirmSubmitBtn.addEventListener('click', function () {
     const form = document.getElementById('examForm');
     if (!isTimeUp && form.checkValidity()) {
@@ -191,7 +256,56 @@ confirmSubmitBtn.addEventListener('click', function () {
         const formData = new FormData(form);
         disableAllInputs();
         showLoading();
-        window.removeEventListener('beforeunload', beforeUnloadHandler);
         submitExamAndRedirect(window.csrfToken, formData);
     }
+});
+
+// Chặn click vào link và submit form để xác nhận trước khi rời trang nếu chưa nộp bài
+function confirmAndSubmitExam(event, redirectUrl) {
+    if (!isExamSubmitted && !isTimeUp && !isSubmitting) {
+        event.preventDefault();
+        if (confirm('Bạn đang làm bài kiểm tra. Nếu rời trang, bài kiểm tra sẽ được nộp ngay lập tức. Bạn có chắc chắn muốn tiếp tục?')) {
+            isExamSubmitted = true;
+            isSubmitting = true;
+            const form = document.getElementById('examForm');
+            if (form) {
+                const formData = new FormData(form);
+                disableAllInputs();
+                showLoading();
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    keepalive: true
+                }).then(() => {
+                    window.location.href = redirectUrl;
+                });
+            } else {
+                window.location.href = redirectUrl;
+            }
+        }
+        // Nếu không xác nhận thì không làm gì
+    }
+}
+
+// Chặn click vào tất cả các link trong trang
+window.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            const href = link.getAttribute('href');
+            if (href && href !== '#' && !href.startsWith('javascript:')) {
+                confirmAndSubmitExam(e, href);
+            }
+        });
+    });
+    // Chặn submit form khác ngoài examForm
+    document.querySelectorAll('form').forEach(function (form) {
+        if (form.id !== 'examForm') {
+            form.addEventListener('submit', function (e) {
+                confirmAndSubmitExam(e, window.location.href);
+            });
+        }
+    });
 });
