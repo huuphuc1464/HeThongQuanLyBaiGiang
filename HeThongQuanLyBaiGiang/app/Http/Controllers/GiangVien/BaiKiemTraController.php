@@ -946,6 +946,7 @@ class BaiKiemTraController extends Controller
         return view('giangvien.quanLyBaiKiemTra.thongKeBaiKiemTra', compact(
             'baiKiemTra',
             'tongSinhVienLam',
+            'tongSinhVienLop',
             'tyLeHoanThanh',
             'diemTrungBinh',
             'diemCaoNhat',
@@ -1015,5 +1016,43 @@ class BaiKiemTraController extends Controller
             }
         }
         return response()->json($phanBo);
+    }
+
+    /**
+     * Xuất Excel danh sách sinh viên đã làm bài kiểm tra (thông tin cơ bản)
+     */
+    public function exportDanhSachSinhVienLam($id)
+    {
+        $baiKiemTra = BaiKiemTra::findOrFail($id);
+        $soCauHoi = $baiKiemTra->cauHoiBaiKiemTra()->count();
+        $ketQua = KetQuaBaiKiemTra::where('MaBaiKiemTra', $id)->with(['sinhVien.nguoiDung'])->get();
+        if ($ketQua->isEmpty()) {
+            return redirect()->back()->with('errorSystem', 'Chưa có sinh viên làm bài kiểm tra');
+        }
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('SV đã làm bài');
+        $headers = ['STT', 'MSSV', 'Họ tên', 'Email', 'Thời gian nộp', 'Số câu đúng', 'Tổng số câu', 'Điểm'];
+        $sheet->fromArray($headers, null, 'A1');
+        $row = 2;
+        foreach ($ketQua as $i => $kq) {
+            $sheet->setCellValue("A$row", $i + 1);
+            $sheet->setCellValue("B$row", $kq->sinhVien->MSSV ?? '');
+            $sheet->setCellValue("C$row", $kq->sinhVien->nguoiDung->HoTen ?? '');
+            $sheet->setCellValue("D$row", $kq->sinhVien->nguoiDung->Email ?? '');
+            $sheet->setCellValue("E$row", $kq->NgayNop);
+            $sheet->setCellValue("F$row", $kq->TongCauDung);
+            $sheet->setCellValue("G$row", $kq->TongSoCauHoi);
+            $sheet->setCellValue("H$row", $soCauHoi > 0 ? round($kq->TongCauDung / $soCauHoi * 10, 2) : 0);
+            $row++;
+        }
+        foreach (range('A', 'H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        $filename = 'DanhSachSinhVienLam_' . str_replace(' ', '_', $baiKiemTra->TenBaiKiemTra) . '_' . str_replace(' ', '_', $baiKiemTra->lopHocPhan->TenLopHocPhan ?? '') . '.xlsx';
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel');
+        $writer->save($tempFile);
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 }

@@ -71,7 +71,8 @@ class KetQuaBaiKiemTraController extends Controller
             return redirect()->route('ket-qua-bai-kiem-tra', $maBaiKiemTra)
                 ->with('error', 'Thời gian làm bài đã hết! Bài làm của bạn đã được nộp tự động.');
         }
-        return view('sinhvien.lambaikiemtra', compact('baiKiemTra', 'thoiGianConLai'));
+        $maLopHocPhan = $baiKiemTra->MaLopHocPhan;
+        return view('sinhvien.lamBaiKiemTra', compact('baiKiemTra', 'thoiGianConLai', 'maLopHocPhan'));
     }
 
     /**

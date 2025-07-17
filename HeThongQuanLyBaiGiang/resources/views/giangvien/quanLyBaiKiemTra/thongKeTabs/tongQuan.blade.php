@@ -3,7 +3,7 @@
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">Tổng số sinh viên đã làm</h5>
-                <p class="display-6">{{ $tongSinhVienLam }}</p>
+                <p class="display-6">{{ $tongSinhVienLam }} / {{ $tongSinhVienLop }}</p>
             </div>
         </div>
     </div>

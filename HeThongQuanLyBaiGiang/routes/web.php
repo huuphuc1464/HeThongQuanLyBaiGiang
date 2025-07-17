@@ -190,3 +190,4 @@ Route::get('giangvien/bai-kiem-tra/{id}/thong-ke', [BaiKiemTraController::class,
 Route::get('api/bai-kiem-tra/{id}/thong-ke/tong-quan', [BaiKiemTraController::class, 'apiThongKeTongQuan']);
 Route::get('api/bai-kiem-tra/{id}/thong-ke/cau-hoi', [BaiKiemTraController::class, 'apiThongKeCauHoi']);
 Route::get('api/bai-kiem-tra/{id}/thong-ke/phan-bo-diem', [BaiKiemTraController::class, 'apiThongKePhanBoDiem']);
+Route::get('giang-vien/bai-kiem-tra/{id}/export-sv-lam', [BaiKiemTraController::class, 'exportDanhSachSinhVienLam'])->name('giangvien.bai-kiem-tra.export-sv-lam');

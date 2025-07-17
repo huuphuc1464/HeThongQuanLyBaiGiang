@@ -3,16 +3,12 @@
         <span>Thống kê thời gian nộp bài</span>
         <div class="d-flex align-items-center">
             <label class="me-2 mb-0">Khoảng thời gian:</label>
-            <select id="binSizeSelect" class="form-select form-select-sm w-auto me-3">
-                <option value="15">15 phút</option>
-                <option value="30" selected>30 phút</option>
-                <option value="45">45 phút</option>
-                <option value="60">60 phút</option>
-            </select>
+            <input id="binSizeInput" type="number" class="form-control form-control-sm w-auto me-3" min="1" value="5"
+                step="1" style="width:100px;display:inline-block;" />
             <label class="me-2 mb-0">Loại biểu đồ:</label>
             <select id="chartTypeSelect" class="form-select form-select-sm w-auto me-3">
                 <option value="bar" selected>Histogram</option>
-                <option value="line">Line tích lũy</option>
+                <option value="scatter">Bubble (Điểm & Thời gian nộp)</option>
             </select>
             <button id="btnShowChartTime" class="btn btn-light btn-sm" type="button">
                 <i class="fas fa-chart-bar"></i> Hiện biểu đồ
@@ -90,14 +86,15 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    window.danhSachSinhVienLam = {!! json_encode($danhSachSinhVienLam)!!};
     document.addEventListener('DOMContentLoaded', function () {
         // Histogram & Line chart
         const btnShowChartTime = document.getElementById('btnShowChartTime');
         const chartTimeContainer = document.getElementById('chartTimeContainer');
-        const binSizeSelect = document.getElementById('binSizeSelect');
+        const binSizeSelect = document.getElementById('binSizeInput');
         const chartTypeSelect = document.getElementById('chartTypeSelect');
         let chartTimeInstance = null;
-        let lastBinSize = parseInt(binSizeSelect.value);
+        let lastBinSize = parseInt(document.getElementById('binSizeInput').value);
         let lastChartType = chartTypeSelect.value;
         function drawChart(binSizeMinute, chartType) {
             // Lấy dữ liệu từ bảng hiện tại
@@ -158,38 +155,72 @@
                         }
                     }
                 });
-            } else {
-                // Line chart tích lũy
-                const sorted = timestamps.slice().sort((a, b) => a - b);
-                const labels = sorted.map(ts => {
-                    const d = new Date(ts);
-                    return d.getDate().toString().padStart(2, '0') + '/' +
-                        (d.getMonth() + 1).toString().padStart(2, '0') + ' ' +
-                        d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+            } else if (chartType === 'scatter') {
+                // Bubble: điểm số theo thời gian nộp, kích thước theo số lượng SV
+                // Nhóm các lần nộp theo thời gian và điểm số
+                const group = {};
+                window.danhSachSinhVienLam.forEach(sv => {
+                    if (!sv.NgayNop || sv.NgayNop === '-' || sv.Diem === null || sv.Diem === undefined) return;
+                    const ts = new Date(sv.NgayNop.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$2/$1/$3')).getTime();
+                    const key = ts + '_' + sv.Diem;
+                    if (!group[key]) group[key] = { x: ts, y: sv.Diem, r: 0, MSSVs: [] };
+                    group[key].r += 5; // mỗi SV tăng bán kính 5px
+                    group[key].MSSVs.push(sv.MSSV);
                 });
-                const data = sorted.map((_, idx) => idx + 1);
+                const bubbleData = Object.values(group);
+                if (bubbleData.length === 0) return;
+                const minX = Math.min(...bubbleData.map(d => d.x));
+                const maxX = Math.max(...bubbleData.map(d => d.x));
                 chartTimeInstance = new Chart(ctx, {
-                    type: 'line',
+                    type: 'bubble',
                     data: {
-                        labels: labels,
                         datasets: [{
-                            label: 'Số SV đã nộp (tích lũy)',
-                            data: data,
-                            borderColor: 'rgba(40, 167, 69, 0.9)',
-                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                            fill: true,
-                            tension: 0.2
+                            label: 'Điểm số theo thời gian nộp',
+                            data: bubbleData,
+                            backgroundColor: 'rgba(0,123,255,0.7)'
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
                             legend: { display: false },
-                            title: { display: true, text: 'Biểu đồ line tích lũy số SV nộp bài' }
+                            title: { display: true, text: 'Biểu đồ bubble: Điểm số & Thời gian nộp bài' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const d = context.raw;
+                                        const date = new Date(d.x);
+                                        const dateStr = date.getDate().toString().padStart(2, '0') + '/' +
+                                            (date.getMonth() + 1).toString().padStart(2, '0') + ' ' +
+                                            date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                                        return `Điểm: ${d.y} | Nộp: ${dateStr} | Số SV: ${d.MSSVs.length}`;
+                                    }
+                                }
+                            }
                         },
                         scales: {
-                            x: { title: { display: true, text: 'Thời gian nộp' } },
-                            y: { title: { display: true, text: 'Số SV đã nộp' }, beginAtZero: true, precision: 0 }
+                            x: {
+                                type: 'linear',
+                                title: { display: true, text: 'Thời gian nộp' },
+                                min: minX,
+                                max: maxX,
+                                ticks: {
+                                    callback: function (value) {
+                                        const date = new Date(value);
+                                        return date.getDate().toString().padStart(2, '0') + '/' +
+                                            (date.getMonth() + 1).toString().padStart(2, '0') + ' ' +
+                                            date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                                    },
+                                    autoSkip: true,
+                                    maxTicksLimit: 10
+                                }
+                            },
+                            y: {
+                                title: { display: true, text: 'Điểm số' },
+                                beginAtZero: true,
+                                min: 0,
+                                max: 10
+                            }
                         }
                     }
                 });
@@ -205,15 +236,19 @@
                 chartTimeContainer.style.display = 'none';
             }
         });
-        binSizeSelect.addEventListener('change', function () {
+        document.getElementById('binSizeInput').addEventListener('input', function () {
             if (chartTimeContainer.style.display !== 'none' && chartTypeSelect.value === 'bar') {
-                drawChart(parseInt(binSizeSelect.value), 'bar');
-                lastBinSize = parseInt(binSizeSelect.value);
+                let val = parseInt(this.value);
+                if (isNaN(val) || val < 1) val = 1;
+                drawChart(val, 'bar');
+                lastBinSize = val;
             }
         });
         chartTypeSelect.addEventListener('change', function () {
             if (chartTimeContainer.style.display !== 'none') {
-                drawChart(parseInt(binSizeSelect.value), chartTypeSelect.value);
+                let binVal = parseInt(document.getElementById('binSizeInput').value);
+                if (isNaN(binVal) || binVal < 1) binVal = 1;
+                drawChart(binVal, chartTypeSelect.value);
                 lastChartType = chartTypeSelect.value;
             }
         });
@@ -237,7 +272,9 @@
             });
             // Vẽ lại biểu đồ nếu đang mở
             if (chartTimeContainer.style.display !== 'none') {
-                drawChart(parseInt(binSizeSelect.value), chartTypeSelect.value);
+                let binVal = parseInt(document.getElementById('binSizeInput').value);
+                if (isNaN(binVal) || binVal < 1) binVal = 1;
+                drawChart(binVal, chartTypeSelect.value);
             }
         });
     });
