@@ -52,7 +52,6 @@ class DashboardController extends Controller
             'tongBaiGiang' => BaiGiang::where('TrangThai', 1)->count(),
             'tongBaiKiemTra' => BaiKiemTra::where('TrangThai', 1)->count(),
             'tongThongBao' => ThongBao::where('TrangThai', 1)->count(),
-            'thongKeTheoThang' => $this->getThongKeTheoThang(),
         ];
 
         return view('admin.dashboard', compact('thongKeTongQuan', 'thongKeDaoTao', 'thongKeSinhVien', 'thongKeHeThong'));
@@ -118,16 +117,8 @@ class DashboardController extends Controller
             ->get();
     }
 
-    private function getThongKeTheoThang()
-    {
-        $currentYear = date('Y');
 
-        return [
-            'baiGiangTheoThang' => $this->getThongKeTheoThangByModel(BaiGiang::class, $currentYear),
-            'baiKiemTraTheoThang' => $this->getThongKeTheoThangByModel(BaiKiemTra::class, $currentYear),
-        ];
-    }
-
+    // Trả về mảng gồm 12 phần tử, mỗi phần tử là số lượng bản ghi của từng  tháng
     private function getThongKeTheoThangByModel($model, $year, $dateColumn = 'created_at')
     {
         $data = [];
